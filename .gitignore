@@ -1,0 +1,27 @@
+# Python
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Entorno
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archivos subidos
+backend/uploads/
+
+# Logs
+*.log
