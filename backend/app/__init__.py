@@ -31,10 +31,16 @@ def create_app(config_name='development'):
     from app.routes.auth_routes import auth_bp
     from app.routes.equipo_routes import equipo_bp
     from app.routes.jugador_routes import jugador_bp
+    from app.routes.campeonato_routes import campeonato_bp
+    from app.routes.partido_routes import partidos_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(equipo_bp, url_prefix='/api/equipos')
     app.register_blueprint(jugador_bp, url_prefix='/api/jugadores')
+    app.register_blueprint(campeonato_bp, url_prefix='/api/campeonato')
+    app.register_blueprint(partidos_bp, url_prefix='/api/partido')
+    
+
     
     # Ruta de salud
     @app.route('/health')
