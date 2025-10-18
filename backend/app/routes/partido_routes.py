@@ -5,7 +5,7 @@ from app.extensions import db
 from app.models.partido import Partido
 from app.models.campeonato import Campeonato
 from app.models.equipo import Equipo
-from datetiem import datetime
+from datetime import datetime
 
 
 partidos_bp = Blueprint('partidos', __name__)
@@ -103,7 +103,7 @@ def obtener_patidos():
         return jsonify({'error': str(e)}), 500
 
 
-@partido_bp.route('/<int:id_partido>', methods=['GET'])
+@partidos_bp.route('/<int:id_partido>', methods=['GET'])
 def obtener_partido_por_id(id_partido):
     try:
         partido = Partido.query.get(id_partido)
@@ -118,7 +118,7 @@ def obtener_partido_por_id(id_partido):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@partido_bp.route('/<int:id_partido>', methods=['PUT'])
+@partidos_bp.route('/<int:id_partido>', methods=['PUT'])
 @jwt_required()
 @role_required(['admin'])
 def actualizar_partido(id_partido):
@@ -155,7 +155,7 @@ def actualizar_partido(id_partido):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@partido_bp.route('/<int:id_partido>/estado', methods=['PATCH'])
+@partidos_bp.route('/<int:id_partido>/estado', methods=['PATCH'])
 @jwt_required()
 @role_required(['admin'])
 def cambiar_estado_partido(id_partido):
@@ -188,7 +188,7 @@ def cambiar_estado_partido(id_partido):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@partido_bp.route('/<int:id_partido>', methods=['DELETE'])
+@partidos_bp.route('/<int:id_partido>', methods=['DELETE'])
 @jwt_required()
 @role_required(['admin'])
 def eliminar_partido(id_partido):
@@ -214,7 +214,7 @@ def eliminar_partido(id_partido):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@partido_bp.route('/<int:id_partido>/resultado', methods=['PATCH'])
+@partidos_bp.route('/<int:id_partido>/resultado', methods=['PATCH'])
 @jwt_required()
 @role_required(['admin'])
 def registrar_resultado(id_partido):

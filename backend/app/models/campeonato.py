@@ -14,7 +14,7 @@ class Campeonato(db.Model):
         default = EstadoCampeonato.PLANIFICACION,
         index=True
     )
-    creado_por = db.Column(db.Integer, db.ForeignKey('usuarios.id_usario'), nullable= False, index=True)
+    creado_por = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable= False, index=True)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     creador = db.relationship('Usuario', backref='campeonatos', lazy='joined')
     partidos = db.relationship('Partido', backref='campeonato', lazy='dynamic', cascade='all, delete-orphan')

@@ -1,4 +1,4 @@
-from enums import Enum
+from enum import Enum
 class EstadoPartido(Enum):
    PROGRAMADO = 'programado'
    EN_JUEGO = 'en_juego'
