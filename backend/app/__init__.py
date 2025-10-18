@@ -34,6 +34,10 @@ def create_app(config_name='development'):
     from app.routes.campeonato_routes import campeonato_bp
     from app.routes.partido_routes import partidos_bp
     from app.routes.gol_routes import gol_bp
+    from app.routes.tarjeta_routes import tarjeta_bp
+    from app.routes.alineacion_routes import alineacion_bp
+    from app.routes.solicitud_equipo_routes import solicitud_bp
+    from app.routes.notificacion_routes import notificacion_bp
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(equipo_bp, url_prefix='/api/equipos')
@@ -41,8 +45,10 @@ def create_app(config_name='development'):
     app.register_blueprint(campeonato_bp, url_prefix='/api/campeonato')
     app.register_blueprint(partidos_bp, url_prefix='/api/partido')
     app.register_blueprint(gol_bp, url_prefix='/api/gol')
-    
-
+    app.register_blueprint(tarjeta_bp, url_prefix='/api/tarjetas')
+    app.register_blueprint(alineacion_bp, url_prefix='/api/alineaciones')
+    app.register_blueprint(solicitud_bp, url_prefix='/api/solicitudes')
+    app.register_blueprint(notificacion_bp, url_prefix='/api/notificaciones')
     
     # Ruta de salud
     @app.route('/health')
