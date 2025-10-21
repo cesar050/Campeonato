@@ -38,7 +38,7 @@ def register():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@auth_bp.route('/login', methods=['POST'])
+"""@auth_bp.route('/login', methods=['POST'])
 def login():
     try:
         data = request.get_json()
@@ -64,13 +64,46 @@ def login():
             'usuario': usuario.to_dict()
         }), 200
     except Exception as e:
+        return jsonify({'error': str(e)}), 500"""
+
+##CPRRECCION DEL LOGIN PARA SOLUCIONAR EL ERROR 422
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        
+        if not data.get('email') or not data.get('contrasena'):
+            return jsonify({'error': 'Email y contraseña requeridos'}), 400
+        
+        usuario = Usuario.query.filter_by(email=data['email']).first()
+        
+        if not usuario or not usuario.check_password(data['contrasena']):
+            return jsonify({'error': 'Credenciales inválidas'}), 401
+
+        access_token = create_access_token(
+            identity=str(usuario.id_usuario),
+            additional_claims={
+                'rol': usuario.rol,
+                'email': usuario.email,
+                'nombre': usuario.nombre
+            }
+        )
+
+        return jsonify({
+            'mensaje': 'Login exitoso',
+            'access_token': access_token,
+            'usuario': usuario.to_dict()
+        }), 200
+
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def get_current_user():
-    current_user = get_jwt_identity()
-    usuario = Usuario.query.get(current_user['id_usuario'])
+    current_user_id = get_jwt_identity()  # ahora devuelve un string
+    usuario = Usuario.query.get(int(current_user_id))
     if not usuario:
         return jsonify({'error': 'Usuario no encontrado'}), 404
     return jsonify({'usuario': usuario.to_dict()}), 200

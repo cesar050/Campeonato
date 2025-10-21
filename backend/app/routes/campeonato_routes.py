@@ -9,7 +9,7 @@ from datetime import datetime
 # Crear el blueprint
 campeonato_bp = Blueprint('campeonatos', __name__)
 
-@campeonato_bp.route('', methods=['POST'])
+"""@campeonato_bp.route('', methods=['POST'])
 @jwt_required()
 @role_required(['admin'])
 def crear_campeonato(): 
@@ -43,7 +43,48 @@ def crear_campeonato():
         return jsonify({'error': 'Formato de fecha invalido. Usa YYYY-MM-DD'}),400
     except Exception as e:
         db.session.rollback()
+        return jsonify({'error': str(e)}), 500"""
+## CORRECION DEL CREAR CAMPEONATO
+@campeonato_bp.route('', methods=['POST'])
+@jwt_required()
+@role_required(['admin'])
+def crear_campeonato(): 
+    try: 
+        data = request.get_json()
+        if not data.get('nombre'):
+            return jsonify({'error':'El nombre es obligatorio'}),400
+        if not data.get('fecha_inicio'):
+            return jsonify({'error':'la fecha de inicio es obligatoria'}), 400
+
+        campeonato_existente = Campeonato.query.filter_by(nombre=data['nombre']).first()
+        if campeonato_existente:
+            return jsonify({'error': 'Ya existe un campeonato con este nombre'}), 400
+
+        # ✅ Corrección aquí
+        current_user_id = get_jwt_identity()
+
+        nuevo_campeonato = Campeonato(
+            nombre=data['nombre'],
+            descripcion=data.get('descripcion'),
+            fecha_inicio=datetime.fromisoformat(data['fecha_inicio']).date(),
+            fecha_fin=datetime.fromisoformat(data['fecha_fin']).date() if data.get('fecha_fin') else None,
+            creado_por=int(current_user_id),
+            estado='planificacion'
+        )
+
+        db.session.add(nuevo_campeonato)
+        db.session.commit()
+        return jsonify({
+            'mensaje': 'Campeonato creado exitosamente',
+            'campeonato': nuevo_campeonato.to_dict()
+        }), 201
+
+    except ValueError:
+        return jsonify({'error': 'Formato de fecha invalido. Usa YYYY-MM-DD'}), 400
+    except Exception as e:
+        db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
     
 @campeonato_bp.route('', methods=['GET'])
 def obtener_campeonatos():

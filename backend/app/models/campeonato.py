@@ -10,10 +10,11 @@ class Campeonato(db.Model):
     fecha_inicio = db.Column(db.Date, nullable= False)
     fecha_fin = db.Column(db.Date, nullable= False)
     estado = db.Column(
-        db.Enum(EstadoCampeonato),
-        default = EstadoCampeonato.PLANIFICACION,
-        index=True
-    )
+    db.String(50),
+    default='planificacion',
+    nullable=False,
+    index=True
+)
     creado_por = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable= False, index=True)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     creador = db.relationship('Usuario', backref='campeonatos', lazy='joined')

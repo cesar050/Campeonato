@@ -16,7 +16,8 @@ partidos_bp = Blueprint('partidos', __name__)
 def crear_partido():
     try: 
         data = request.get_json()
-        if not data.get('id_campeonto'):
+        
+        if not data.get('id_campeonato'):
             return jsonify({'error': 'El campeonato es obligatorio'}), 400
         if not data.get('id_equipo_local'):
             return jsonify({'error': 'El equipo local es obligatorio'}), 400
@@ -60,19 +61,20 @@ def crear_partido():
 
         return jsonify({
             'mensaje': 'Partido creado exitosamente',
-            'partido' :nuevo_partido.to_dict()
+            'partido': nuevo_partido.to_dict()
         }), 201
+        
     except ValueError:
         return jsonify({
-            'error': 'Formato de fecha invalida. Por favor use YYYY-MM-DD'
-        }),400
+            'error': 'Formato de fecha invalido. Use formato ISO: YYYY-MM-DDTHH:MM:SS'
+        }), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
 
 @partidos_bp.route('', methods=['GET'])
-def obtener_patidos():
+def obtener_partidos(): 
     try:
         id_campeonato = request.args.get('id_campeonato')
         estado = request.args.get('estado')
@@ -91,14 +93,16 @@ def obtener_patidos():
         if id_equipo:
             equipo_id = int(id_equipo)
             query = query.filter(
-                (Partido-id_equipo_local == equipo_id) |
+                (Partido.id_equipo_local == equipo_id) |
                 (Partido.id_equipo_visitante == equipo_id)
             )
+        
         partidos = query.order_by(Partido.fecha_partido.desc()).all()
 
-        return  jsonify({
-            'partidos':[p.to_dict() for p in partidos]
-        })
+        return jsonify({
+            'partidos': [p.to_dict() for p in partidos]
+        }), 200
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -117,6 +121,7 @@ def obtener_partido_por_id(id_partido):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @partidos_bp.route('/<int:id_partido>', methods=['PUT'])
 @jwt_required()
@@ -150,10 +155,11 @@ def actualizar_partido(id_partido):
         }), 200
         
     except ValueError:
-        return jsonify({'error': 'Formato de fecha inválido. Usa YYYY-MM-DDTHH:MM:SS'}), 400
+        return jsonify({'error': 'Formato de fecha inválido. Use formato ISO: YYYY-MM-DDTHH:MM:SS'}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
 @partidos_bp.route('/<int:id_partido>/estado', methods=['PATCH'])
 @jwt_required()
@@ -188,6 +194,7 @@ def cambiar_estado_partido(id_partido):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
 @partidos_bp.route('/<int:id_partido>', methods=['DELETE'])
 @jwt_required()
 @role_required(['admin'])
@@ -213,6 +220,7 @@ def eliminar_partido(id_partido):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
 @partidos_bp.route('/<int:id_partido>/resultado', methods=['PATCH'])
 @jwt_required()
