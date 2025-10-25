@@ -9,6 +9,14 @@ from app.models.alineacion import Alineacion
 from app.models.solicitud_equipo import SolicitudEquipo
 from app.models.notificacion import Notificacion
 
+#Seguridad
+from app.models.token_blacklist import TokenBlacklist
+from app.models.refresh_token import RefreshToken
+from app.models.login_attempt import LoginAttempt
+from app.models.account_lockout import AccountLockout
+from app.models.security_log import SecurityLog
+
+
 
 __all__ = ['Usuario', 'Equipo', 'Jugador', 'Campeonato','Partido','Gol','Tarjeta','Alineacion','SolicitudEquipo','Notificacion']
 
