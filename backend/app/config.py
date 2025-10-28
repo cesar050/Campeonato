@@ -1,40 +1,44 @@
 import os
 from datetime import timedelta
-from dotenv import load_dotenv
-
-load_dotenv()
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'default_secret_key')
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'Jwt_secret_key')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
-
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = os.getenv('DB_PORT', '3306')
-    DB_USER = os.getenv('DB_USER', 'root')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', 'cesar05')
-    DB_NAME = os.getenv('DB_NAME', 'gestion_campeonato')
-
-    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4'
+    # Base de datos
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        'DATABASE_URL',
+        'mysql+pymysql://root:cesar05@localhost/gestion_campeonato'
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = True
-
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'uploads')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png'}
+    
+    # JWT Configuration
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'dev-secret-key-CAMBIAR-EN-PRODUCCION')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    
+    # Uploads
+    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max
+    
+    # CORS
+    CORS_HEADERS = 'Content-Type'
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    TESTING = False
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_ECHO = False
+    TESTING = False
+    # En producción, JWT_SECRET_KEY DEBE venir de variable de entorno
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 config_by_name = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
-    'default': DevelopmentConfig
+    'testing': TestingConfig
 }
-
-
-   

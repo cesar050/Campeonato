@@ -1,5 +1,16 @@
 from app import create_app
-import os 
+import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+load_dotenv()
+
+# Crear app
 app = create_app(os.getenv('FLASK_ENV', 'development'))
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port= 5000, debug=True)
+    app.run(
+        host='0.0.0.0',
+        port=5000,
+        debug=True
+    )
