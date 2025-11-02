@@ -6,6 +6,8 @@ from app.models.login_attempt import LoginAttempt
 from app.models.account_lockout import AccountLockout
 from app.models.security_log import SecurityLog
 from app.utils.validators import validar_email
+from app.utils.sanitizer import sanitize_input, InputSanitizer
+from app.middlewares.rate_limit_middleware import rate_limit
 from app.security.token_manager import TokenManager
 from app.security.email_service import EmailService
 from datetime import datetime
@@ -14,15 +16,27 @@ import secrets
 auth_bp = Blueprint('auth', __name__)
 
 
+# ============================================
+# 📝 REGISTRO
+# ============================================
+
 @auth_bp.route('/register', methods=['POST'])
+@rate_limit(max_requests=10, window_minutes=60)  # 🔒 Max 10 registros por hora
+@sanitize_input({'nombre': 100, 'email': 'email'})
 def register():
     """
     Registro de nuevos usuarios (SOLO GMAIL)
     
+    Seguridad:
+    - Rate limiting: 10 registros por hora por IP
+    - Sanitización de inputs (XSS prevention)
+    - Solo permite emails de Gmail
+    - Verificación de email obligatoria
+    
     Body:
         {
             "nombre": "Juan Pérez",
-            "email": "juan@gmail.com",  # Solo Gmail permitido
+            "email": "juan@gmail.com",
             "contrasena": "MiPassword123",
             "rol": "lider"  // opcional, default: lider
         }
@@ -30,6 +44,7 @@ def register():
     Returns:
         201: Usuario creado (debe verificar email)
         400: Error de validación
+        429: Demasiadas peticiones (rate limit)
     """
     try:
         data = request.get_json()
@@ -41,7 +56,6 @@ def register():
         if not validar_email(data['email']):
             return jsonify({'error': 'Email no válido'}), 400
         
-        # ⚠️ VALIDAR QUE SEA GMAIL
         email = data['email'].lower()
         if not email.endswith('@gmail.com'):
             return jsonify({
@@ -58,10 +72,10 @@ def register():
         
         # Crear nuevo usuario (INACTIVO hasta verificar)
         nuevo_usuario = Usuario(
-            nombre=data['nombre'],
+            nombre=InputSanitizer.sanitize_string(data['nombre'], max_length=100),
             email=email,
             rol=data.get('rol', 'lider'),
-            activo=False,  # ← Inactivo hasta verificar email
+            activo=False,
             email_verified=False,
             email_verification_token=verification_token
         )
@@ -72,7 +86,6 @@ def register():
         
         # 📧 Enviar email de VERIFICACIÓN
         try:
-            # Construir link de verificación
             verification_link = f"http://localhost:5000/api/auth/verify-email?token={verification_token}"
             
             email_sent = EmailService.send_verification_email(
@@ -80,10 +93,6 @@ def register():
                 nombre=nuevo_usuario.nombre,
                 verification_link=verification_link
             )
-            
-            if not email_sent:
-                print("⚠️ No se pudo enviar email de verificación")
-                
         except Exception as e:
             print(f"⚠️ Error al enviar email de verificación: {str(e)}")
         
@@ -109,6 +118,10 @@ def register():
         return jsonify({'error': str(e)}), 500
 
 
+# ============================================
+# ✅ VERIFICAR EMAIL
+# ============================================
+
 @auth_bp.route('/verify-email', methods=['GET'])
 def verify_email():
     """
@@ -120,7 +133,6 @@ def verify_email():
     Returns:
         200: Email verificado, cuenta activada
         400: Token inválido o expirado
-        404: Usuario no encontrado
     """
     try:
         token = request.args.get('token')
@@ -128,10 +140,7 @@ def verify_email():
         if not token:
             return jsonify({'error': 'Token de verificación requerido'}), 400
         
-        # Buscar usuario con ese token
-        usuario = Usuario.query.filter_by(
-            email_verification_token=token
-        ).first()
+        usuario = Usuario.query.filter_by(email_verification_token=token).first()
         
         if not usuario:
             return jsonify({
@@ -139,7 +148,6 @@ def verify_email():
                 'mensaje': 'El enlace de verificación no es válido o ya fue usado'
             }), 400
         
-        # Verificar si ya estaba verificado
         if usuario.email_verified:
             return jsonify({
                 'mensaje': 'Tu email ya está verificado',
@@ -149,10 +157,9 @@ def verify_email():
         # ✅ ACTIVAR CUENTA
         usuario.email_verified = True
         usuario.activo = True
-        usuario.email_verification_token = None  # Invalidar token
+        usuario.email_verification_token = None
         db.session.commit()
         
-        # Log del evento
         SecurityLog.log_event(
             event_type='login_success',
             user_id=usuario.id_usuario,
@@ -173,10 +180,19 @@ def verify_email():
         return jsonify({'error': str(e)}), 500
 
 
+# ============================================
+# 📧 REENVIAR VERIFICACIÓN
+# ============================================
+
 @auth_bp.route('/resend-verification', methods=['POST'])
+@rate_limit(max_requests=5, window_minutes=60)
+@sanitize_input({'email': 'email'})
 def resend_verification():
     """
     Reenvía el email de verificación
+    
+    Seguridad:
+    - Rate limiting: 5 reenvíos por hora
     
     Body:
         {
@@ -195,14 +211,11 @@ def resend_verification():
             return jsonify({'error': 'Email requerido'}), 400
         
         email = data['email'].lower()
-        
-        # Buscar usuario
         usuario = Usuario.query.filter_by(email=email).first()
         
         if not usuario:
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
-        # Verificar si ya está verificado
         if usuario.email_verified:
             return jsonify({
                 'mensaje': 'Tu email ya está verificado',
@@ -236,13 +249,20 @@ def resend_verification():
         return jsonify({'error': str(e)}), 500
 
 
+# ============================================
+# 🔐 LOGIN
+# ============================================
+
 @auth_bp.route('/login', methods=['POST'])
+@rate_limit(max_requests=10, window_minutes=15)  # 🔒 Max 10 intentos de login por 15 min
+@sanitize_input({'email': 'email'})
 def login():
     """
     Login con protección contra fuerza bruta
     
     Seguridad:
-    - Máximo 5 intentos fallidos
+    - Rate limiting: 10 intentos por 15 minutos
+    - Máximo 5 intentos fallidos por cuenta
     - Bloqueo de 10 minutos tras 5 intentos
     - Código de desbloqueo enviado por email
     - Logs de todos los intentos
@@ -258,6 +278,7 @@ def login():
         200: Login exitoso + tokens
         401: Credenciales inválidas
         403: Cuenta bloqueada o email no verificado
+        429: Demasiadas peticiones (rate limit)
     """
     try:
         data = request.get_json()
@@ -274,7 +295,6 @@ def login():
         usuario = Usuario.query.filter_by(email=email).first()
         
         if not usuario:
-            # Registrar intento fallido (email no existe)
             LoginAttempt.record_attempt(
                 email=email,
                 ip_address=ip_address,
@@ -344,7 +364,6 @@ def login():
         active_lockout = AccountLockout.get_active_lockout(usuario.id_usuario)
         
         if active_lockout and active_lockout.is_locked():
-            # Calcular tiempo restante de bloqueo
             time_remaining = (active_lockout.locked_until - datetime.utcnow()).total_seconds()
             minutes_remaining = int(time_remaining / 60)
             
@@ -366,9 +385,6 @@ def login():
         
         # 5️⃣ VERIFICAR CONTRASEÑA
         if not usuario.check_password(data['contrasena']):
-            # Contraseña incorrecta
-            
-            # Registrar intento fallido
             LoginAttempt.record_attempt(
                 email=email,
                 ip_address=ip_address,
@@ -386,23 +402,19 @@ def login():
                 details={'reason': 'contrasena_incorrecta'}
             )
             
-            # Contar intentos fallidos recientes (últimos 10 minutos)
+            # Contar intentos fallidos recientes
             failed_attempts = LoginAttempt.count_recent_failures(email, minutes=10)
-            
-            # Incrementar contador en el modelo Usuario
             usuario.failed_login_attempts = failed_attempts
             db.session.commit()
             
             # 6️⃣ SI ALCANZÓ 5 INTENTOS → BLOQUEAR CUENTA
             if failed_attempts >= 5:
-                # Crear bloqueo de 10 minutos
                 lockout = AccountLockout.create_lockout(
                     user_id=usuario.id_usuario,
                     minutes=10,
                     reason='intentos_fallidos'
                 )
                 
-                # Actualizar campo locked_until en usuario
                 usuario.locked_until = lockout.locked_until
                 db.session.commit()
                 
@@ -415,7 +427,6 @@ def login():
                     attempts=failed_attempts
                 )
                 
-                # Log del bloqueo
                 SecurityLog.log_event(
                     event_type='account_locked',
                     user_id=usuario.id_usuario,
@@ -438,7 +449,6 @@ def login():
                     'email_notification': 'Se ha enviado un código de desbloqueo a tu email' if email_sent else 'No se pudo enviar el email, espera 10 minutos'
                 }), 403
             
-            # Informar intentos restantes
             attempts_remaining = 5 - failed_attempts
             
             return jsonify({
@@ -455,7 +465,6 @@ def login():
         usuario.last_login_ip = ip_address
         db.session.commit()
         
-        # Registrar intento exitoso
         LoginAttempt.record_attempt(
             email=email,
             ip_address=ip_address,
@@ -463,7 +472,7 @@ def login():
             success=True
         )
         
-        # Generar tokens usando TokenManager
+        # Generar tokens
         tokens = TokenManager.create_tokens(
             user_id=usuario.id_usuario,
             email=usuario.email,
@@ -491,13 +500,10 @@ def login():
 # ============================================
 
 @auth_bp.route('/refresh', methods=['POST'])
+@rate_limit(max_requests=30, window_minutes=15)
 def refresh_token():
     """
     Renueva el access token usando un refresh token
-    
-    ¿Cuándo usar esto?
-    - Cada vez que el access token expire (15 min)
-    - El frontend detecta 401 y automáticamente llama a este endpoint
     
     Body:
         {
@@ -514,7 +520,6 @@ def refresh_token():
         if not data.get('refresh_token'):
             return jsonify({'error': 'Refresh token requerido'}), 400
         
-        # Intentar renovar el token
         result = TokenManager.refresh_access_token(
             refresh_token_str=data['refresh_token'],
             ip_address=request.remote_addr,
@@ -556,12 +561,10 @@ def logout():
         200: Logout exitoso
     """
     try:
-        # Obtener info del token actual
         jwt_data = get_jwt()
         jti = jwt_data['jti']
         current_user_id = int(get_jwt_identity())
         
-        # Revocar el access token actual
         TokenManager.revoke_token(
             jti=jti,
             token_type='access',
@@ -569,7 +572,6 @@ def logout():
             reason='logout'
         )
         
-        # Si envió el refresh token, revocarlo también
         data = request.get_json() or {}
         if data.get('refresh_token'):
             from app.models.refresh_token import RefreshToken
@@ -582,7 +584,6 @@ def logout():
                 refresh_token.is_revoked = True
                 db.session.commit()
         
-        # Log del evento
         SecurityLog.log_event(
             event_type='logout',
             user_id=current_user_id,
@@ -591,9 +592,7 @@ def logout():
             details={'jti': jti}
         )
         
-        return jsonify({
-            'mensaje': 'Logout exitoso'
-        }), 200
+        return jsonify({'mensaje': 'Logout exitoso'}), 200
         
     except Exception as e:
         db.session.rollback()
@@ -635,6 +634,8 @@ def get_current_user():
 # ============================================
 
 @auth_bp.route('/unlock', methods=['POST'])
+@rate_limit(max_requests=5, window_minutes=15)
+@sanitize_input({'email': 'email', 'unlock_code': 10})
 def unlock_account():
     """
     Desbloquea una cuenta usando el código de 6 dígitos
@@ -656,31 +657,25 @@ def unlock_account():
         if not data.get('email') or not data.get('unlock_code'):
             return jsonify({'error': 'Email y código de desbloqueo requeridos'}), 400
         
-        # Buscar usuario
         usuario = Usuario.query.filter_by(email=data['email'].lower()).first()
         
         if not usuario:
             return jsonify({'error': 'Usuario no encontrado'}), 404
         
-        # Buscar bloqueo activo
         active_lockout = AccountLockout.get_active_lockout(usuario.id_usuario)
         
         if not active_lockout:
             return jsonify({'error': 'No hay bloqueo activo en esta cuenta'}), 404
         
-        # Verificar código
         if not active_lockout.verify_unlock_code(data['unlock_code']):
             return jsonify({'error': 'Código de desbloqueo inválido o expirado'}), 400
         
-        # Desbloquear cuenta
         active_lockout.unlock()
         
-        # Resetear contador de intentos fallidos
         usuario.failed_login_attempts = 0
         usuario.locked_until = None
         db.session.commit()
         
-        # Log del evento
         SecurityLog.log_event(
             event_type='account_unlocked',
             user_id=usuario.id_usuario,

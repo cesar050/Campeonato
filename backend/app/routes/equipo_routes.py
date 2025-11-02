@@ -10,35 +10,62 @@ import os
 
 equipo_bp = Blueprint('equipos', __name__)
 
-# Versión simplificada sin subida de archivos (para testing)
 @equipo_bp.route('', methods=['POST'])
 @jwt_required()
 @role_required(['admin', 'lider'])
 def crear_equipo():
+    """
+    Crear equipo usando NOMBRE del líder en vez de ID
+    
+    Body:
+        {
+            "nombre": "Barcelona FC",
+            "nombre_lider": "Juan Pérez",
+            "estadio": "Camp Nou",
+            "logo_url": "..."
+        }
+    """
     try:
         data = request.get_json()
         
         # Validaciones básicas
         if not data.get('nombre'):
-            return jsonify({'error': 'El nombre es obligatorio'}), 400
+            return jsonify({'error': 'El nombre del equipo es obligatorio'}), 400
         
-        if not data.get('id_lider'):
-            return jsonify({'error': 'El id_lider es obligatorio'}), 400
+        if not data.get('nombre_lider'):
+            return jsonify({'error': 'El nombre del líder es obligatorio'}), 400
+        
+        if not data.get('estadio'):
+            return jsonify({'error': 'El estadio es obligatorio'}), 400
+        
+        # Buscar líder por nombre
+        lider = Usuario.query.filter(
+            Usuario.nombre.ilike(f"%{data['nombre_lider']}%")
+        ).first()
+        
+        if not lider:
+            return jsonify({
+                'error': 'Líder no encontrado',
+                'mensaje': f'No existe un usuario con el nombre "{data["nombre_lider"]}"'
+            }), 404
+        
+        # Verificar que sea líder o admin
+        if lider.rol not in ['lider', 'admin']:
+            return jsonify({
+                'error': 'El usuario debe tener rol de líder o admin'
+            }), 400
         
         # Verificar si el equipo ya existe
         equipo_existente = Equipo.query.filter_by(nombre=data['nombre']).first()
         if equipo_existente:
             return jsonify({'error': 'Ya existe un equipo con este nombre'}), 400
         
-        # Verificar que el líder existe
-        lider = Usuario.query.get(data['id_lider'])
-        if not lider:
-            return jsonify({'error': 'Líder no encontrado'}), 404
-        
+        # Crear equipo
         nuevo_equipo = Equipo(
             nombre=data['nombre'],
-            logo_url=data.get('logo_url'),  # Opcional
-            id_lider=int(data['id_lider']),
+            logo_url=data.get('logo_url'),
+            estadio=data['estadio'],
+            id_lider=lider.id_usuario,
             estado='pendiente'
         )
         
@@ -53,7 +80,6 @@ def crear_equipo():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
 
 @equipo_bp.route('', methods=['GET'])
 def obtener_equipos():

@@ -15,7 +15,8 @@ solicitud_bp = Blueprint('solicitudes', __name__)
 def crear_solicitud():
     try:
         data = request.get_json()
-        current_user = get_jwt_identity()
+        # ✅ CORREGIDO
+        current_user_id = int(get_jwt_identity())
         
         if not data.get('id_equipo'):
             return jsonify({'error': 'El equipo es requerido'}), 400
@@ -24,12 +25,12 @@ def crear_solicitud():
         if not equipo:
             return jsonify({'error': 'Equipo no encontrado'}), 404
         
-        if equipo.id_lider != current_user['id_usuario']:
+        if equipo.id_lider != current_user_id:
             return jsonify({'error': 'Solo el líder del equipo puede crear solicitudes'}), 403
         
         nueva_solicitud = SolicitudEquipo(
             id_equipo=data['id_equipo'],
-            id_lider=current_user['id_usuario'],
+            id_lider=current_user_id,
             observaciones=data.get('observaciones')
         )
         
@@ -92,7 +93,8 @@ def cambiar_estado_solicitud(id_solicitud):
             return jsonify({'error': 'Solicitud no encontrada'}), 404
         
         data = request.get_json()
-        current_user = get_jwt_identity()
+        # ✅ CORREGIDO
+        current_user_id = int(get_jwt_identity())
         
         if 'estado' not in data:
             return jsonify({'error': 'El estado es requerido'}), 400
@@ -102,7 +104,7 @@ def cambiar_estado_solicitud(id_solicitud):
             return jsonify({'error': f'Estado no válido. Debe ser: {", ".join(estados_validos)}'}), 400
         
         solicitud.estado = data['estado']
-        solicitud.revisado_por = current_user['id_usuario']
+        solicitud.revisado_por = current_user_id
         solicitud.fecha_revision = datetime.utcnow()
         
         if 'observaciones' in data:

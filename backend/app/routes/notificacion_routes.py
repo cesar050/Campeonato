@@ -55,10 +55,11 @@ def crear_notificacion():
 @jwt_required()
 def obtener_mis_notificaciones():
     try:
-        current_user = get_jwt_identity()
+        # ✅ CORREGIDO: get_jwt_identity() devuelve un STRING
+        current_user_id = int(get_jwt_identity())
         leida = request.args.get('leida')
         
-        query = Notificacion.query.filter_by(id_usuario=current_user['id_usuario'])
+        query = Notificacion.query.filter_by(id_usuario=current_user_id)
         
         if leida is not None:
             query = query.filter_by(leida=leida.lower() == 'true')
@@ -92,13 +93,14 @@ def obtener_notificacion_por_id(id_notificacion):
 @jwt_required()
 def marcar_como_leida(id_notificacion):
     try:
-        current_user = get_jwt_identity()
+        # ✅ CORREGIDO
+        current_user_id = int(get_jwt_identity())
         notificacion = Notificacion.query.get(id_notificacion)
         
         if not notificacion:
             return jsonify({'error': 'Notificación no encontrada'}), 404
         
-        if notificacion.id_usuario != current_user['id_usuario']:
+        if notificacion.id_usuario != current_user_id:
             return jsonify({'error': 'No tienes permiso para marcar esta notificación'}), 403
         
         notificacion.leida = True

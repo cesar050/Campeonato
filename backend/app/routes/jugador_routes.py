@@ -12,25 +12,46 @@ jugador_bp = Blueprint('jugadores', __name__)
 @jwt_required()
 @role_required(['admin', 'lider'])
 def crear_jugador():
+    """
+    Crear jugador usando NOMBRE del equipo en vez de ID
+    
+    Body:
+        {
+            "nombre_equipo": "Barcelona FC",
+            "nombre": "Lionel",
+            "apellido": "Messi",
+            ...
+        }
+    """
     try:
         data = request.get_json()
         
         # Validaciones básicas
-        if not data.get('id_equipo'):
-            return jsonify({'error': 'El id_equipo es obligatorio'}), 400
+        if not data.get('nombre_equipo'):
+            return jsonify({'error': 'El nombre del equipo es obligatorio'}), 400
+        
         if not data.get('nombre'):
             return jsonify({'error': 'El nombre es obligatorio'}), 400
+        
         if not data.get('apellido'):
             return jsonify({'error': 'El apellido es obligatorio'}), 400
+        
         if not data.get('documento'):
             return jsonify({'error': 'El documento es obligatorio'}), 400
+        
         if not data.get('dorsal'):
             return jsonify({'error': 'El dorsal es obligatorio'}), 400
         
-        # Verificar que el equipo existe
-        equipo = Equipo.query.get(data['id_equipo'])
+        # Buscar equipo por nombre
+        equipo = Equipo.query.filter(
+            Equipo.nombre.ilike(f"%{data['nombre_equipo']}%")
+        ).first()
+        
         if not equipo:
-            return jsonify({'error': 'Equipo no encontrado'}), 404
+            return jsonify({
+                'error': 'Equipo no encontrado',
+                'mensaje': f'No existe un equipo con el nombre "{data["nombre_equipo"]}"'
+            }), 404
         
         # Verificar que el equipo está aprobado
         if equipo.estado != 'aprobado':
@@ -41,23 +62,23 @@ def crear_jugador():
         if jugador_existente:
             return jsonify({'error': 'Ya existe un jugador con este documento'}), 400
         
-        # Verificar que el dorsal no esté ocupado en el equipo
+        # Verificar que el dorsal no esté ocupado
         dorsal_ocupado = Jugador.query.filter_by(
-            id_equipo=data['id_equipo'],
+            id_equipo=equipo.id_equipo,
             dorsal=data['dorsal']
         ).first()
         if dorsal_ocupado:
-            return jsonify({'error': f'El dorsal {data["dorsal"]} ya está ocupado en este equipo'}), 400
+            return jsonify({'error': f'El dorsal {data["dorsal"]} ya está ocupado en {equipo.nombre}'}), 400
         
+        # Crear jugador
         nuevo_jugador = Jugador(
-            id_equipo=int(data['id_equipo']),
+            id_equipo=equipo.id_equipo,
             nombre=data['nombre'],
             apellido=data['apellido'],
             documento=data['documento'],
             dorsal=int(data['dorsal']),
             posicion=data.get('posicion', 'delantero'),
-            fecha_nacimiento=datetime.fromisoformat(data['fecha_nacimiento']).date() if data.get('fecha_nacimiento') else None,
-            documento_pdf=data.get('documento_pdf')
+            fecha_nacimiento=datetime.fromisoformat(data['fecha_nacimiento']).date() if data.get('fecha_nacimiento') else None
         )
         
         db.session.add(nuevo_jugador)
@@ -65,7 +86,8 @@ def crear_jugador():
         
         return jsonify({
             'mensaje': 'Jugador creado exitosamente',
-            'jugador': nuevo_jugador.to_dict()
+            'jugador': nuevo_jugador.to_dict(),
+            'equipo': equipo.nombre
         }), 201
         
     except ValueError:
