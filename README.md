@@ -3,6 +3,36 @@
 **Práctica APE 005** - Simulación de peticiones HTTP
 
 ---
+## Documentacion de Peticiones HTTP
+
+### Tabla de Resultados
+
+| Metodo | URL | Codigo de Estado | Tiempo Respuesta | Observaciones CORS |
+|--------|-----|------------------|------------------|-------------------|
+| POST | /auth/login | 200 OK | ~150ms | Access-Control-Allow-Origin: http://localhost:4200 |
+| POST | /auth/register | 201 Created | ~200ms | CORS habilitado, solo acepta Gmail |
+| GET | /auth/me | 200 OK | ~50ms | Requiere header Authorization: Bearer token |
+| POST | /auth/logout | 200 OK | ~30ms | Revoca token JWT |
+| OPTIONS | /auth/login | 200 OK | ~10ms | Preflight request para CORS |
+
+### Request Headers
+```
+POST /auth/login HTTP/1.1
+Host: localhost:5000
+Content-Type: application/json
+Origin: http://localhost:4200
+Accept: application/json
+```
+
+### Response Headers
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+Access-Control-Allow-Origin: http://localhost:4200
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization
+```
 
 ## Requisitos
 
