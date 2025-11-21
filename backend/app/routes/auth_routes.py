@@ -124,7 +124,7 @@ class Register(Resource):
 
             email_sent = False
             try:
-                verification_link = f"http://localhost:5000/api/auth/verify-email?token={verification_token}"
+                verification_link = f"http://localhost:5000/auth/verify-email?token={verification_token}"
                 email_sent = EmailService.send_verification_email(
                     email=nuevo_usuario.email,
                     nombre=nuevo_usuario.nombre,
