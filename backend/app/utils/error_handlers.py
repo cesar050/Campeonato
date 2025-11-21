@@ -221,4 +221,4 @@ def register_error_handlers(app):
             }), 500
     
     
-    print("✅ Manejadores de errores globales registrados")
+  

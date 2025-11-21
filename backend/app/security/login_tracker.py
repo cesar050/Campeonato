@@ -96,6 +96,25 @@ class LoginTracker:
             
             # Si alcanzó el límite, bloquear
             if failed_attempts >= max_attempts:
+                # ✅ VERIFICAR SI YA TIENE UN BLOQUEO ACTIVO
+                now = datetime.utcnow()
+                existing_lockout = AccountLockout.query.filter(
+                    AccountLockout.user_id == usuario.id_usuario,
+                    AccountLockout.is_active == True,
+                    AccountLockout.locked_until > now
+                ).first()
+                
+                # Si ya está bloqueado, retornar el bloqueo existente (NO crear uno nuevo)
+                if existing_lockout:
+                    print(f"🔒 Cuenta YA bloqueada: {email} (usando bloqueo existente)")
+                    return {
+                        'locked': True,
+                        'attempts': failed_attempts,
+                        'locked_until': existing_lockout.locked_until,
+                        'unlock_code': existing_lockout.unlock_code
+                    }
+                
+                # ✅ CREAR NUEVO BLOQUEO (solo si no existe uno activo)
                 locked_until = datetime.utcnow() + timedelta(minutes=lockout_minutes)
                 
                 # Generar código de desbloqueo
@@ -120,23 +139,33 @@ class LoginTracker:
                 db.session.add(lockout)
                 db.session.commit()
                 
-                print(f"🔒 Cuenta bloqueada: {email} hasta {locked_until}")
+                print(f"🔒 Cuenta bloqueada: {email} hasta {locked_until} - Código: {unlock_code}")
                 
                 # Enviar email de desbloqueo (si está habilitado)
-                if current_app.config.get('SEND_LOCKOUT_EMAIL', True):
-                    EmailService.send_unlock_code(
-                        email=email,
-                        nombre=usuario.nombre,
-                        unlock_code=unlock_code,
-                        locked_until=locked_until.strftime('%H:%M:%S'),
-                        attempts=failed_attempts
-                    )
+                try:
+                    if current_app.config.get('SEND_LOCKOUT_EMAIL', True):
+                        email_sent = EmailService.send_unlock_code(
+                            email=email,
+                            nombre=usuario.nombre,
+                            unlock_code=unlock_code,
+                            locked_until=locked_until.strftime('%H:%M:%S'),
+                            attempts=failed_attempts
+                        )
+                        
+                        if email_sent:
+                            print(f"✅ Código de desbloqueo enviado exitosamente a {email}")
+                        else:
+                            print(f"⚠️ EmailService retornó False - No se pudo enviar email a {email}")
+                except Exception as email_error:
+                    print(f"❌ EXCEPCIÓN enviando email de desbloqueo: {email_error}")
+                    import traceback
+                    traceback.print_exc()
                 
                 return {
                     'locked': True,
                     'attempts': failed_attempts,
                     'locked_until': locked_until,
-                    'unlock_code': unlock_code  # Solo para testing, en producción no devolver
+                    'unlock_code': unlock_code
                 }
             
             # No se alcanzó el límite

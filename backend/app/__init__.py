@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_restx import Api
 from app.config import config_by_name
 from app.extensions import db, migrate, jwt, cors, mail
 from app.utils.error_handlers import register_error_handlers
@@ -8,21 +9,18 @@ from datetime import timedelta
 def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
-    
-    # ============================================
-    # 🔐 CONFIGURACIÓN JWT
-    # ============================================
-    
-    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-cambiar-en-produccion')
+
+    # Initialize Flask-RESTx API
+    api = Api(app, title='Campeonato API', version='1.0', description='API para gestión de campeonatos de fútbol')
+
+    #app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-cambiar-en-produccion')
+    app.config['JWT_SECRET_KEY'] = 'dev-secret-cambiar-en-produccion'
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config['JWT_BLACKLIST_ENABLED'] = True
     app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
     
-    # ============================================
-    # 🔒 CONFIGURACIÓN DE SEGURIDAD
-    # ============================================
-    
+ 
     app.config['MAX_LOGIN_ATTEMPTS'] = 5
     app.config['LOCKOUT_DURATION_MINUTES'] = 10
     app.config['UNLOCK_CODE_EXPIRES_MINUTES'] = 15
@@ -33,22 +31,16 @@ def create_app(config_name='development'):
     app.config['SECURITY_LOG_RETENTION_DAYS'] = 90
     app.config['SEND_LOCKOUT_EMAIL'] = True
     
-    # ============================================
-    # 📁 CREAR CARPETAS DE UPLOADS
-    # ============================================
     
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'documentos'), exist_ok=True)
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'logos'), exist_ok=True)
     
-    # ============================================
-    # 🔌 INICIALIZAR EXTENSIONES
-    # ============================================
     
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     cors.init_app(app, resources={
-        r"/api/*": {
+        r"/*": {
             "origins": ["http://localhost:4200", "http://localhost:3000"],
             "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
@@ -65,15 +57,10 @@ def create_app(config_name='development'):
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     mail.init_app(app)
     
-    # ============================================
-    # 🛡️ REGISTRAR MANEJADORES DE ERRORES GLOBALES
-    # ============================================
     
     register_error_handlers(app)
     
-    # ============================================
-    # 🔐 CALLBACKS DE JWT
-    # ============================================
+
     
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
@@ -113,45 +100,32 @@ def create_app(config_name='development'):
             'code': 'TOKEN_REVOKED'
         }), 401
     
-    # ============================================
-    # 📊 CREAR TABLAS AUTOMÁTICAMENTE
-    # ============================================
     
     with app.app_context():
         db.create_all()
     
-    # ============================================
-    # 🗺️ REGISTRAR BLUEPRINTS
-    # ============================================
-    
-    from app.routes.auth_routes import auth_bp
-    from app.routes.equipo_routes import equipo_bp
-    from app.routes.jugador_routes import jugador_bp
-    from app.routes.campeonato_routes import campeonato_bp
-    from app.routes.partido_routes import partidos_bp
-    from app.routes.gol_routes import gol_bp
-    from app.routes.tarjeta_routes import tarjeta_bp
-    from app.routes.alineacion_routes import alineacion_bp
-    from app.routes.solicitud_equipo_routes import solicitud_bp
-    from app.routes.notificacion_routes import notificacion_bp
-    from app.routes.estadisticas_routes import estadisticas_bp
-    
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(equipo_bp, url_prefix='/api/equipos')
-    app.register_blueprint(jugador_bp, url_prefix='/api/jugadores')
-    app.register_blueprint(campeonato_bp, url_prefix='/api/campeonato')  
-    app.register_blueprint(partidos_bp, url_prefix='/api/partido')        
-    app.register_blueprint(gol_bp, url_prefix='/api/gol')               
-    app.register_blueprint(tarjeta_bp, url_prefix='/api/tarjetas')
-    app.register_blueprint(alineacion_bp, url_prefix='/api/alineaciones')
-    app.register_blueprint(solicitud_bp, url_prefix='/api/solicitudes')
-    app.register_blueprint(notificacion_bp, url_prefix='/api/notificaciones')
-    app.register_blueprint(estadisticas_bp, url_prefix='/api/estadisticas')
-    
-    # ============================================
-    # 🏥 HEALTH CHECK
-    # ============================================
-    
+    from app.routes.auth_routes import auth_ns
+    from app.routes.equipo_routes import equipo_ns
+    from app.routes.jugador_routes import jugador_ns
+    from app.routes.campeonato_routes import campeonato_ns
+    from app.routes.partido_routes import partidos_ns
+    from app.routes.gol_routes import gol_ns
+    from app.routes.tarjeta_routes import tarjeta_ns
+    from app.routes.solicitud_equipo_routes import solicitud_ns
+    from app.routes.notificacion_routes import notificacion_ns
+    from app.routes.estadisticas_routes import estadisticas_ns
+
+    api.add_namespace(auth_ns, path='/auth')
+    api.add_namespace(equipo_ns, path='/equipos')
+    api.add_namespace(jugador_ns, path='/jugadores')
+    api.add_namespace(campeonato_ns, path='/campeonato')
+    api.add_namespace(partidos_ns, path='/partidos')
+    api.add_namespace(gol_ns, path='/gol')
+    api.add_namespace(tarjeta_ns, path='/tarjetas')
+    api.add_namespace(solicitud_ns, path='/solicitudes')
+    api.add_namespace(notificacion_ns, path='/notificaciones')
+    api.add_namespace(estadisticas_ns, path='/estadisticas')
+
     @app.route('/health')
     def health_check():
         return jsonify({

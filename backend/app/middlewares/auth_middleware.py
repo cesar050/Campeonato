@@ -6,7 +6,6 @@ def role_required(roles):
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            # ✅ Usar get_jwt() para obtener todos los claims
             claims = get_jwt()
             
             # El rol viene en los claims del token

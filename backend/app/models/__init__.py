@@ -5,7 +5,6 @@ from app.models.campeonato import Campeonato
 from app.models.partido import Partido
 from app.models.gol import Gol
 from app.models.tarjeta import Tarjeta
-from app.models.alineacion import Alineacion
 from app.models.solicitud_equipo import SolicitudEquipo
 from app.models.notificacion import Notificacion
 
@@ -26,7 +25,6 @@ __all__ = [
     'Partido',
     'Gol',
     'Tarjeta',
-    'Alineacion',
     'SolicitudEquipo',
     'Notificacion',
     # Modelos de seguridad

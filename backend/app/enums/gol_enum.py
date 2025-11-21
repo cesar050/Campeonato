@@ -1,6 +1,7 @@
 from enum import Enum
+
 class TipoGol(Enum):
-    NORMAL = 'normal'
-    PENAL = 'penal'
-    AUTOGOL = 'autogol'
-    TIRO_LIBRE = 'tiro_libre'
+    NORMAL = 'NORMAL'
+    PENAL = 'PENAL'
+    AUTOGOL = 'AUTOGOL'
+    TIRO_LIBRE = 'TIRO_LIBRE'

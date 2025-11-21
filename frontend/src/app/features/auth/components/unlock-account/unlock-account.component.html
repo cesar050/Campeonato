@@ -1,0 +1,94 @@
+<div class="unlock-container">
+  <div class="unlock-card">
+    <div class="unlock-header">
+      <div class="logo">🔓</div>
+      <h1>Desbloquear cuenta</h1>
+      <p>Ingresa el código de 6 dígitos enviado a tu email</p>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+          <strong>{{ successMessage() }}</strong>
+          <p>Redirigiendo al inicio de sesión...</p>
+        </div>
+      </div>
+    }
+
+    <!-- Mensaje de error -->
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (!successMessage()) {
+      <form [formGroup]="unlockForm" (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <div class="input-wrapper">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="tucorreo@gmail.com"
+              [class.invalid]="emailInvalid"
+              autocomplete="email"
+            />
+            <span class="input-icon">📧</span>
+          </div>
+          @if (emailInvalid) {
+            <span class="error-text">Ingresa un email válido</span>
+          }
+        </div>
+
+        <!-- Código de desbloqueo -->
+        <div class="form-group">
+          <label for="unlock_code">Código de desbloqueo</label>
+          <div class="input-wrapper code-input">
+            <input
+              type="text"
+              id="unlock_code"
+              formControlName="unlock_code"
+              placeholder="000000"
+              [class.invalid]="codeInvalid"
+              (input)="onCodeInput($event)"
+              maxlength="6"
+              autocomplete="one-time-code"
+            />
+            <span class="input-icon">🔑</span>
+          </div>
+          @if (codeInvalid) {
+            <span class="error-text">
+              @if (unlockForm.get('unlock_code')?.hasError('required')) {
+                El código es requerido
+              } @else {
+                Debe ser un código de 6 dígitos
+              }
+            </span>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isLoading()"
+        >
+          @if (isLoading()) {
+            <span class="spinner"></span>
+            Verificando...
+          } @else {
+            Desbloquear cuenta
+          }
+        </button>
+      </form>
+    }
+
+    <div class="unlock-footer">
+      <p><a routerLink="/auth/login">← Volver al inicio de sesión</a></p>
+    </div>
+  </div>
+</div>

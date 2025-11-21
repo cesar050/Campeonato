@@ -1,30 +1,54 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/auth/login/login.component';
-import { RegisterComponent } from './components/auth/register/register.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { authGuard } from './guards/auth.guard';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  // Ruta por defecto - redirige al dashboard si está autenticado, sino al login
   {
     path: '',
-    redirectTo: '/login',
+    redirectTo: 'dashboard',
     pathMatch: 'full'
   },
+
+  // Rutas de autenticación (solo para invitados)
   {
-    path: 'login',
-    component: LoginComponent
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./features/auth/components/login/login.component').then(m => m.LoginComponent),
+        canActivate: [guestGuard]
+      },
+      {
+        path: 'register',
+        loadComponent: () =>
+          import('./features/auth/components/register/register.component').then(m => m.RegisterComponent),
+        canActivate: [guestGuard]
+      },
+      {
+        path: 'unlock',
+        loadComponent: () =>
+          import('./features/auth/components/unlock-account/unlock-account.component').then(m => m.UnlockAccountComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full'
+      }
+    ]
   },
-  {
-    path: 'register',
-    component: RegisterComponent
-  },
+
+  // Dashboard (requiere autenticación)
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
+
+  // Ruta 404
   {
     path: '**',
-    redirectTo: '/login'
+    redirectTo: 'dashboard'
   }
 ];
