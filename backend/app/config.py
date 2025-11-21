@@ -1,12 +1,18 @@
 import os
 from datetime import timedelta
 
+
+def get_database_uri():
+    """Usa SQLite si USE_SQLITE=true, sino MySQL"""
+    if os.getenv('USE_SQLITE', 'false').lower() == 'true':
+        db_path = os.path.join(os.getcwd(), 'campeonato.db')
+        return f'sqlite:///{db_path}'
+    return os.getenv('DATABASE_URL', 'mysql+pymysql://root:cesar05@localhost/gestion_campeonato')
+
+
 class Config:
     # Base de datos
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL',
-        'mysql+pymysql://root:cesar05@localhost/gestion_campeonato'
-    )
+    SQLALCHEMY_DATABASE_URI = get_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT Configuration
@@ -22,36 +28,35 @@ class Config:
     
     # CORS
     CORS_HEADERS = 'Content-Type'
-
-    MAX_LOGIN_ATTEMPTS = 5  # intentos antes de bloquear
-    LOCKOUT_DURATION_MINUTES = 10  # tiempo de bloqueo automático
-    UNLOCK_CODE_EXPIRES_MINUTES = 15  # validez del código de desbloqueo
     
- 
+    MAX_LOGIN_ATTEMPTS = 5
+    LOCKOUT_DURATION_MINUTES = 10
+    UNLOCK_CODE_EXPIRES_MINUTES = 15
+    
     RATE_LIMIT_ENABLED = True
-    RATE_LIMIT_REQUESTS = 100  
-    RATE_LIMIT_WINDOW_MINUTES = 15  
-    RATE_LIMIT_BAN_DURATION_MINUTES = 30 
+    RATE_LIMIT_REQUESTS = 100
+    RATE_LIMIT_WINDOW_MINUTES = 15
+    RATE_LIMIT_BAN_DURATION_MINUTES = 30
     
-    # --- Security Logs ---
-    SECURITY_LOG_RETENTION_DAYS = 90  
-    
-    # --- Email Notifications ---
-    SEND_LOCKOUT_EMAIL = True  
+    SECURITY_LOG_RETENTION_DAYS = 90
+    SEND_LOCKOUT_EMAIL = True
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False
 
+
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
-    # En producción, JWT_SECRET_KEY DEBE venir de variable de entorno
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+
 
 config_by_name = {
     'development': DevelopmentConfig,
