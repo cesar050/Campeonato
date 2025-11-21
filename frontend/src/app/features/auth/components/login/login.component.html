@@ -1,0 +1,118 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+      </div>
+      <h1>Gestión de Campeonatos</h1>
+      <p>Inicia sesión para continuar</p>
+    </div>
+
+    <!-- Alerta de cuenta bloqueada -->
+    @if (isLocked()) {
+      <div class="alert alert-error">
+        <div class="alert-icon">🔒</div>
+        <div class="alert-content">
+          <strong>{{ errorMessage() }}</strong>
+          @if (minutesRemaining()) {
+            <p>Tiempo restante: {{ minutesRemaining() }} minutos</p>
+          }
+          @if (unlockInfo()) {
+            <p>{{ unlockInfo() }}</p>
+          }
+          <button type="button" class="btn-link" (click)="goToUnlock()">
+            Desbloquear cuenta
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Alerta de error -->
+    @if (errorMessage() && !isLocked()) {
+      <div class="alert alert-error">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- Alerta de intentos restantes -->
+    @if (warningMessage()) {
+      <div class="alert alert-warning">
+        <span>{{ warningMessage() }}</span>
+      </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <div class="input-wrapper">
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="tucorreo@gmail.com"
+            [class.invalid]="emailInvalid"
+            autocomplete="email"
+          />
+          <span class="input-icon">📧</span>
+        </div>
+        @if (emailInvalid) {
+          <span class="error-text">
+            @if (loginForm.get('email')?.hasError('required')) {
+              El email es requerido
+            } @else if (loginForm.get('email')?.hasError('email')) {
+              Ingresa un email válido
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label for="contrasena">Contraseña</label>
+        <div class="input-wrapper">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="contrasena"
+            formControlName="contrasena"
+            placeholder="••••••••"
+            [class.invalid]="passwordInvalid"
+            autocomplete="current-password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePassword()">
+            {{ showPassword() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (passwordInvalid) {
+          <span class="error-text">
+            @if (loginForm.get('contrasena')?.hasError('required')) {
+              La contraseña es requerida
+            } @else if (loginForm.get('contrasena')?.hasError('minlength')) {
+              Mínimo 6 caracteres
+            }
+          </span>
+        }
+      </div>
+
+      <!-- Botón de submit -->
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isLoading() || isLocked()"
+      >
+        @if (isLoading()) {
+          <span class="spinner"></span>
+          Iniciando sesión...
+        } @else {
+          Iniciar sesión
+        }
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a></p>
+    </div>
+  </div>
+</div>

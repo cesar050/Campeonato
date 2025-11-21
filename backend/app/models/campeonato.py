@@ -15,6 +15,9 @@ class Campeonato(db.Model):
     nullable=False,
     index=True
 )
+    max_equipos = db.Column(db.Integer, default=16)
+    partidos_generados = db.Column(db.Boolean, default=False)
+    fecha_generacion_partidos = db.Column(db.DateTime, nullable=True)
     creado_por = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario'), nullable= False, index=True)
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     creador = db.relationship('Usuario', backref='campeonatos', lazy='joined')

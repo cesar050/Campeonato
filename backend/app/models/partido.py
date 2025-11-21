@@ -13,8 +13,7 @@ class Partido(db.Model):
     jornada = db.Column(db.Integer, default=1)
     goles_local = db.Column(db.Integer, default=0)
     goles_visitante = db.Column(db.Integer, default=0)
-    
-    # ✅ CAMBIO: Usar String en lugar de Enum
+
     estado = db.Column(
         db.String(50),
         default='programado',
@@ -23,7 +22,7 @@ class Partido(db.Model):
     )
     
     observaciones = db.Column(db.Text, nullable=True)
-    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)  # ✅ Ahora existe en la BD
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow) 
     
     __table_args__ = (
         db.CheckConstraint('id_equipo_local != id_equipo_visitante',
@@ -35,7 +34,6 @@ class Partido(db.Model):
 
     goles = db.relationship('Gol', backref='partido', lazy='dynamic')
     tarjetas = db.relationship('Tarjeta', backref='partido', lazy='dynamic')
-    alineaciones = db.relationship('Alineacion', backref='partido', lazy='dynamic')
     
     def __repr__(self):
         return f'<Partido {self.equipo_local.nombre} vs {self.equipo_visitante.nombre}>'
@@ -54,7 +52,7 @@ class Partido(db.Model):
             'jornada': self.jornada,
             'goles_local': self.goles_local,
             'goles_visitante': self.goles_visitante,
-            'estado': self.estado,  # ✅ Ya es string
+            'estado': self.estado, 
             'observaciones': self.observaciones,
             'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None,
             'total_goles': self.goles.count(),

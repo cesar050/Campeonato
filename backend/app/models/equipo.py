@@ -13,6 +13,7 @@ class Equipo(db.Model):
     estado = db.Column(db.Enum('pendiente', 'aprobado', 'rechazado', name='estado_equipo_enum'), default='pendiente', index=True)
     observaciones = db.Column(db.Text, nullable=True)
     aprobado_por = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete='SET NULL'), nullable=True)
+    estadio = db.Column(db.String(150), nullable=True)
     
     # Relaciones
     lider = db.relationship('Usuario', foreign_keys=[id_lider], backref='equipos_liderados', lazy='joined')
@@ -33,7 +34,8 @@ class Equipo(db.Model):
             'fecha_aprobacion': self.fecha_aprobacion.isoformat() if self.fecha_aprobacion else None,
             'estado': self.estado,
             'observaciones': self.observaciones,
-            'total_jugadores': self.jugadores.count()
+            'total_jugadores': self.jugadores.count(),
+            'estadio': self.estadio
         }
         
         if include_jugadores:

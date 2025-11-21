@@ -1,0 +1,184 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+      </div>
+      <h1>Crear cuenta</h1>
+      <p>Regístrate para gestionar tu equipo</p>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+          <strong>{{ successMessage() }}</strong>
+          <p>📧 Revisa tu correo <strong>{{ registeredEmail() }}</strong> para verificar tu cuenta</p>
+          <button type="button" class="btn-link" (click)="goToLogin()">
+            Ir al inicio de sesión
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- Mensaje de error -->
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (!successMessage()) {
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombre completo</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="nombre"
+              formControlName="nombre"
+              placeholder="Tu nombre completo"
+              [class.invalid]="nombreInvalid"
+              autocomplete="name"
+            />
+            <span class="input-icon">👤</span>
+          </div>
+          @if (nombreInvalid) {
+            <span class="error-text">
+              @if (registerForm.get('nombre')?.hasError('required')) {
+                El nombre es requerido
+              } @else if (registerForm.get('nombre')?.hasError('minlength')) {
+                Mínimo 3 caracteres
+              } @else if (registerForm.get('nombre')?.hasError('maxlength')) {
+                Máximo 100 caracteres
+              }
+            </span>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Correo Gmail</label>
+          <div class="input-wrapper">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="tucorreo@gmail.com"
+              [class.invalid]="emailInvalid"
+              autocomplete="email"
+            />
+            <span class="input-icon">📧</span>
+          </div>
+          @if (emailInvalid) {
+            <span class="error-text">
+              @if (registerForm.get('email')?.hasError('required')) {
+                El email es requerido
+              } @else if (registerForm.get('email')?.hasError('email')) {
+                Ingresa un email válido
+              } @else if (registerForm.get('email')?.hasError('gmailOnly')) {
+                Solo se permiten cuentas de Gmail
+              }
+            </span>
+          }
+        </div>
+
+        <!-- Contraseña -->
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <div class="input-wrapper">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="contrasena"
+              formControlName="contrasena"
+              placeholder="Mínimo 8 caracteres"
+              [class.invalid]="passwordInvalid"
+              autocomplete="new-password"
+            />
+            <button type="button" class="toggle-password" (click)="togglePassword()">
+              {{ showPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+
+          <!-- Indicador de fortaleza -->
+          @if (registerForm.get('contrasena')?.value) {
+            <div class="password-strength">
+              <div class="strength-bar">
+                <div
+                  class="strength-fill"
+                  [style.width.%]="passwordStrength.percentage"
+                  [style.background]="passwordStrength.color"
+                ></div>
+              </div>
+              <span [style.color]="passwordStrength.color">{{ passwordStrength.level }}</span>
+            </div>
+          }
+
+          @if (passwordInvalid) {
+            <span class="error-text">
+              @if (registerForm.get('contrasena')?.hasError('required')) {
+                La contraseña es requerida
+              } @else if (registerForm.get('contrasena')?.hasError('minlength')) {
+                Mínimo 8 caracteres
+              } @else {
+                Debe incluir mayúscula, minúscula, número y carácter especial
+              }
+            </span>
+          }
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div class="form-group">
+          <label for="confirmarContrasena">Confirmar contraseña</label>
+          <div class="input-wrapper">
+            <input
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              id="confirmarContrasena"
+              formControlName="confirmarContrasena"
+              placeholder="Repite tu contraseña"
+              [class.invalid]="confirmPasswordInvalid"
+              autocomplete="new-password"
+            />
+            <button type="button" class="toggle-password" (click)="toggleConfirmPassword()">
+              {{ showConfirmPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (confirmPasswordInvalid) {
+            <span class="error-text">
+              @if (registerForm.get('confirmarContrasena')?.hasError('required')) {
+                Confirma tu contraseña
+              } @else if (registerForm.get('confirmarContrasena')?.hasError('mismatch')) {
+                Las contraseñas no coinciden
+              }
+            </span>
+          }
+        </div>
+
+        <!-- Rol (oculto por defecto) -->
+        <input type="hidden" formControlName="rol" />
+
+        <!-- Botón de submit -->
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isLoading()"
+        >
+          @if (isLoading()) {
+            <span class="spinner"></span>
+            Registrando...
+          } @else {
+            Crear cuenta
+          }
+        </button>
+      </form>
+    }
+
+    <div class="register-footer">
+      <p>¿Ya tienes cuenta? <a routerLink="/auth/login">Inicia sesión</a></p>
+    </div>
+  </div>
+</div>

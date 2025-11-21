@@ -23,6 +23,22 @@ class Config:
     # CORS
     CORS_HEADERS = 'Content-Type'
 
+    MAX_LOGIN_ATTEMPTS = 5  # intentos antes de bloquear
+    LOCKOUT_DURATION_MINUTES = 10  # tiempo de bloqueo automático
+    UNLOCK_CODE_EXPIRES_MINUTES = 15  # validez del código de desbloqueo
+    
+ 
+    RATE_LIMIT_ENABLED = True
+    RATE_LIMIT_REQUESTS = 100  
+    RATE_LIMIT_WINDOW_MINUTES = 15  
+    RATE_LIMIT_BAN_DURATION_MINUTES = 30 
+    
+    # --- Security Logs ---
+    SECURITY_LOG_RETENTION_DAYS = 90  
+    
+    # --- Email Notifications ---
+    SEND_LOCKOUT_EMAIL = True  
+
 class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False

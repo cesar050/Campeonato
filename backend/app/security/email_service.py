@@ -10,7 +10,6 @@ class EmailService:
     Funcionalidades:
     - Enviar email de verificación (registro)
     - Enviar código de desbloqueo (seguridad)
-    - Plantillas HTML profesionales
     """
     
     @staticmethod
