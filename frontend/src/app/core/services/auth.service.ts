@@ -37,6 +37,7 @@ export class AuthService {
   readonly isLoading = computed(() => this.isLoadingSignal());
   readonly isAdmin = computed(() => this.currentUserSignal()?.rol === 'admin');
   readonly isLider = computed(() => this.currentUserSignal()?.rol === 'lider');
+  readonly isSuperAdmin = computed(() => this.currentUserSignal()?.rol === 'superadmin');
 
   constructor() {
     this.loadStoredUser();
@@ -83,16 +84,22 @@ export class AuthService {
   /**
    * Logout del usuario
    */
-  logout(): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${this.API_URL}/logout`, {}).pipe(
-      tap(() => this.clearSession()),
-      catchError(error => {
-        // Limpiar sesión incluso si falla el logout en el servidor
-        this.clearSession();
-        return this.handleError(error);
-      })
-    );
-  }
+  /**
+ * Logout del usuario
+ */
+logout(): void {
+  console.log('Logout iniciado...');
+  
+  // Intentar logout en el servidor, pero NO esperar respuesta
+  this.http.post<MessageResponse>(`${this.API_URL}/logout`, {}).subscribe({
+    next: () => console.log('Logout exitoso en servidor'),
+    error: (err) => console.warn('Error en logout del servidor (pero continuamos):', err)
+  });
+  
+  // Limpiar sesión INMEDIATAMENTE (no esperar al servidor)
+  this.clearSession();
+  console.log('Sesión limpiada');
+}
 
   /**
    * Logout sin llamar al servidor (para casos de error)

@@ -1,0 +1,181 @@
+<div class="campeonato-container">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando campeonato...</p>
+    </div>
+  } @else {
+    <div class="page-header">
+      <div class="header-left">
+        <div class="campeonato-title">
+          <h1>{{ campeonato()?.nombre || 'Copa de Verano 2024' }}</h1>
+          <button type="button" class="btn-edit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="estado-dropdown">
+          <button type="button" class="estado-badge" [class]="getEstadoBadgeClass(campeonato()?.estado || 'en_curso')" (click)="toggleEstadoDropdown()">
+            {{ getEstadoLabel(campeonato()?.estado || 'en_curso') }}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          @if (showEstadoDropdown()) {
+            <div class="dropdown-menu">
+              <button type="button" (click)="cambiarEstado('planificacion')">Planificación</button>
+              <button type="button" (click)="cambiarEstado('en_curso')">En Juego</button>
+              <button type="button" (click)="cambiarEstado('finalizado')">Finalizado</button>
+            </div>
+          }
+        </div>
+        <button type="button" class="btn-save">Guardar Cambios</button>
+      </div>
+    </div>
+
+    <div class="tabs-container">
+      <div class="tabs-nav">
+        <button type="button" class="tab-item" [class.active]="activeTab() === 'informacion'" (click)="setActiveTab('informacion')">Información</button>
+        <button type="button" class="tab-item" [class.active]="activeTab() === 'equipos'" (click)="setActiveTab('equipos')">Equipos</button>
+        <button type="button" class="tab-item" [class.active]="activeTab() === 'fixture'" (click)="setActiveTab('fixture')">Fixture</button>
+        <button type="button" class="tab-item" [class.active]="activeTab() === 'configuracion'" (click)="setActiveTab('configuracion')">Configuración</button>
+      </div>
+
+      <div class="tabs-content">
+        @if (activeTab() === 'informacion') {
+          <div class="tab-panel">
+            <div class="hero-card">
+              <div class="hero-image-container">
+                <div class="hero-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                    <path d="M2 12h20"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="hero-content">
+                <h2>{{ campeonato()?.nombre }}</h2>
+                <p>{{ campeonato()?.descripcion }}</p>
+                <button type="button" class="btn-edit-hero">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  Editar
+                </button>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Equipos Registrados</div>
+                <div class="stat-value">{{ stats().equipos_registrados }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Partidos Totales</div>
+                <div class="stat-value">{{ stats().partidos_totales }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Partidos Jugados</div>
+                <div class="stat-value">{{ stats().partidos_jugados }}</div>
+                <div class="stat-progress">
+                  <div class="progress-bar" [style.width.%]="(stats().partidos_jugados / stats().partidos_totales) * 100"></div>
+                </div>
+                <div class="stat-meta">{{ stats().partidos_jugados }}/{{ stats().partidos_totales }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Goles Totales</div>
+                <div class="stat-value">{{ stats().goles_totales }}</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3>Acciones Rápidas</h3>
+              </div>
+              <div class="card-body">
+                <div class="actions-grid">
+                  <button type="button" class="action-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span>Generar Fixture</span>
+                  </button>
+                  <button type="button" class="action-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <polyline points="16 11 18 13 22 9"></polyline>
+                    </svg>
+                    <span>Cambiar Estado</span>
+                  </button>
+                  <button type="button" class="action-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Descargar Reporte</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'equipos') {
+          <div class="tab-panel">
+            <div class="empty-tab">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <h3>Gestión de Equipos</h3>
+              <p>Aquí podrás ver y gestionar todos los equipos inscritos en tu campeonato.</p>
+              <button type="button" class="btn-primary" routerLink="/organizador/equipos">Ver Equipos</button>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'fixture') {
+          <div class="tab-panel">
+            <div class="empty-tab">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <h3>Calendario de Partidos</h3>
+              <p>Visualiza y gestiona todos los partidos de tu campeonato.</p>
+              <button type="button" class="btn-primary" routerLink="/organizador/partidos">Ver Fixture</button>
+            </div>
+          </div>
+        }
+
+        @if (activeTab() === 'configuracion') {
+          <div class="tab-panel">
+            <div class="empty-tab">
+              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2m5-11.2l-6 0m-6 0l-6 0m13.2 5.2l-4.2-4.2m0-6l-4.2-4.2"></path>
+              </svg>
+              <h3>Configuración del Campeonato</h3>
+              <p>Ajusta las configuraciones y reglas de tu campeonato.</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

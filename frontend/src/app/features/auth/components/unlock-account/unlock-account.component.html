@@ -1,94 +1,116 @@
-<div class="unlock-container">
-  <div class="unlock-card">
-    <div class="unlock-header">
-      <div class="logo">🔓</div>
-      <h1>Desbloquear cuenta</h1>
-      <p>Ingresa el código de 6 dígitos enviado a tu email</p>
-    </div>
+<div class="unlock-page">
+  <div class="unlock-container">
+    <div class="unlock-card">
+      <!-- ICON -->
+      <div class="icon-circle warning">
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="warning-badge">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
 
-    <!-- Mensaje de éxito -->
-    @if (successMessage()) {
-      <div class="alert alert-success">
-        <div class="alert-icon">✅</div>
-        <div class="alert-content">
-          <strong>{{ successMessage() }}</strong>
-          <p>Redirigiendo al inicio de sesión...</p>
+      <h1>Cuenta Bloqueada Temporalmente</h1>
+
+      <!-- WARNING ALERT -->
+      <div class="alert alert-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <div>
+          <strong>Demasiados intentos de inicio de sesión</strong>
+          <p>Para proteger tu cuenta, la hemos bloqueado temporalmente. Puedes intentarlo de nuevo cuando el contador llegue a cero.</p>
         </div>
       </div>
-    }
 
-    <!-- Mensaje de error -->
-    @if (errorMessage()) {
-      <div class="alert alert-error">
-        <span>{{ errorMessage() }}</span>
+      <!-- COUNTDOWN -->
+      <div class="countdown-box">
+        <p>Se desbloqueará automáticamente en</p>
+        <div class="countdown-timer">
+          <span class="time-digit">{{ countdown().split(':')[0] }}</span>
+          <span class="time-separator">:</span>
+          <span class="time-digit">{{ countdown().split(':')[1] }}</span>
+        </div>
       </div>
-    }
 
-    @if (!successMessage()) {
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <div>
+            <strong>¡Éxito!</strong>
+            <p>{{ successMessage() }}</p>
+          </div>
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div>
+            <strong>Error</strong>
+            <p>{{ errorMessage() }}</p>
+          </div>
+        </div>
+      }
+
       <form [formGroup]="unlockForm" (ngSubmit)="onSubmit()">
-        <!-- Email -->
+        <!-- EMAIL -->
         <div class="form-group">
-          <label for="email">Correo electrónico</label>
-          <div class="input-wrapper">
-            <input
-              type="email"
-              id="email"
-              formControlName="email"
-              placeholder="tucorreo@gmail.com"
-              [class.invalid]="emailInvalid"
-              autocomplete="email"
-            />
-            <span class="input-icon">📧</span>
-          </div>
-          @if (emailInvalid) {
-            <span class="error-text">Ingresa un email válido</span>
-          }
+          <label for="email">Correo Electrónico</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="usuario@campeonatolibre.com">
         </div>
 
-        <!-- Código de desbloqueo -->
+        <!-- CODE -->
         <div class="form-group">
-          <label for="unlock_code">Código de desbloqueo</label>
-          <div class="input-wrapper code-input">
-            <input
-              type="text"
-              id="unlock_code"
-              formControlName="unlock_code"
-              placeholder="000000"
-              [class.invalid]="codeInvalid"
-              (input)="onCodeInput($event)"
-              maxlength="6"
-              autocomplete="one-time-code"
-            />
-            <span class="input-icon">🔑</span>
-          </div>
-          @if (codeInvalid) {
-            <span class="error-text">
-              @if (unlockForm.get('unlock_code')?.hasError('required')) {
-                El código es requerido
-              } @else {
-                Debe ser un código de 6 dígitos
-              }
-            </span>
-          }
+          <label for="code">Código de Desbloqueo</label>
+          <input 
+            type="text" 
+            id="code" 
+            formControlName="code" 
+            placeholder="Ingresa el código que te enviamos"
+            maxlength="6">
         </div>
 
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="isLoading()"
-        >
+        <button type="submit" class="btn-submit" [disabled]="isLoading()">
           @if (isLoading()) {
             <span class="spinner"></span>
-            Verificando...
+            Desbloqueando...
           } @else {
-            Desbloquear cuenta
+            Desbloquear Cuenta Ahora
           }
         </button>
       </form>
-    }
 
-    <div class="unlock-footer">
-      <p><a routerLink="/auth/login">← Volver al inicio de sesión</a></p>
+      <!-- INFO BOX -->
+      <div class="info-box">
+        <p><strong>Revisa la bandeja de entrada de tu correo electrónico para encontrar el código.</strong></p>
+        <p>Verifica tu carpeta de spam si no lo encuentras.</p>
+      </div>
+
+      <!-- RESEND -->
+      <p class="resend-text">
+        ¿No recibiste el código? 
+        <button type="button" class="link-button" (click)="resendCode()" [disabled]="isLoading()">
+          Reenviar código
+        </button>
+      </p>
     </div>
   </div>
 </div>

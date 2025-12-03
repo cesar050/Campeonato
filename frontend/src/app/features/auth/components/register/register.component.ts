@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ErrorResponse } from '../../../../core/models/usuario.model';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.scss'
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
   private fb = inject(FormBuilder);
@@ -18,105 +17,86 @@ export class RegisterComponent {
   private router = inject(Router);
 
   isLoading = signal(false);
+  errorMessage = signal('');
   showPassword = signal(false);
   showConfirmPassword = signal(false);
-  errorMessage = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
-  registeredEmail = signal<string | null>(null);
+  passwordStrength = signal<'weak' | 'medium' | 'strong'>('weak');
+  registerSuccess = signal(false);
 
   registerForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+    nombre: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email, this.gmailValidator]],
-    contrasena: ['', [Validators.required, Validators.minLength(8), this.passwordStrengthValidator]],
-    confirmarContrasena: ['', [Validators.required]],
-    rol: ['lider']
-  }, {
-    validators: this.passwordMatchValidator
-  });
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [Validators.required]],
+    rol: ['lider'], // FIJO como lider
+    acceptTerms: [false, [Validators.requiredTrue]]
+  }, { validators: this.passwordMatchValidator });
 
-  // Validador personalizado para Gmail
   gmailValidator(control: AbstractControl): ValidationErrors | null {
-    const email = control.value?.toLowerCase();
-    if (email && !email.endsWith('@gmail.com')) {
-      return { gmailOnly: true };
-    }
-    return null;
+    if (!control.value) return null;
+    const isGmail = control.value.toLowerCase().endsWith('@gmail.com');
+    return isGmail ? null : { notGmail: true };
   }
 
-  // Validador de fortaleza de contraseña
-  passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
-    const password = control.value;
-    if (!password) return null;
-
-    const errors: ValidationErrors = {};
-
-    if (!/[A-Z]/.test(password)) {
-      errors['noUppercase'] = true;
-    }
-    if (!/[a-z]/.test(password)) {
-      errors['noLowercase'] = true;
-    }
-    if (!/[0-9]/.test(password)) {
-      errors['noNumber'] = true;
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      errors['noSpecial'] = true;
-    }
-
-    return Object.keys(errors).length > 0 ? errors : null;
-  }
-
-  // Validador de contraseñas coincidentes
   passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
-    const password = group.get('contrasena')?.value;
-    const confirmPassword = group.get('confirmarContrasena')?.value;
-
-    if (password && confirmPassword && password !== confirmPassword) {
-      group.get('confirmarContrasena')?.setErrors({ mismatch: true });
-      return { mismatch: true };
-    }
-    return null;
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  onSubmit(): void {
+  onPasswordChange() {
+    const password = this.registerForm.get('password')?.value || '';
+    if (password.length === 0) {
+      this.passwordStrength.set('weak');
+      return;
+    }
+
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    if (strength <= 2) this.passwordStrength.set('weak');
+    else if (strength <= 4) this.passwordStrength.set('medium');
+    else this.passwordStrength.set('strong');
+  }
+
+  onSubmit() {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
+    this.errorMessage.set('');
 
-    const { confirmarContrasena, ...registerData } = this.registerForm.value;
+    const { confirmPassword, acceptTerms, ...registerData } = this.registerForm.value;
 
     this.authService.register(registerData).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading.set(false);
-        this.successMessage.set(response.mensaje);
-        this.registeredEmail.set(response.email);
-        this.registerForm.reset();
+        this.registerSuccess.set(true);
+        setTimeout(() => {
+          this.router.navigate(['/auth/login']);
+        }, 3000);
       },
-      error: (error: ErrorResponse) => {
+      error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error || 'Error al registrar usuario');
+        this.errorMessage.set(err.error?.error || 'Error al crear la cuenta');
       }
     });
   }
 
-  togglePassword(): void {
+  togglePassword() {
     this.showPassword.update(v => !v);
   }
 
-  toggleConfirmPassword(): void {
+  toggleConfirmPassword() {
     this.showConfirmPassword.update(v => !v);
   }
 
-  goToLogin(): void {
-    this.router.navigate(['/auth/login']);
-  }
-
-  // Getters para validaciones
   get nombreInvalid(): boolean {
     const control = this.registerForm.get('nombre');
     return !!(control?.invalid && control?.touched);
@@ -128,30 +108,12 @@ export class RegisterComponent {
   }
 
   get passwordInvalid(): boolean {
-    const control = this.registerForm.get('contrasena');
+    const control = this.registerForm.get('password');
     return !!(control?.invalid && control?.touched);
   }
 
   get confirmPasswordInvalid(): boolean {
-    const control = this.registerForm.get('confirmarContrasena');
-    return !!(control?.invalid && control?.touched);
-  }
-
-  // Getter para la fortaleza de la contraseña
-  get passwordStrength(): { level: string; percentage: number; color: string } {
-    const password = this.registerForm.get('contrasena')?.value || '';
-    let score = 0;
-
-    if (password.length >= 8) score++;
-    if (password.length >= 12) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[a-z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
-
-    if (score <= 2) return { level: 'Débil', percentage: 25, color: '#dc2626' };
-    if (score <= 4) return { level: 'Media', percentage: 50, color: '#f59e0b' };
-    if (score <= 5) return { level: 'Fuerte', percentage: 75, color: '#10b981' };
-    return { level: 'Muy fuerte', percentage: 100, color: '#059669' };
+    const control = this.registerForm.get('confirmPassword');
+    return !!(control?.invalid && control?.touched) || this.registerForm.hasError('passwordMismatch');
   }
 }

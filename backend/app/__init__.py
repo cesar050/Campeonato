@@ -120,17 +120,19 @@ def create_app(config_name='development'):
     from app.routes.solicitud_equipo_routes import solicitud_ns
     from app.routes.notificacion_routes import notificacion_ns
     from app.routes.estadisticas_routes import estadisticas_ns
+    from app.routes.superadmin_routes import superadmin_ns
 
     api.add_namespace(auth_ns, path='/auth')
     api.add_namespace(equipo_ns, path='/equipos')
     api.add_namespace(jugador_ns, path='/jugadores')
-    api.add_namespace(campeonato_ns, path='/campeonato')
+    api.add_namespace(campeonato_ns, path='/campeonatos')
     api.add_namespace(partidos_ns, path='/partidos')
     api.add_namespace(gol_ns, path='/gol')
     api.add_namespace(tarjeta_ns, path='/tarjetas')
     api.add_namespace(solicitud_ns, path='/solicitudes')
     api.add_namespace(notificacion_ns, path='/notificaciones')
     api.add_namespace(estadisticas_ns, path='/estadisticas')
+    api.add_namespace(superadmin_ns, path='/superadmin')
 
     @app.route('/health')
     def health_check():

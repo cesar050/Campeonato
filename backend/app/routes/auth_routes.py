@@ -430,3 +430,371 @@ class GetCurrentUser(Resource):
             return usuario.to_dict(), 200
         except Exception as e:
             auth_ns.abort(500, error=str(e))
+# ============================================
+# 👑 SUPER ADMIN - GESTION DE ORGANIZADORES
+# ============================================
+
+def superadmin_required():
+    """Decorador para verificar si es superadmin"""
+    def wrapper(fn):
+        from functools import wraps
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            current_user_id = int(get_jwt_identity())
+            usuario = Usuario.query.get(current_user_id)
+            if not usuario or usuario.rol != 'superadmin':
+                auth_ns.abort(403, error='Acceso denegado. Se requiere rol de superadmin')
+            return fn(*args, **kwargs)
+        return decorator
+    return wrapper
+
+
+# Modelos para documentacion
+organizador_model = auth_ns.model('Organizador', {
+    'nombre': fields.String(required=True, description='Nombre del organizador'),
+    'email': fields.String(required=True, description='Email del organizador (Gmail)'),
+    'nombre_campeonato': fields.String(required=True, description='Nombre del campeonato que gestionara')
+})
+
+organizador_update_model = auth_ns.model('OrganizadorUpdate', {
+    'nombre': fields.String(description='Nombre del organizador'),
+    'activo': fields.Boolean(description='Estado activo/inactivo')
+})
+
+
+@auth_ns.route('/superadmin/dashboard')
+class SuperAdminDashboard(Resource):
+    @jwt_required()
+    @superadmin_required()
+    def get(self):
+        """Dashboard con estadisticas generales del sistema"""
+        try:
+            from app.models.equipo import Equipo
+            from app.models.campeonato import Campeonato
+            from app.models.partido import Partido
+            
+            total_usuarios = Usuario.query.count()
+            total_admins = Usuario.query.filter_by(rol='admin').count()
+            total_lideres = Usuario.query.filter_by(rol='lider').count()
+            total_equipos = Equipo.query.count()
+            total_campeonatos = Campeonato.query.count()
+            total_partidos = Partido.query.count()
+            
+            # Ultimos organizadores registrados
+            ultimos_admins = Usuario.query.filter_by(rol='admin').order_by(Usuario.fecha_registro.desc()).limit(5).all()
+            
+            return {
+                'estadisticas': {
+                    'total_usuarios': total_usuarios,
+                    'total_organizadores': total_admins,
+                    'total_lideres': total_lideres,
+                    'total_equipos': total_equipos,
+                    'total_campeonatos': total_campeonatos,
+                    'total_partidos': total_partidos
+                },
+                'ultimos_organizadores': [admin.to_dict() for admin in ultimos_admins]
+            }, 200
+            
+        except Exception as e:
+            auth_ns.abort(500, error=str(e))
+
+
+@auth_ns.route('/superadmin/organizadores')
+class SuperAdminOrganizadores(Resource):
+    @jwt_required()
+    @superadmin_required()
+    def get(self):
+        """Lista todos los organizadores (admins)"""
+        try:
+            organizadores = Usuario.query.filter_by(rol='admin').order_by(Usuario.fecha_registro.desc()).all()
+            return {
+                'organizadores': [org.to_dict() for org in organizadores],
+                'total': len(organizadores)
+            }, 200
+        except Exception as e:
+            auth_ns.abort(500, error=str(e))
+    
+    @jwt_required()
+    @superadmin_required()
+    @auth_ns.expect(organizador_model)
+    def post(self):
+        """Crear nuevo organizador y enviar credenciales por correo"""
+        try:
+            data = auth_ns.payload
+            
+            if not data.get('nombre') or not data.get('email'):
+                auth_ns.abort(400, error='Nombre y email son requeridos')
+            
+            email = data['email'].lower()
+            
+            if not email.endswith('@gmail.com'):
+                auth_ns.abort(400, error='Solo se permiten cuentas de Gmail')
+            
+            if Usuario.query.filter_by(email=email).first():
+                auth_ns.abort(400, error='El email ya esta registrado')
+            
+            # Generar contrasena temporal
+            contrasena_temporal = secrets.token_urlsafe(12)
+            
+            nuevo_organizador = Usuario(
+                nombre=InputSanitizer.sanitize_string(data['nombre'], max_length=100),
+                email=email,
+                rol='admin',
+                activo=True,
+                email_verified=True  # Ya verificado porque lo crea el superadmin
+            )
+            nuevo_organizador.set_password(contrasena_temporal)
+            
+            db.session.add(nuevo_organizador)
+            db.session.commit()
+            
+            # Enviar correo con credenciales
+            email_enviado = False
+            try:
+                email_enviado = EmailService.send_organizador_credentials(
+                    email=email,
+                    nombre=data['nombre'],
+                    contrasena=contrasena_temporal,
+                    nombre_campeonato=data.get('nombre_campeonato', 'Tu Campeonato')
+                )
+            except Exception as e:
+                print(f"⚠️ Error enviando email: {str(e)}")
+            
+            SecurityLog.log_event(
+                event_type='login_success',
+                user_id=nuevo_organizador.id_usuario,
+                email=email,
+                ip_address=request.remote_addr,
+                user_agent=request.headers.get('User-Agent'),
+                details={'action': 'superadmin_create_organizador'}
+            )
+            
+            return {
+                'mensaje': 'Organizador creado exitosamente',
+                'organizador': nuevo_organizador.to_dict(),
+                'email_enviado': email_enviado,
+                'contrasena_temporal': contrasena_temporal if not email_enviado else None,
+                'info': '📧 Se enviaron las credenciales por correo' if email_enviado else '⚠️ No se pudo enviar el correo, entrega la contrasena manualmente'
+            }, 201
+            
+        except Exception as e:
+            db.session.rollback()
+            auth_ns.abort(500, error=str(e))
+
+
+@auth_ns.route('/superadmin/organizadores/<int:id>')
+class SuperAdminOrganizadorDetail(Resource):
+    @jwt_required()
+    @superadmin_required()
+    def get(self, id):
+        """Obtener detalle de un organizador"""
+        try:
+            organizador = Usuario.query.filter_by(id_usuario=id, rol='admin').first()
+            if not organizador:
+                auth_ns.abort(404, error='Organizador no encontrado')
+            return organizador.to_dict(), 200
+        except Exception as e:
+            auth_ns.abort(500, error=str(e))
+    
+    @jwt_required()
+    @superadmin_required()
+    @auth_ns.expect(organizador_update_model)
+    def put(self, id):
+        """Actualizar organizador"""
+        try:
+            organizador = Usuario.query.filter_by(id_usuario=id, rol='admin').first()
+            if not organizador:
+                auth_ns.abort(404, error='Organizador no encontrado')
+            
+            data = auth_ns.payload
+            
+            if data.get('nombre'):
+                organizador.nombre = InputSanitizer.sanitize_string(data['nombre'], max_length=100)
+            
+            if 'activo' in data:
+                organizador.activo = data['activo']
+            
+            db.session.commit()
+            
+            return {
+                'mensaje': 'Organizador actualizado',
+                'organizador': organizador.to_dict()
+            }, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            auth_ns.abort(500, error=str(e))
+    
+    @jwt_required()
+    @superadmin_required()
+    def delete(self, id):
+        """Desactivar organizador (no elimina, solo desactiva)"""
+        try:
+            organizador = Usuario.query.filter_by(id_usuario=id, rol='admin').first()
+            if not organizador:
+                auth_ns.abort(404, error='Organizador no encontrado')
+            
+            organizador.activo = False
+            db.session.commit()
+            
+            return {
+                'mensaje': 'Organizador desactivado',
+                'organizador': organizador.to_dict()
+            }, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            auth_ns.abort(500, error=str(e))
+
+
+@auth_ns.route('/superadmin/organizadores/<int:id>/reenviar-credenciales')
+class SuperAdminReenviarCredenciales(Resource):
+    @jwt_required()
+    @superadmin_required()
+    def post(self, id):
+        """Generar nueva contrasena y reenviar credenciales"""
+        try:
+            organizador = Usuario.query.filter_by(id_usuario=id, rol='admin').first()
+            if not organizador:
+                auth_ns.abort(404, error='Organizador no encontrado')
+            
+            # Generar nueva contrasena
+            nueva_contrasena = secrets.token_urlsafe(12)
+            organizador.set_password(nueva_contrasena)
+            db.session.commit()
+            
+            # Enviar correo
+            email_enviado = False
+            try:
+                email_enviado = EmailService.send_organizador_credentials(
+                    email=organizador.email,
+                    nombre=organizador.nombre,
+                    contrasena=nueva_contrasena,
+                    nombre_campeonato='Tu Campeonato'
+                )
+            except Exception as e:
+                print(f"⚠️ Error enviando email: {str(e)}")
+            
+            return {
+                'mensaje': 'Credenciales regeneradas',
+                'email_enviado': email_enviado,
+                'contrasena_temporal': nueva_contrasena if not email_enviado else None
+            }, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            auth_ns.abort(500, error=str(e))
+    # ============================================
+# 🔐 RECUPERAR CONTRASEÑA
+# ============================================
+
+forgot_password_model = auth_ns.model('ForgotPassword', {
+    'email': fields.String(required=True, description='Email del usuario')
+})
+
+reset_password_model = auth_ns.model('ResetPassword', {
+    'email': fields.String(required=True, description='Email del usuario'),
+    'code': fields.String(required=True, description='Codigo de 6 digitos'),
+    'new_password': fields.String(required=True, description='Nueva contraseña')
+})
+
+
+@auth_ns.route('/forgot-password')
+class ForgotPassword(Resource):
+    @auth_ns.expect(forgot_password_model)
+    @rate_limit(max_requests=5, window_minutes=15)
+    def post(self):
+        """Solicitar codigo para restablecer contraseña"""
+        try:
+            data = auth_ns.payload
+            
+            if not data.get('email'):
+                auth_ns.abort(400, error='Email requerido')
+            
+            email = data['email'].lower()
+            usuario = Usuario.query.filter_by(email=email).first()
+            
+            # Por seguridad, siempre responder igual (no revelar si existe el email)
+            response_message = {
+                'mensaje': 'Si el email existe, recibiras un codigo de verificacion',
+                'info': '📧 Revisa tu bandeja de entrada y spam'
+            }
+            
+            if not usuario:
+                return response_message, 200
+            
+            # Generar codigo de 6 digitos
+            reset_code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+            
+            # Guardar codigo en el usuario (expira en 15 min)
+            from datetime import timedelta
+            usuario.password_reset_code = reset_code
+            usuario.password_reset_expires = datetime.utcnow() + timedelta(minutes=15)
+            db.session.commit()
+            
+            # Enviar email
+            try:
+                EmailService.send_password_reset(
+                    email=usuario.email,
+                    nombre=usuario.nombre,
+                    reset_code=reset_code
+                )
+            except Exception as e:
+                print(f"⚠️ Error enviando email: {str(e)}")
+            
+            return response_message, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            auth_ns.abort(500, error=str(e))
+
+
+@auth_ns.route('/reset-password')
+class ResetPassword(Resource):
+    @auth_ns.expect(reset_password_model)
+    @rate_limit(max_requests=5, window_minutes=15)
+    def post(self):
+        """Restablecer contraseña con codigo"""
+        try:
+            data = auth_ns.payload
+            
+            if not data.get('email') or not data.get('code') or not data.get('new_password'):
+                auth_ns.abort(400, error='Email, codigo y nueva contraseña son requeridos')
+            
+            email = data['email'].lower()
+            usuario = Usuario.query.filter_by(email=email).first()
+            
+            if not usuario:
+                auth_ns.abort(400, error='Codigo invalido o expirado')
+            
+            # Verificar codigo
+            if not usuario.password_reset_code or usuario.password_reset_code != data['code']:
+                auth_ns.abort(400, error='Codigo invalido o expirado')
+            
+            # Verificar expiracion
+            if not usuario.password_reset_expires or usuario.password_reset_expires < datetime.utcnow():
+                auth_ns.abort(400, error='Codigo invalido o expirado')
+            
+            # Validar nueva contraseña (minimo 8 caracteres)
+            if len(data['new_password']) < 8:
+                auth_ns.abort(400, error='La contraseña debe tener minimo 8 caracteres')
+            
+            # Actualizar contraseña
+            usuario.set_password(data['new_password'])
+            usuario.password_reset_code = None
+            usuario.password_reset_expires = None
+            
+            # Resetear intentos fallidos por si estaba bloqueado
+            usuario.failed_login_attempts = 0
+            usuario.locked_until = None
+            
+            db.session.commit()
+            
+            return {
+                'mensaje': '✅ Contraseña actualizada exitosamente',
+                'info': 'Ya puedes iniciar sesion con tu nueva contraseña'
+            }, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            auth_ns.abort(500, error=str(e))

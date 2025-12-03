@@ -4,7 +4,7 @@ export interface Usuario {
   nombre: string;
   email: string;
   email_verified: boolean;
-  rol: 'admin' | 'lider' | 'espectador';
+  rol: 'superadmin' | 'admin' | 'lider' | 'espectador';
   activo: boolean;
   failed_login_attempts: number;
   last_login_at: string | null;
