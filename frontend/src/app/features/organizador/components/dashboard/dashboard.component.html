@@ -1,0 +1,166 @@
+<div class="dashboard-container">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando dashboard...</p>
+    </div>
+  } @else {
+    <!-- HERO SECTION -->
+    <div class="hero-section">
+      <div class="hero-image">
+        <img src="assets/images/stadium.jpg" alt="Estadio" onerror="this.style.display='none'">
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="hero-content">
+        <h1>Resumen del Campeonato: {{ campeonato()?.nombre || 'Copa Verde 2024' }}</h1>
+        <p>Sigue de cerca el progreso de tu torneo.</p>
+        <div class="hero-meta">
+          <span class="meta-item">Etapa Actual: <strong>Fase de Grupos</strong></span>
+        </div>
+        <button type="button" class="btn-details" routerLink="/organizador/mi-campeonato">
+          Ver Detalles Completos
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Equipos Inscritos</span>
+        </div>
+        <div class="stat-value">{{ stats().equipos_inscritos }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Equipos Pendientes</span>
+        </div>
+        <div class="stat-value">{{ stats().equipos_pendientes }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">Partidos Programados</span>
+        </div>
+        <div class="stat-value">{{ stats().partidos_programados }}</div>
+      </div>
+
+      <div class="stat-card highlight">
+        <div class="stat-header">
+          <span class="stat-label">Próximo Partido</span>
+        </div>
+        <div class="stat-value">En {{ stats().proximo_partido_dias }} días</div>
+      </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="content-grid">
+      <!-- PRÓXIMOS PARTIDOS -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Próximos Partidos</h3>
+        </div>
+        <div class="card-body">
+          <div class="partidos-list">
+            @for (partido of proximosPartidos(); track partido.id) {
+              <div class="partido-item">
+                <div class="partido-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                    <path d="M2 12h20"></path>
+                  </svg>
+                </div>
+                <div class="partido-info">
+                  <div class="partido-equipos">{{ partido.local }} vs. {{ partido.visitante }}</div>
+                  <div class="partido-meta">{{ partido.fecha }} - {{ partido.lugar }}</div>
+                </div>
+                <button type="button" class="btn-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- SOLICITUDES PENDIENTES -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Solicitudes Pendientes</h3>
+        </div>
+        <div class="card-body">
+          <div class="solicitudes-list">
+            @for (solicitud of solicitudesPendientes(); track solicitud.id) {
+              <div class="solicitud-item">
+                <div class="solicitud-avatar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                  </svg>
+                </div>
+                <div class="solicitud-info">
+                  <div class="solicitud-nombre">{{ solicitud.equipo }}</div>
+                </div>
+                <div class="solicitud-actions">
+                  <button type="button" class="btn-reject" (click)="rechazarEquipo(solicitud.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                  <button type="button" class="btn-approve" (click)="aprobarEquipo(solicitud.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="card actions-card">
+      <div class="card-header">
+        <h3>Acciones Rápidas</h3>
+      </div>
+      <div class="card-body">
+        <div class="actions-grid">
+          <button type="button" class="action-btn primary" routerLink="/organizador/partidos">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>Agregar Partido</span>
+          </button>
+
+          <button type="button" class="action-btn secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>Registrar Resultado</span>
+          </button>
+
+          <button type="button" class="action-btn secondary" routerLink="/organizador/tabla-posiciones">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            <span>Ver Tabla</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

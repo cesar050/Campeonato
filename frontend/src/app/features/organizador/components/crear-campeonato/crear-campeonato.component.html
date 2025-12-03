@@ -1,0 +1,299 @@
+<div class="wizard-container">
+  <!-- HEADER -->
+  <div class="wizard-header">
+    <div class="header-content">
+      <a href="javascript:history.back()" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Volver
+      </a>
+      <h1>Crear un Nuevo Campeonato</h1>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step-line"></div>
+    
+    <!-- STEP 1 -->
+    <div class="step" [class.active]="currentStep() >= 1" [class.completed]="currentStep() > 1">
+      <div class="step-circle">
+        @if (currentStep() > 1) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        } @else {
+          <span>1</span>
+        }
+      </div>
+      <div class="step-content">
+        <div class="step-number">1. INFORMACIÓN</div>
+        <div class="step-title" [class.active-title]="currentStep() === 1">Información Básica</div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" [class.active]="currentStep() >= 2" [class.completed]="currentStep() > 2">
+      <div class="step-circle">
+        @if (currentStep() > 2) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        } @else {
+          <span>2</span>
+        }
+      </div>
+      <div class="step-content">
+        <div class="step-number">2. CONFIGURACIÓN</div>
+        <div class="step-title" [class.active-title]="currentStep() === 2">Configuración del Torneo</div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" [class.active]="currentStep() >= 3">
+      <div class="step-circle">
+        <span>3</span>
+      </div>
+      <div class="step-content">
+        <div class="step-number">3. CONFIRMACIÓN</div>
+        <div class="step-title" [class.active-title]="currentStep() === 3">Revisión Final</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMS CONTAINER -->
+  <div class="forms-container">
+    <!-- PASO 1: INFORMACIÓN -->
+    @if (currentStep() === 1) {
+      <div class="form-card" [@slideIn]>
+        <div class="form-header">
+          <h2>Paso 1: Información Básica</h2>
+          <p>Comienza ingresando los detalles principales de tu campeonato.</p>
+        </div>
+
+        <form [formGroup]="infoForm">
+          <!-- NOMBRE -->
+          <div class="form-group">
+            <label for="nombre">Nombre del Campeonato <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="nombre" 
+              formControlName="nombre" 
+              placeholder="Ej: Copa de Verano 2024"
+              [class.invalid]="nombreInvalid">
+            @if (nombreInvalid) {
+              <span class="error-text">El nombre es requerido (mínimo 3 caracteres)</span>
+            }
+          </div>
+
+          <!-- DESCRIPCIÓN -->
+          <div class="form-group">
+            <label for="descripcion">Descripción del Campeonato <span class="required">*</span></label>
+            <textarea 
+              id="descripcion" 
+              formControlName="descripcion" 
+              rows="4"
+              placeholder="Describe tu campeonato. Ejemplo: El torneo de fútbol amateur más emocionante de la temporada. Reúne a los mejores equipos de la región para competir por la gloria."
+              [class.invalid]="descripcionInvalid"></textarea>
+            @if (descripcionInvalid) {
+              <span class="error-text">La descripción es requerida (mínimo 10 caracteres)</span>
+            }
+          </div>
+        </form>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="prevStep()" disabled>
+            Atrás
+          </button>
+          <button type="button" class="btn-primary" (click)="nextStep()">
+            Siguiente
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- PASO 2: CONFIGURACIÓN -->
+    @if (currentStep() === 2) {
+      <div class="form-card">
+        <div class="form-header">
+          <h2>Paso 2: Configuración del Torneo</h2>
+          <p>Define las reglas y el calendario de tu campeonato.</p>
+        </div>
+
+        <form [formGroup]="configForm">
+          <!-- FECHAS -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fecha_inicio">Fecha de Inicio <span class="required">*</span></label>
+              <input 
+                type="date" 
+                id="fecha_inicio" 
+                formControlName="fecha_inicio"
+                [class.invalid]="fechaInicioInvalid">
+              @if (fechaInicioInvalid) {
+                <span class="error-text">La fecha de inicio es requerida</span>
+              }
+            </div>
+
+            <div class="form-group">
+              <label for="fecha_fin">Fecha de Fin <span class="required">*</span></label>
+              <input 
+                type="date" 
+                id="fecha_fin" 
+                formControlName="fecha_fin"
+                [class.invalid]="fechaFinInvalid">
+              @if (fechaFinInvalid) {
+                <span class="error-text">La fecha de fin es requerida</span>
+              }
+            </div>
+          </div>
+
+          <!-- MÁXIMO DE EQUIPOS -->
+          <div class="form-group">
+            <label>Máximo de Equipos <span class="required">*</span></label>
+            <div class="number-input">
+              <button type="button" class="btn-decrease" (click)="decrementEquipos()">
+                -
+              </button>
+              <input 
+                type="number" 
+                formControlName="max_equipos" 
+                readonly
+                [class.invalid]="maxEquiposInvalid">
+              <button type="button" class="btn-increase" (click)="incrementEquipos()">
+                +
+              </button>
+            </div>
+            @if (maxEquiposInvalid) {
+              <span class="error-text">Se requiere al menos 2 equipos</span>
+            }
+          </div>
+
+          <!-- TIPO DE COMPETICIÓN -->
+          <div class="form-group">
+            <label>Tipo de Competición <span class="required">*</span></label>
+            <div class="competition-types">
+              @for (tipo of tiposCompeticion; track tipo.id) {
+                <div 
+                  class="competition-card" 
+                  [class.selected]="configForm.get('tipo_competicion')?.value === tipo.id"
+                  (click)="selectTipoCompeticion(tipo.id)">
+                  <div class="card-radio">
+                    <div class="radio-dot"></div>
+                  </div>
+                  <div class="card-content">
+                    <h3>{{ tipo.nombre }}</h3>
+                    <p>{{ tipo.descripcion }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </form>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="prevStep()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Atrás
+          </button>
+          <button type="button" class="btn-primary" (click)="nextStep()">
+            Siguiente
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- PASO 3: CONFIRMACIÓN -->
+    @if (currentStep() === 3) {
+      <div class="form-card">
+        <div class="form-header">
+          <h2>Paso 3: Revisión y Confirmación</h2>
+          <p>Revisa los detalles antes de crear tu campeonato.</p>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <div class="summary-section">
+          <h3>Información Básica</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ infoForm.get('nombre')?.value }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Descripción:</span>
+              <span class="value">{{ infoForm.get('descripcion')?.value }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-section">
+          <h3>Configuración del Torneo</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="label">Fecha de Inicio:</span>
+              <span class="value">{{ configForm.get('fecha_inicio')?.value }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Fecha de Fin:</span>
+              <span class="value">{{ configForm.get('fecha_fin')?.value }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Máximo de Equipos:</span>
+              <span class="value">{{ configForm.get('max_equipos')?.value }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Tipo de Competición:</span>
+              <span class="value">
+                {{ getTipoCompeticionNombre() }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="prevStep()" [disabled]="isSubmitting()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Atrás
+          </button>
+          <button type="button" class="btn-primary" (click)="onSubmit()" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <span class="spinner-small"></span>
+              Creando...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Crear Campeonato
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

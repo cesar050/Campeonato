@@ -12,7 +12,7 @@ class Usuario(db.Model):
     email_verification_token = db.Column(db.String(255), nullable=True)
     contrasena = db.Column(db.String(255), nullable=False)
     password_changed_at = db.Column(db.DateTime, nullable=True)
-    rol = db.Column(db.Enum('admin', 'lider', 'espectador', name='rol_enum'), default='lider')
+    rol = db.Column(db.Enum('superadmin', 'admin', 'lider', 'espectador'), default='lider')
     activo = db.Column(db.Boolean, default=True)
     failed_login_attempts = db.Column(db.Integer, default=0)
     locked_until = db.Column(db.DateTime, nullable=True) 
@@ -20,6 +20,9 @@ class Usuario(db.Model):
     fecha_actualizacion = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     last_login_at = db.Column(db.DateTime, nullable=True)
     last_login_ip = db.Column(db.String(45), nullable=True)
+    # Campos para recuperar contraseña
+    password_reset_code = db.Column(db.String(6), nullable=True)
+    password_reset_expires = db.Column(db.DateTime, nullable=True)
     
     def __repr__(self):
         return f'<Usuario {self.email}>'

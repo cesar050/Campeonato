@@ -1,0 +1,323 @@
+<div class="dashboard-container">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Resumen General</h1>
+      <p class="subtitle">Métricas clave de la plataforma</p>
+    </div>
+    <div class="header-meta">
+      <span class="last-update">Actualizado: 15 de Julio, 2024</span>
+    </div>
+  </div>
+
+  <!-- STATS CARDS -->
+  <div class="stats-grid">
+    <!-- CAMPEONATOS ACTIVOS -->
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="7"></circle>
+          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Campeonatos Activos</div>
+        <div class="stat-value">{{ stats().campeonatos_activos || 128 }}</div>
+        @if (stats().trend_campeonatos) {
+          <div class="stat-trend" [class]="getTrendClass(stats().trend_campeonatos)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              @if (stats().trend_campeonatos! > 0) {
+                <polyline points="18 15 12 9 6 15"></polyline>
+              } @else {
+                <polyline points="6 9 12 15 18 9"></polyline>
+              }
+            </svg>
+            <span>{{ formatTrend(stats().trend_campeonatos) }}</span>
+          </div>
+        } @else {
+          <div class="stat-trend trend-up">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+            <span>+5.2%</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ORGANIZADORES REGISTRADOS -->
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Organizadores Registrados</div>
+        <div class="stat-value">{{ stats().total_organizadores || 64 }}</div>
+        @if (stats().trend_organizadores) {
+          <div class="stat-trend" [class]="getTrendClass(stats().trend_organizadores)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              @if (stats().trend_organizadores! > 0) {
+                <polyline points="18 15 12 9 6 15"></polyline>
+              } @else {
+                <polyline points="6 9 12 15 18 9"></polyline>
+              }
+            </svg>
+            <span>{{ formatTrend(stats().trend_organizadores) }}</span>
+          </div>
+        } @else {
+          <div class="stat-trend trend-up">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+            <span>+10%</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- USUARIOS TOTALES -->
+    <div class="stat-card">
+      <div class="stat-icon purple">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Usuarios Totales</div>
+        <div class="stat-value">{{ stats().usuarios_totales || 1234 }}</div>
+        @if (stats().trend_usuarios) {
+          <div class="stat-trend" [class]="getTrendClass(stats().trend_usuarios)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              @if (stats().trend_usuarios! > 0) {
+                <polyline points="18 15 12 9 6 15"></polyline>
+              } @else {
+                <polyline points="6 9 12 15 18 9"></polyline>
+              }
+            </svg>
+            <span>{{ formatTrend(stats().trend_usuarios) }}</span>
+          </div>
+        } @else {
+          <div class="stat-trend trend-up">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+            <span>+8.1%</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- SOLICITUDES PENDIENTES -->
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <div class="stat-label">Solicitudes Pendientes</div>
+        <div class="stat-value">{{ stats().solicitudes_pendientes || 3 }}</div>
+        @if (stats().trend_solicitudes) {
+          <div class="stat-trend" [class]="getTrendClass(stats().trend_solicitudes)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              @if (stats().trend_solicitudes! > 0) {
+                <polyline points="18 15 12 9 6 15"></polyline>
+              } @else {
+                <polyline points="6 9 12 15 18 9"></polyline>
+              }
+            </svg>
+            <span>{{ formatTrend(stats().trend_solicitudes) }}</span>
+          </div>
+        } @else {
+          <div class="stat-trend trend-down">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            <span>-25%</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS & ACTIVITY -->
+  <div class="content-grid">
+    <!-- GROWTH CHART -->
+    <div class="card chart-card">
+      <div class="card-header">
+        <h3>Crecimiento de Usuarios (Últimos 30 días)</h3>
+      </div>
+      <div class="card-body">
+        <div class="chart-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="300" viewBox="0 0 600 300">
+            <!-- Grid lines -->
+            <line x1="50" y1="50" x2="50" y2="250" stroke="#E0E0E0" stroke-width="1"/>
+            <line x1="50" y1="250" x2="580" y2="250" stroke="#E0E0E0" stroke-width="1"/>
+            
+            <!-- Area chart -->
+            <defs>
+              <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:0.3" />
+                <stop offset="100%" style="stop-color:#4CAF50;stop-opacity:0" />
+              </linearGradient>
+            </defs>
+            
+            <path d="M 50 200 L 100 180 L 150 190 L 200 160 L 250 170 L 300 140 L 350 150 L 400 120 L 450 130 L 500 100 L 550 90 L 580 80 L 580 250 L 50 250 Z" 
+                  fill="url(#chartGradient)" />
+            
+            <path d="M 50 200 L 100 180 L 150 190 L 200 160 L 250 170 L 300 140 L 350 150 L 400 120 L 450 130 L 500 100 L 550 90 L 580 80" 
+                  fill="none" 
+                  stroke="#4CAF50" 
+                  stroke-width="3"/>
+            
+            <!-- Data points -->
+            <circle cx="50" cy="200" r="4" fill="#2E7D32"/>
+            <circle cx="100" cy="180" r="4" fill="#2E7D32"/>
+            <circle cx="150" cy="190" r="4" fill="#2E7D32"/>
+            <circle cx="200" cy="160" r="4" fill="#2E7D32"/>
+            <circle cx="250" cy="170" r="4" fill="#2E7D32"/>
+            <circle cx="300" cy="140" r="4" fill="#2E7D32"/>
+            <circle cx="350" cy="150" r="4" fill="#2E7D32"/>
+            <circle cx="400" cy="120" r="4" fill="#2E7D32"/>
+            <circle cx="450" cy="130" r="4" fill="#2E7D32"/>
+            <circle cx="500" cy="100" r="4" fill="#2E7D32"/>
+            <circle cx="550" cy="90" r="4" fill="#2E7D32"/>
+            <circle cx="580" cy="80" r="4" fill="#2E7D32"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAMPIONSHIPS STATUS -->
+    <div class="card donut-card">
+      <div class="card-header">
+        <h3>Estado de Campeonatos</h3>
+      </div>
+      <div class="card-body">
+        <div class="donut-chart">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <!-- Donut chart -->
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#E8F5E9" stroke-width="30"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#4CAF50" stroke-width="30"
+                    stroke-dasharray="264 440" stroke-dashoffset="0" 
+                    transform="rotate(-90 100 100)"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#9C27B0" stroke-width="30"
+                    stroke-dasharray="132 440" stroke-dashoffset="-264" 
+                    transform="rotate(-90 100 100)"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#FF9800" stroke-width="30"
+                    stroke-dasharray="44 440" stroke-dashoffset="-396" 
+                    transform="rotate(-90 100 100)"/>
+          </svg>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #4CAF50;"></span>
+            <span class="legend-label">Activos</span>
+            <span class="legend-value">60%</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #9C27B0;"></span>
+            <span class="legend-label">Finalizados</span>
+            <span class="legend-value">30%</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: #FF9800;"></span>
+            <span class="legend-label">Planificación</span>
+            <span class="legend-value">10%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT ACTIVITY & QUICK ACTIONS -->
+  <div class="bottom-grid">
+    <!-- RECENT ACTIVITY -->
+    <div class="card activity-card">
+      <div class="card-header">
+        <h3>Actividad Reciente</h3>
+      </div>
+      <div class="card-body">
+        <div class="activity-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ACCIÓN</th>
+                <th>USUARIO</th>
+                <th>FECHA</th>
+                <th>ESTADO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (activity of recentActivities(); track activity.id) {
+                <tr>
+                  <td>{{ activity.accion }}</td>
+                  <td>{{ activity.usuario }}</td>
+                  <td>{{ activity.fecha }}</td>
+                  <td>
+                    <span class="status-badge" [class]="getStatusClass(activity.estado)">
+                      {{ activity.estado }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span>Mostrando 1-4 de 50</span>
+          <div class="pagination">
+            <button class="page-btn" disabled>Anterior</button>
+            <button class="page-btn">Siguiente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card actions-card">
+      <div class="card-header">
+        <h3>Acciones Rápidas</h3>
+      </div>
+      <div class="card-body">
+        <a routerLink="/superadmin/organizadores" class="action-btn primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <line x1="19" y1="8" x2="19" y2="14"></line>
+            <line x1="22" y1="11" x2="16" y2="11"></line>
+          </svg>
+          <span>Crear Organizador</span>
+        </a>
+
+        <a routerLink="/superadmin/analytics" class="action-btn secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="20" x2="12" y2="10"></line>
+            <line x1="18" y1="20" x2="18" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="16"></line>
+          </svg>
+          <span>Ver Reportes</span>
+        </a>
+
+        <a href="#" class="action-btn secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Gestionar Solicitudes</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

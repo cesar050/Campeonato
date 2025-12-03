@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
-import { ErrorResponse } from '../../../../core/models/usuario.model';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
@@ -18,93 +17,102 @@ export class LoginComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // Signals para estado reactivo
   isLoading = signal(false);
+  errorMessage = signal('');
   showPassword = signal(false);
-  errorMessage = signal<string | null>(null);
-  warningMessage = signal<string | null>(null);
-  attemptsRemaining = signal<number | null>(null);
-  isLocked = signal(false);
-  lockedUntil = signal<string | null>(null);
-  minutesRemaining = signal<number | null>(null);
-  unlockInfo = signal<string | null>(null);
+  accountLocked = signal(false);
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    contrasena: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required]],
+    remember: [false]
   });
 
-  onSubmit(): void {
+  onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
-
+  
     this.isLoading.set(true);
-    this.clearMessages();
+    this.errorMessage.set('');
+    this.accountLocked.set(false);
+  
 
-    this.authService.login(this.loginForm.value).subscribe({
+    const loginData = {
+      email: this.loginForm.value.email,
+      contrasena: this.loginForm.value.password
+    };
+  
+    console.log('Sending login request...', loginData); 
+    this.authService.login(loginData).subscribe({
       next: (response) => {
+        console.log('Login successful! Response:', response);
         this.isLoading.set(false);
-        // Redirigir al returnUrl o al dashboard
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-        this.router.navigateByUrl(returnUrl);
+        
+        // Verificar estructura de la respuesta
+        const user = response.usuario || (response as any).user;
+        
+        if (!user) {
+          console.error('No user data in response:', response);
+          this.errorMessage.set('Error en la respuesta del servidor');
+          return;
+        }
+  
+        console.log('👤 User data:', user);
+        console.log('🔑 User role:', user.rol);
+  
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+  
+        if (returnUrl) {
+          console.log('↪️ Redirecting to returnUrl:', returnUrl);
+          this.router.navigateByUrl(returnUrl);
+        } else if (user.rol === 'superadmin') {
+          console.log('👑 Redirecting to superadmin dashboard');
+          this.router.navigate(['/superadmin/dashboard']);
+        } else if (user.rol === 'admin') {
+          console.log('⚙️ Redirecting to organizador dashboard');
+          this.router.navigate(['/organizador/dashboard']);
+        } else if (user.rol === 'lider') {
+          console.log('👥 Redirecting to lider dashboard');
+          this.router.navigate(['/dashboard']);
+        } else {
+          console.log('❓ Unknown role, redirecting to default dashboard');
+          this.router.navigate(['/dashboard']);
+        }
       },
-      error: (error: ErrorResponse) => {
+      error: (err) => {
+        console.error('❌ Login error:', err);
+        console.error('Status:', err.status);
+        console.error('Error body:', err.error);
+        
         this.isLoading.set(false);
-        this.handleLoginError(error);
+        
+        if (err.status === 403) {
+          this.accountLocked.set(true);
+          this.errorMessage.set('Cuenta bloqueada temporalmente');
+        } else if (err.status === 401) {
+          this.errorMessage.set('Las credenciales proporcionadas son incorrectas.');
+        } else if (err.error?.error) {
+          this.errorMessage.set(err.error.error);
+        } else {
+          this.errorMessage.set('Error al iniciar sesión. Inténtalo de nuevo.');
+        }
       }
     });
   }
 
-  private handleLoginError(error: ErrorResponse): void {
-    // Verificar si la cuenta está bloqueada
-    if (error.locked_until || error.error === 'Cuenta bloqueada') {
-      this.isLocked.set(true);
-      this.lockedUntil.set(error.locked_until || null);
-      this.minutesRemaining.set(error.minutes_remaining || null);
-      this.unlockInfo.set(error.info || null);
-      this.errorMessage.set(error.mensaje || 'Cuenta bloqueada temporalmente');
-      return;
-    }
-
-    // Verificar intentos restantes
-    if (error.attempts_remaining !== undefined) {
-      this.attemptsRemaining.set(error.attempts_remaining);
-      this.warningMessage.set(error.warning || null);
-    }
-
-    // Mensaje de error general
-    this.errorMessage.set(error.error || 'Error al iniciar sesión');
-  }
-
-  private clearMessages(): void {
-    this.errorMessage.set(null);
-    this.warningMessage.set(null);
-    this.attemptsRemaining.set(null);
-    this.isLocked.set(false);
-    this.lockedUntil.set(null);
-    this.minutesRemaining.set(null);
-    this.unlockInfo.set(null);
-  }
-
-  togglePassword(): void {
+  togglePassword() {
     this.showPassword.update(v => !v);
   }
 
-  goToUnlock(): void {
-    const email = this.loginForm.get('email')?.value;
-    this.router.navigate(['/auth/unlock'], { queryParams: { email } });
-  }
-
-  // Getters para validaciones
   get emailInvalid(): boolean {
     const control = this.loginForm.get('email');
     return !!(control?.invalid && control?.touched);
   }
 
   get passwordInvalid(): boolean {
-    const control = this.loginForm.get('contrasena');
+    const control = this.loginForm.get('password');
     return !!(control?.invalid && control?.touched);
   }
 }

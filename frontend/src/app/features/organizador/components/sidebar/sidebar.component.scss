@@ -1,0 +1,138 @@
+$white: #FFFFFF;
+$bg-light: #F8F9FA;
+$text-dark: #1A1A1A;
+$text-gray: #666666;
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$border-color: #E0E0E0;
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: $white;
+  border-right: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.user-section {
+  padding: 2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid $border-color;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  background: $bg-light;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    color: $text-gray;
+  }
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $text-dark;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 0.8rem;
+  color: $text-gray;
+  margin-top: 0.125rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0.75rem;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: 3px;
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  color: $text-gray;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    background: $bg-light;
+    color: $text-dark;
+  }
+
+  &.active {
+    background: rgba(76, 175, 80, 0.1);
+    color: $green-primary;
+    font-weight: 600;
+
+    .nav-icon {
+      color: $green-primary;
+    }
+  }
+}
+
+.nav-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.nav-label {
+  flex: 1;
+}
+
+.sidebar-bottom {
+  padding: 0.75rem;
+  border-top: 1px solid $border-color;
+}
+
+.logout-btn {
+  color: #DC2626;
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #B91C1C;
+  }
+
+  .nav-icon {
+    color: #DC2626;
+  }
+}

@@ -24,12 +24,33 @@ export const authGuard: CanActivateFn = (route, state) => {
  * Guard para rutas de invitado (login, register)
  * Redirige al dashboard si ya está autenticado
  */
-export const guestGuard: CanActivateFn = (route, state) => {
+/**export const guestGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
   if (authService.isAuthenticated() && authService.hasValidToken()) {
     router.navigate(['/dashboard']);
+    return false;
+  }
+
+  return true;
+};*/
+
+export const guestGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated() && authService.hasValidToken()) {
+    const user = authService.currentUser();
+    
+    // Redirigir segun el rol
+    if (user?.rol === 'superadmin') {
+      router.navigate(['/superadmin/dashboard']);
+    } else if (user?.rol === 'admin') {
+      router.navigate(['/organizador/dashboard']);
+    } else {
+      router.navigate(['/dashboard']);
+    }
     return false;
   }
 
@@ -71,6 +92,23 @@ export const liderGuard: CanActivateFn = (route, state) => {
 
   const user = authService.currentUser();
   if (user?.rol === 'admin' || user?.rol === 'lider') {
+    return true;
+  }
+
+  router.navigate(['/dashboard']);
+  return false;
+  
+};
+/**
+ * Guard para rutas de superadmin
+ */
+export const superadminGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  const user = authService.currentUser();
+  
+  if (user?.rol === 'superadmin') {
     return true;
   }
 

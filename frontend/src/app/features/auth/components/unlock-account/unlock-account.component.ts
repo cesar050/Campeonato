@@ -1,81 +1,105 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
-import { ErrorResponse } from '../../../../core/models/usuario.model';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-unlock-account',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './unlock-account.component.html',
-  styleUrl: './unlock-account.component.scss'
+  styleUrls: ['./unlock-account.component.scss']
 })
-export class UnlockAccountComponent implements OnInit {
+export class UnlockAccountComponent {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  private http = inject(HttpClient);
   private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private apiUrl = environment.apiUrl || 'http://localhost:5000';
 
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
+  errorMessage = signal('');
+  successMessage = signal('');
+  countdown = signal('');
 
   unlockForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    unlock_code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d{6}$/)]]
+    code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
   });
 
-  ngOnInit(): void {
-    // Obtener email desde query params si existe
-    const email = this.route.snapshot.queryParams['email'];
-    if (email) {
-      this.unlockForm.patchValue({ email });
+  private countdownInterval: any;
+
+  ngOnInit() {
+    this.startCountdown();
+  }
+
+  ngOnDestroy() {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
     }
   }
 
-  onSubmit(): void {
+  startCountdown() {
+    // Simular 10 minutos de bloqueo
+    let seconds = 600;
+    
+    this.countdownInterval = setInterval(() => {
+      seconds--;
+      
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      
+      this.countdown.set(`${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`);
+      
+      if (seconds <= 0) {
+        clearInterval(this.countdownInterval);
+        this.countdown.set('00:00');
+      }
+    }, 1000);
+  }
+
+  onSubmit() {
     if (this.unlockForm.invalid) {
       this.unlockForm.markAllAsTouched();
       return;
     }
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
+    this.errorMessage.set('');
 
-    this.authService.unlockAccount(this.unlockForm.value).subscribe({
-      next: (response) => {
+    this.http.post(`${this.apiUrl}/auth/unlock`, this.unlockForm.value).subscribe({
+      next: () => {
         this.isLoading.set(false);
-        this.successMessage.set(response.mensaje);
-        
-        // Redirigir al login después de 2 segundos
+        this.successMessage.set('Cuenta desbloqueada exitosamente');
         setTimeout(() => {
           this.router.navigate(['/auth/login']);
         }, 2000);
       },
-      error: (error: ErrorResponse) => {
+      error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(error.error || 'Código inválido o expirado');
+        this.errorMessage.set(err.error?.error || 'Código inválido o expirado');
       }
     });
   }
 
-  // Formatear código mientras escribe (solo números)
-  onCodeInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    input.value = input.value.replace(/\D/g, '').slice(0, 6);
-    this.unlockForm.patchValue({ unlock_code: input.value });
-  }
+  resendCode() {
+    const email = this.unlockForm.get('email')?.value;
+    if (!email) {
+      this.errorMessage.set('Por favor ingresa tu email primero');
+      return;
+    }
 
-  get emailInvalid(): boolean {
-    const control = this.unlockForm.get('email');
-    return !!(control?.invalid && control?.touched);
-  }
-
-  get codeInvalid(): boolean {
-    const control = this.unlockForm.get('unlock_code');
-    return !!(control?.invalid && control?.touched);
+    this.isLoading.set(true);
+    this.http.post(`${this.apiUrl}/auth/resend-unlock-code`, { email }).subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        alert('Código reenviado a tu email');
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.errorMessage.set('Error al reenviar el código');
+      }
+    });
   }
 }

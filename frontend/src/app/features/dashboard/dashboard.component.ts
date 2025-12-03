@@ -268,14 +268,7 @@ export class DashboardComponent {
   isLider = this.authService.isLider;
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/auth/login']);
-      },
-      error: () => {
-        // Incluso si falla, redirigir al login
-        this.router.navigate(['/auth/login']);
-      }
-    });
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }

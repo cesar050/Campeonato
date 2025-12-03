@@ -1,118 +1,140 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <div class="logo">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-        </svg>
-      </div>
-      <h1>Gestión de Campeonatos</h1>
-      <p>Inicia sesión para continuar</p>
+<div class="auth-layout">
+  <!-- LEFT SIDE - IMAGE -->
+  <div class="auth-side">
+    <div class="auth-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+        <path d="M2 12h20"></path>
+      </svg>
+      <span>Campeonato Libre</span>
     </div>
 
-    <!-- Alerta de cuenta bloqueada -->
-    @if (isLocked()) {
-      <div class="alert alert-error">
-        <div class="alert-icon">🔒</div>
-        <div class="alert-content">
-          <strong>{{ errorMessage() }}</strong>
-          @if (minutesRemaining()) {
-            <p>Tiempo restante: {{ minutesRemaining() }} minutos</p>
+    <img src="assets/images/Principal.png" alt="Campeonato Libre" class="auth-image">
+
+    <div class="auth-tagline">
+      <h2>La gestión de tu liga, simplificada.</h2>
+      <p>Enfócate en el juego, nosotros nos encargamos del resto.</p>
+    </div>
+
+    <div class="auth-footer">
+      © 2024 Campeonato Libre. Todos los derechos reservados.
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE - FORM -->
+  <div class="auth-form-container">
+    <div class="auth-form-wrapper">
+      <h1>Iniciar Sesión</h1>
+      <p class="auth-subtitle">Gestiona tu campeonato con facilidad.</p>
+
+      <!-- ERROR ALERT -->
+      @if (errorMessage() && !accountLocked()) {
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <div>
+            <strong>Error de Autenticación</strong>
+            <p>{{ errorMessage() }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- ACCOUNT LOCKED ALERT -->
+      @if (accountLocked()) {
+        <div class="alert alert-warning">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <div>
+            <strong>Cuenta Bloqueada</strong>
+            <p>Demasiados intentos fallidos. Inténtalo más tarde.</p>
+          </div>
+        </div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- EMAIL -->
+        <div class="form-group">
+          <label for="email">Correo Electrónico</label>
+          <div class="input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="input-icon">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m2 7 10 7 10-7"></path>
+            </svg>
+            <input 
+              type="email" 
+              id="email" 
+              formControlName="email" 
+              placeholder="tu.correo@ejemplo.com"
+              [class.invalid]="emailInvalid">
+          </div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <div class="input-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="input-icon">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input 
+              [type]="showPassword() ? 'text' : 'password'" 
+              id="password" 
+              formControlName="password" 
+              placeholder="Ingresa tu contraseña"
+              [class.invalid]="passwordInvalid">
+            <button type="button" class="toggle-password" (click)="togglePassword()">
+              @if (showPassword()) {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- REMEMBER & FORGOT -->
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="remember">
+            <span>Recordarme</span>
+          </label>
+          <a routerLink="/auth/forgot-password" class="link-primary">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <!-- SUBMIT -->
+        <button type="submit" class="btn-submit" [disabled]="isLoading()">
+          @if (isLoading()) {
+            <span class="spinner"></span>
+            Iniciando Sesión...
+          } @else {
+            Iniciar Sesión
           }
-          @if (unlockInfo()) {
-            <p>{{ unlockInfo() }}</p>
-          }
-          <button type="button" class="btn-link" (click)="goToUnlock()">
-            Desbloquear cuenta
-          </button>
+        </button>
+
+        <!-- DIVIDER -->
+        <div class="divider">
+          <span>o</span>
         </div>
-      </div>
-    }
 
-    <!-- Alerta de error -->
-    @if (errorMessage() && !isLocked()) {
-      <div class="alert alert-error">
-        <span>{{ errorMessage() }}</span>
-      </div>
-    }
-
-    <!-- Alerta de intentos restantes -->
-    @if (warningMessage()) {
-      <div class="alert alert-warning">
-        <span>{{ warningMessage() }}</span>
-      </div>
-    }
-
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <!-- Email -->
-      <div class="form-group">
-        <label for="email">Correo electrónico</label>
-        <div class="input-wrapper">
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="tucorreo@gmail.com"
-            [class.invalid]="emailInvalid"
-            autocomplete="email"
-          />
-          <span class="input-icon">📧</span>
-        </div>
-        @if (emailInvalid) {
-          <span class="error-text">
-            @if (loginForm.get('email')?.hasError('required')) {
-              El email es requerido
-            } @else if (loginForm.get('email')?.hasError('email')) {
-              Ingresa un email válido
-            }
-          </span>
-        }
-      </div>
-
-      <!-- Contraseña -->
-      <div class="form-group">
-        <label for="contrasena">Contraseña</label>
-        <div class="input-wrapper">
-          <input
-            [type]="showPassword() ? 'text' : 'password'"
-            id="contrasena"
-            formControlName="contrasena"
-            placeholder="••••••••"
-            [class.invalid]="passwordInvalid"
-            autocomplete="current-password"
-          />
-          <button type="button" class="toggle-password" (click)="togglePassword()">
-            {{ showPassword() ? '🙈' : '👁️' }}
-          </button>
-        </div>
-        @if (passwordInvalid) {
-          <span class="error-text">
-            @if (loginForm.get('contrasena')?.hasError('required')) {
-              La contraseña es requerida
-            } @else if (loginForm.get('contrasena')?.hasError('minlength')) {
-              Mínimo 6 caracteres
-            }
-          </span>
-        }
-      </div>
-
-      <!-- Botón de submit -->
-      <button
-        type="submit"
-        class="btn-primary"
-        [disabled]="isLoading() || isLocked()"
-      >
-        @if (isLoading()) {
-          <span class="spinner"></span>
-          Iniciando sesión...
-        } @else {
-          Iniciar sesión
-        }
-      </button>
-    </form>
-
-    <div class="login-footer">
-      <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a></p>
+        <!-- REGISTER LINK -->
+        <p class="form-footer">
+          ¿No tienes cuenta? <a routerLink="/auth/register" class="link-primary">Regístrate aquí</a>
+        </p>
+      </form>
     </div>
   </div>
 </div>

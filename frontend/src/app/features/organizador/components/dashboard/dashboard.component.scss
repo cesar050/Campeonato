@@ -1,0 +1,415 @@
+$white: #FFFFFF;
+$bg-light: #F8F9FA;
+$text-dark: #1A1A1A;
+$text-gray: #666666;
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$border-color: #E0E0E0;
+
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  min-height: 100vh;
+  background: $bg-light;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $border-color;
+    border-top-color: $green-primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.hero-section {
+  position: relative;
+  background: $white;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.9), rgba(27, 94, 32, 0.85));
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem;
+  color: $white;
+  max-width: 700px;
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+  }
+
+  p {
+    font-size: 1.05rem;
+    margin: 0 0 1.5rem;
+    opacity: 0.95;
+  }
+}
+
+.hero-meta {
+  margin-bottom: 1.5rem;
+
+  .meta-item {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+
+    strong {
+      font-weight: 600;
+    }
+  }
+}
+
+.btn-details {
+  display: inline-flex;
+  padding: 0.75rem 1.5rem;
+  background: $white;
+  color: $green-primary;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card {
+  background: $white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  &.highlight {
+    background: linear-gradient(135deg, $green-light, $green-primary);
+    color: $white;
+
+    .stat-label {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .stat-value {
+      color: $white;
+    }
+  }
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: $text-gray;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-top: 0.5rem;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid $border-color;
+
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0;
+  }
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.partidos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.partido-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: $bg-light;
+  border-radius: 8px;
+
+  &:hover {
+    background: #F1F2F3;
+  }
+}
+
+.partido-icon {
+  width: 40px;
+  height: 40px;
+  background: $white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    color: $green-primary;
+  }
+}
+
+.partido-info {
+  flex: 1;
+}
+
+.partido-equipos {
+  font-weight: 600;
+  color: $text-dark;
+  margin-bottom: 0.25rem;
+}
+
+.partido-meta {
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  background: $white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  svg {
+    color: $text-gray;
+  }
+
+  &:hover {
+    border-color: $green-primary;
+    background: rgba(76, 175, 80, 0.1);
+
+    svg {
+      color: $green-primary;
+    }
+  }
+}
+
+.solicitudes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.solicitud-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: $bg-light;
+  border-radius: 8px;
+}
+
+.solicitud-avatar {
+  width: 40px;
+  height: 40px;
+  background: $white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    color: $green-primary;
+  }
+}
+
+.solicitud-info {
+  flex: 1;
+}
+
+.solicitud-nombre {
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.solicitud-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-reject,
+.btn-approve {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reject {
+  background: #FFEBEE;
+
+  svg {
+    color: #DC2626;
+  }
+
+  &:hover {
+    background: #FFCDD2;
+  }
+}
+
+.btn-approve {
+  background: #E8F5E9;
+
+  svg {
+    color: $green-primary;
+  }
+
+  &:hover {
+    background: #C8E6C9;
+  }
+}
+
+.actions-card .card-body {
+  padding: 2rem;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+
+  &.primary {
+    background: linear-gradient(135deg, $green-light, $green-primary);
+    color: $white;
+
+    svg {
+      color: $white;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
+    }
+  }
+
+  &.secondary {
+    background: $bg-light;
+    color: $text-dark;
+
+    svg {
+      color: $green-primary;
+    }
+
+    &:hover {
+      background: #EEEFF0;
+    }
+  }
+}

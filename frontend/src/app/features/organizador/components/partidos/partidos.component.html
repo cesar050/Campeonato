@@ -1,0 +1,131 @@
+<div class="partidos-container">
+    <div class="page-header">
+      <h1>Calendario de Partidos</h1>
+      <button type="button" class="btn-generate">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>Generar Fixture Automático</span>
+      </button>
+    </div>
+  
+    <div class="views-tabs">
+      <button type="button" class="tab-btn" [class.active]="activeView() === 'lista'" (click)="setView('lista')">Lista</button>
+      <button type="button" class="tab-btn" [class.active]="activeView() === 'calendario'" (click)="setView('calendario')">Calendario</button>
+      <button type="button" class="tab-btn" [class.active]="activeView() === 'tabla'" (click)="setView('tabla')">Tabla</button>
+    </div>
+  
+    @if (isLoading()) {
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Cargando partidos...</p>
+      </div>
+    } @else {
+      @if (activeView() === 'lista') {
+        <div class="jornadas-list">
+          @for (jornada of jornadas(); track jornada.jornada) {
+            <div class="jornada-section">
+              <h2>Jornada {{ jornada.jornada }}</h2>
+  
+              @for (partido of jornada.partidos; track partido.id) {
+                <div class="partido-card">
+                  <div class="partido-header">
+                    <span class="partido-fecha">{{ partido.fecha }} | {{ partido.lugar }}</span>
+                    <span class="estado-badge" [class]="getEstadoBadgeClass(partido.estado)">
+                      {{ getEstadoLabel(partido.estado) }}
+                    </span>
+                  </div>
+  
+                  <div class="partido-main">
+                    <div class="equipo">
+                      <div class="equipo-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                      </div>
+                      <span class="equipo-nombre">{{ partido.local }}</span>
+                    </div>
+  
+                    <div class="resultado">
+                      @if (partido.estado === 'finalizado') {
+                        <span class="marcador">{{ partido.goles_local }} - {{ partido.goles_visitante }}</span>
+                      } @else {
+                        <span class="vs">-  -</span>
+                      }
+                    </div>
+  
+                    <div class="equipo">
+                      <div class="equipo-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                      </div>
+                      <span class="equipo-nombre">{{ partido.visitante }}</span>
+                    </div>
+                  </div>
+  
+                  <div class="partido-actions">
+                    @if (partido.estado === 'programado') {
+                      <button type="button" class="btn-action">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Registrar Resultado
+                      </button>
+                    }
+                    <button type="button" class="btn-action">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="5" r="1"></circle>
+                        <circle cx="12" cy="19" r="1"></circle>
+                      </svg>
+                      Ver Detalles
+                    </button>
+                    <button type="button" class="btn-action">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                      Editar
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+  
+      @if (activeView() === 'calendario') {
+        <div class="empty-view">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <h3>Vista de Calendario</h3>
+          <p>Próximamente disponible</p>
+        </div>
+      }
+  
+      @if (activeView() === 'tabla') {
+        <div class="empty-view">
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <h3>Vista de Tabla</h3>
+          <p>Próximamente disponible</p>
+        </div>
+      }
+    }
+  </div>

@@ -10,17 +10,14 @@ def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
 
-    # Initialize Flask-RESTx API
     api = Api(app, title='Campeonato API', version='1.0', description='API para gestión de campeonatos de fútbol')
 
-    #app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev-secret-cambiar-en-produccion')
     app.config['JWT_SECRET_KEY'] = 'dev-secret-cambiar-en-produccion'
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)
     app.config['JWT_BLACKLIST_ENABLED'] = True
     app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
     
- 
     app.config['MAX_LOGIN_ATTEMPTS'] = 5
     app.config['LOCKOUT_DURATION_MINUTES'] = 10
     app.config['UNLOCK_CODE_EXPIRES_MINUTES'] = 15
@@ -31,10 +28,8 @@ def create_app(config_name='development'):
     app.config['SECURITY_LOG_RETENTION_DAYS'] = 90
     app.config['SEND_LOCKOUT_EMAIL'] = True
     
-    
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'documentos'), exist_ok=True)
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'logos'), exist_ok=True)
-    
     
     db.init_app(app)
     migrate.init_app(app, db)
@@ -57,11 +52,8 @@ def create_app(config_name='development'):
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     mail.init_app(app)
     
-    
     register_error_handlers(app)
-    
 
-    
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         from app.security.token_manager import TokenManager
@@ -100,8 +92,22 @@ def create_app(config_name='development'):
             'code': 'TOKEN_REVOKED'
         }), 401
     
-    
+    # Importar modelos y crear tablas
     with app.app_context():
+        from app.models.usuario import Usuario
+        from app.models.equipo import Equipo
+        from app.models.jugador import Jugador
+        from app.models.campeonato import Campeonato
+        from app.models.partido import Partido
+        from app.models.gol import Gol
+        from app.models.tarjeta import Tarjeta
+        from app.models.notificacion import Notificacion
+        from app.models.solicitud_equipo import SolicitudEquipo
+        from app.models.token_blacklist import TokenBlacklist
+        from app.models.refresh_token import RefreshToken
+        from app.models.login_attempt import LoginAttempt
+        from app.models.account_lockout import AccountLockout
+        from app.models.security_log import SecurityLog
         db.create_all()
     
     from app.routes.auth_routes import auth_ns
@@ -114,30 +120,26 @@ def create_app(config_name='development'):
     from app.routes.solicitud_equipo_routes import solicitud_ns
     from app.routes.notificacion_routes import notificacion_ns
     from app.routes.estadisticas_routes import estadisticas_ns
+    from app.routes.superadmin_routes import superadmin_ns
 
     api.add_namespace(auth_ns, path='/auth')
     api.add_namespace(equipo_ns, path='/equipos')
     api.add_namespace(jugador_ns, path='/jugadores')
-    api.add_namespace(campeonato_ns, path='/campeonato')
+    api.add_namespace(campeonato_ns, path='/campeonatos')
     api.add_namespace(partidos_ns, path='/partidos')
     api.add_namespace(gol_ns, path='/gol')
     api.add_namespace(tarjeta_ns, path='/tarjetas')
     api.add_namespace(solicitud_ns, path='/solicitudes')
     api.add_namespace(notificacion_ns, path='/notificaciones')
     api.add_namespace(estadisticas_ns, path='/estadisticas')
+    api.add_namespace(superadmin_ns, path='/superadmin')
 
     @app.route('/health')
     def health_check():
         return jsonify({
             'status': 'ok',
             'message': 'API funcionando correctamente',
-            'version': '1.0.0',
-            'security': {
-                'jwt_enabled': True,
-                'rate_limiting': app.config['RATE_LIMIT_ENABLED'],
-                'cors_enabled': True,
-                'email_notifications': app.config['SEND_LOCKOUT_EMAIL']
-            }
+            'version': '1.0.0'
         }), 200
     
     return app

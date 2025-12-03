@@ -1,0 +1,244 @@
+<div class="detalle-container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando equipo...</p>
+      </div>
+    } @else {
+      <!-- HEADER -->
+      <div class="page-header">
+        <button type="button" class="btn-back" (click)="volver()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Equipos
+        </button>
+        <h1>Detalle de Equipo</h1>
+      </div>
+  
+      <!-- EQUIPO HERO -->
+      <div class="equipo-hero">
+        <div class="hero-left">
+          <div class="equipo-avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+            </svg>
+          </div>
+          <div class="equipo-info">
+            <h2>{{ equipo()?.nombre }}</h2>
+            <div class="estado-badge badge-warning">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              Pendiente de Aprobación
+            </div>
+            <div class="equipo-meta">
+              Fundado: {{ equipo()?.fecha_fundacion }}
+            </div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <button type="button" class="btn-edit">Editar</button>
+          <button type="button" class="btn-more">Más opciones</button>
+        </div>
+      </div>
+  
+      <!-- APROBACIÓN RÁPIDA -->
+      @if (equipo()?.estado === 'pendiente') {
+        <div class="quick-approval">
+          <div class="approval-content">
+            <h3>Aprobación Rápida</h3>
+            <p>Completa los siguientes pasos para finalizar la aprobación del equipo.</p>
+            <div class="checklist">
+              <div class="check-item checked">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Jugadores verificados</span>
+              </div>
+              <div class="check-item checked">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Documentación completa y válida</span>
+              </div>
+              <div class="check-item checked">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Información del equipo completa</span>
+              </div>
+            </div>
+          </div>
+          <div class="approval-actions">
+            <button type="button" class="btn-aprobar" (click)="openAprobarModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Aprobar Equipo
+            </button>
+            <button type="button" class="btn-rechazar" (click)="openRechazarModal()">Rechazar</button>
+          </div>
+        </div>
+      }
+  
+      <!-- TABS -->
+      <div class="tabs-container">
+        <div class="tabs-nav">
+          <button type="button" class="tab-item" [class.active]="activeTab() === 'informacion'" (click)="setActiveTab('informacion')">Información</button>
+          <button type="button" class="tab-item" [class.active]="activeTab() === 'jugadores'" (click)="setActiveTab('jugadores')">Jugadores</button>
+          <button type="button" class="tab-item" [class.active]="activeTab() === 'documentos'" (click)="setActiveTab('documentos')">Documentos</button>
+          <button type="button" class="tab-item" [class.active]="activeTab() === 'historial'" (click)="setActiveTab('historial')">Historial</button>
+        </div>
+  
+        <div class="tabs-content">
+          @if (activeTab() === 'informacion') {
+            <div class="tab-panel">
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Líder del Equipo</div>
+                  <div class="info-value">{{ equipo()?.lider }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Teléfono</div>
+                  <div class="info-value">{{ equipo()?.telefono }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Estadio</div>
+                  <div class="info-value">{{ equipo()?.estadio }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Colores</div>
+                  <div class="info-value">
+                    <span class="color-dot" style="background: #FFD700;"></span>
+                    <span class="color-dot" style="background: #0000FF;"></span>
+                    {{ equipo()?.colores }}
+                  </div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Fecha de Registro</div>
+                  <div class="info-value">{{ equipo()?.fecha_registro }}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">Aprobado por</div>
+                  <div class="info-value">-</div>
+                </div>
+              </div>
+  
+              <div class="observaciones-section">
+                <h3>Observaciones</h3>
+                <p>{{ equipo()?.observaciones }}</p>
+              </div>
+            </div>
+          }
+  
+          @if (activeTab() === 'jugadores') {
+            <div class="tab-panel">
+              <p class="tab-desc">Lista de jugadores registrados en el equipo.</p>
+            </div>
+          }
+  
+          @if (activeTab() === 'documentos') {
+            <div class="tab-panel">
+              <p class="tab-desc">Documentos del equipo y verificación.</p>
+            </div>
+          }
+  
+          @if (activeTab() === 'historial') {
+            <div class="tab-panel">
+              <p class="tab-desc">Historial de acciones y cambios.</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  
+    <!-- MODAL APROBAR -->
+    @if (showAprobarModal()) {
+      <div class="modal-overlay" (click)="closeAprobarModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-icon success">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h2>Aprobar Equipo</h2>
+          <p>Revisa la información antes de confirmar.</p>
+  
+          <div class="checklist">
+            <div class="check-item checked">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Lista de jugadores verificada</span>
+            </div>
+            <div class="check-item checked">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Documentación completa y válida</span>
+            </div>
+            <div class="check-item checked">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Información del equipo completa</span>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label>Notas adicionales (opcional)</label>
+            <textarea [(ngModel)]="notasAprobacion" rows="3" placeholder="Ej: Pendiente foto del capitán..."></textarea>
+          </div>
+  
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="closeAprobarModal()">Cancelar</button>
+            <button type="button" class="btn-confirm" (click)="confirmarAprobacion()">Aprobar Equipo</button>
+          </div>
+        </div>
+      </div>
+    }
+  
+    <!-- MODAL RECHAZAR -->
+    @if (showRechazarModal()) {
+      <div class="modal-overlay" (click)="closeRechazarModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-icon danger">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </div>
+          <h2>Rechazar Equipo</h2>
+          <p>El equipo será notificado y deberá volver a enviar su solicitud.</p>
+  
+          <div class="form-group">
+            <label>Motivo del rechazo (obligatorio)</label>
+            <textarea [(ngModel)]="motivoRechazo" rows="4" placeholder="Describe claramente por qué el equipo está siendo rechazado..." required></textarea>
+          </div>
+  
+          <div class="form-group">
+            <label>Sugerencias:</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" [ngModel]="sugerencias().documentacion" (ngModelChange)="updateSugerencia('documentacion', $event)">
+                <span>Documentación incompleta o inválida</span>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" [ngModel]="sugerencias().jugadores" (ngModelChange)="updateSugerencia('jugadores', $event)">
+                <span>Faltan jugadores por registrar</span>
+              </label>
+            </div>
+          </div>
+  
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="closeRechazarModal()">Cancelar</button>
+            <button type="button" class="btn-danger" (click)="confirmarRechazo()" [disabled]="!motivoRechazo()">Rechazar Equipo</button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>

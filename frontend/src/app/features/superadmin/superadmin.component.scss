@@ -1,0 +1,17 @@
+.superadmin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #F8F9FA;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  overflow-x: hidden;
+}
+
+@media (max-width: 968px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
