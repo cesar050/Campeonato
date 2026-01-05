@@ -50,7 +50,7 @@ $breakpoint-mobile: 768px;
   transition: transform 0.3s ease;
 
   // Desktop: collapsed state
-  @media (min-width: #{$breakpoint-mobile + 1px}) {
+  @media (min-width: $breakpoint-mobile + 1px) {
     &.collapsed {
       transform: translateX(-260px);
     }

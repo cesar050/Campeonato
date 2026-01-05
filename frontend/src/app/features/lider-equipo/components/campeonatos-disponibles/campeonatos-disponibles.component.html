@@ -1,0 +1,215 @@
+<div class="campeonatos-container">
+    <!-- HEADER -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">
+          <span class="material-symbols-outlined">search</span>
+          Campeonatos Disponibles
+        </h1>
+        <p class="page-subtitle">Encuentra campeonatos e inscribe tus equipos</p>
+      </div>
+    </div>
+  
+    <!-- BÚSQUEDA POR CÓDIGO -->
+    <div class="search-code-section">
+      <div class="code-card">
+        <div class="code-header">
+          <span class="material-symbols-outlined">key</span>
+          <h3>¿Tienes un código de inscripción?</h3>
+        </div>
+        <p class="code-description">Ingresa el código que te proporcionó el organizador para acceder a campeonatos privados</p>
+        
+        <div class="code-input-group">
+          <input 
+            type="text" 
+            [(ngModel)]="codigoBusqueda"
+            (keyup.enter)="buscarPorCodigo()"
+            placeholder="Ej: CAMP2024"
+            class="code-input"
+            [class.error]="errorCodigo()">
+          <button 
+            class="btn-search-code" 
+            (click)="buscarPorCodigo()"
+            [disabled]="loadingCodigo()">
+            <span *ngIf="!loadingCodigo()" class="material-symbols-outlined">search</span>
+            <span *ngIf="loadingCodigo()" class="spinner-small"></span>
+            {{ loadingCodigo() ? 'Buscando...' : 'Buscar' }}
+          </button>
+        </div>
+        
+        <p *ngIf="errorCodigo()" class="error-message">
+          <span class="material-symbols-outlined">error</span>
+          {{ errorCodigo() }}
+        </p>
+      </div>
+    </div>
+  
+    <!-- CAMPEONATO ENCONTRADO POR CÓDIGO -->
+    <div *ngIf="campeonatoBuscado()" class="campeonato-encontrado">
+      <div class="encontrado-header">
+        <h3>
+          <span class="material-symbols-outlined">check_circle</span>
+          Campeonato Encontrado
+        </h3>
+        <button class="btn-close" (click)="cerrarCampeonatoBuscado()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <div class="campeonato-card featured">
+        <div class="card-header">
+          <div class="card-badges">
+            <span class="badge badge-private">
+              <span class="material-symbols-outlined">lock</span>
+              PRIVADO
+            </span>
+            <span class="badge badge-tipo">{{ getTipoDeporteTexto(campeonatoBuscado()!.tipo_deporte) }}</span>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <h3 class="campeonato-nombre">{{ campeonatoBuscado()!.nombre }}</h3>
+          <p class="campeonato-descripcion">{{ campeonatoBuscado()!.descripcion }}</p>
+          
+          <div class="campeonato-info">
+            <div class="info-item">
+              <span class="material-symbols-outlined">emoji_events</span>
+              <span>{{ getTipoCompeticionTexto(campeonatoBuscado()!.tipo_competicion) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">calendar_month</span>
+              <span>{{ formatearFecha(campeonatoBuscado()!.fecha_inicio) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">groups</span>
+              <span>{{ campeonatoBuscado()!.total_equipos_inscritos }} / {{ campeonatoBuscado()!.max_equipos }} equipos</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-footer">
+          <select class="equipo-select" #equipoSelect>
+            <option value="">Selecciona tu equipo</option>
+            <option *ngFor="let equipo of misEquipos()" [value]="equipo.id_equipo">
+              {{ equipo.nombre }}
+            </option>
+          </select>
+          <button 
+            class="btn-inscribir" 
+            (click)="inscribirEquipo(campeonatoBuscado()!, +equipoSelect.value)"
+            [disabled]="inscribiendo()">
+            <span class="material-symbols-outlined">{{ inscribiendo() ? 'schedule' : 'how_to_reg' }}</span>
+            {{ inscribiendo() ? 'Inscribiendo...' : 'Inscribir Equipo' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- FILTROS -->
+    <div class="filters-section">
+      <h2 class="section-title">Campeonatos Públicos</h2>
+      
+      <div class="filters-group">
+        <div class="filter-item">
+          <label>
+            <span class="material-symbols-outlined">sports_soccer</span>
+            Tipo de Deporte
+          </label>
+          <select [(ngModel)]="tipoDeporteFilter" (change)="aplicarFiltros()">
+            <option value="">Todos</option>
+            <option value="futbol">Fútbol 11</option>
+            <option value="indoor">Indoor / Fútbol 5</option>
+          </select>
+        </div>
+        
+        <div class="filter-item">
+          <label>
+            <span class="material-symbols-outlined">search</span>
+            Buscar por nombre
+          </label>
+          <input 
+            type="text" 
+            [(ngModel)]="buscarTexto"
+            (keyup)="aplicarFiltros()"
+            placeholder="Ej: Copa Verano">
+        </div>
+      </div>
+    </div>
+  
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando campeonatos...</p>
+    </div>
+  
+    <!-- EMPTY STATE -->
+    <div *ngIf="!loading() && campeonatosPublicos().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <span class="material-symbols-outlined">event_busy</span>
+      </div>
+      <h2>No hay campeonatos disponibles</h2>
+      <p>Por el momento no hay campeonatos públicos con inscripciones abiertas</p>
+    </div>
+  
+    <!-- GRID DE CAMPEONATOS -->
+    <div *ngIf="!loading() && campeonatosPublicos().length > 0" class="campeonatos-grid">
+      <div *ngFor="let campeonato of campeonatosPublicos()" class="campeonato-card">
+        <div class="card-header">
+          <div class="card-badges">
+            <span class="badge badge-public">
+              <span class="material-symbols-outlined">public</span>
+              PÚBLICO
+            </span>
+            <span class="badge badge-tipo">{{ getTipoDeporteTexto(campeonato.tipo_deporte) }}</span>
+          </div>
+        </div>
+        
+        <div class="card-body">
+          <h3 class="campeonato-nombre">{{ campeonato.nombre }}</h3>
+          <p class="campeonato-descripcion">{{ campeonato.descripcion || 'Sin descripción' }}</p>
+          
+          <div class="campeonato-info">
+            <div class="info-item">
+              <span class="material-symbols-outlined">emoji_events</span>
+              <span>{{ getTipoCompeticionTexto(campeonato.tipo_competicion) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">calendar_month</span>
+              <span>{{ formatearFecha(campeonato.fecha_inicio) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">groups</span>
+              <span>{{ campeonato.total_equipos_inscritos }} / {{ campeonato.max_equipos }} equipos</span>
+            </div>
+          </div>
+  
+          <!-- Barra de progreso -->
+          <div class="progress-bar">
+            <div 
+              class="progress-fill" 
+              [style.width.%]="(campeonato.total_equipos_inscritos / campeonato.max_equipos) * 100">
+            </div>
+          </div>
+          <p class="cupos-text">
+            {{ campeonato.max_equipos - campeonato.total_equipos_inscritos }} cupos disponibles
+          </p>
+        </div>
+        
+        <div class="card-footer">
+          <select class="equipo-select" #equipoSelectPublic>
+            <option value="">Selecciona tu equipo</option>
+            <option *ngFor="let equipo of misEquipos()" [value]="equipo.id_equipo">
+              {{ equipo.nombre }}
+            </option>
+          </select>
+          <button 
+            class="btn-inscribir" 
+            (click)="inscribirEquipo(campeonato, +equipoSelectPublic.value)"
+            [disabled]="inscribiendo()">
+            <span class="material-symbols-outlined">{{ inscribiendo() ? 'schedule' : 'how_to_reg' }}</span>
+            {{ inscribiendo() ? 'Inscribiendo...' : 'Inscribir' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

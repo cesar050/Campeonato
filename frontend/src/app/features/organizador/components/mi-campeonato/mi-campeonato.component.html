@@ -1,181 +1,835 @@
-<div class="campeonato-container">
-  @if (isLoading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando campeonato...</p>
+<!-- TOAST NOTIFICATION -->
+<app-toast
+  [show]="showToast()"
+  [type]="toastType()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  (close)="cerrarToast()">
+</app-toast>
+
+<!-- LOADING -->
+<div *ngIf="loading()" class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-[#102211]">
+  <div class="text-center">
+    <div class="inline-block w-16 h-16 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4"></div>
+    <p class="text-gray-600 dark:text-gray-400 font-medium">Cargando campeonato...</p>
+  </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div *ngIf="!loading()" class="min-h-screen bg-gray-50 dark:bg-[#102211]">
+  
+  <!-- HEADER CON SELECTOR DE CAMPEONATO -->
+  <div class="bg-white dark:bg-[#182c19] border-b-2 border-gray-200 dark:border-[#2a452b] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      
+      <!-- Selector de Campeonato -->
+      <div class="mb-4" *ngIf="misCampeonatos().length > 1">
+        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Mis Campeonatos ({{ misCampeonatos().length }})
+        </label>
+        <div class="relative max-w-md">
+          <button 
+            (click)="toggleCampeonatosDropdown()"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-left flex items-center justify-between hover:border-[#2E7D32] transition-all">
+            <span class="font-semibold text-gray-900 dark:text-white">
+              {{ campeonatoActual()?.nombre || 'Selecciona un campeonato' }}
+            </span>
+            <span class="material-symbols-outlined text-gray-400">expand_more</span>
+          </button>
+
+          <!-- Dropdown de campeonatos -->
+          <div *ngIf="showCampeonatosDropdown()" 
+               class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#182c19] rounded-xl shadow-2xl border-2 border-gray-200 dark:border-[#2a452b] z-50 max-h-80 overflow-y-auto">
+            <button
+              *ngFor="let campeonato of misCampeonatos()"
+              (click)="seleccionarCampeonato(campeonato.id_campeonato)"
+              class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-all border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+              [class.bg-green-50]="campeonato.id_campeonato === idCampeonatoActual()">
+              <p class="font-semibold text-gray-900 dark:text-white">{{ campeonato.nombre }}</p>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ campeonato.descripcion }}</p>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Principal -->
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <!-- Logo y Título -->
+        <div class="flex items-center gap-4">
+          <div class="flex-shrink-0">
+            <app-image-placeholder icon="emoji_events" size="medium"></app-image-placeholder>
+          </div>
+          
+          <div class="flex-1">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2 flex-wrap">
+              {{ campeonatoActual()?.nombre || 'Mi Campeonato' }}
+              <button 
+                (click)="abrirEditarModal()"
+                class="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all"
+                aria-label="Editar campeonato">
+                <span class="material-symbols-outlined text-xl text-gray-400 hover:text-[#2E7D32]">edit</span>
+              </button>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">{{ campeonatoActual()?.descripcion }}</p>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Dropdown Estado -->
+          <div class="relative">
+            <button 
+              (click)="toggleEstadoDropdown()"
+              [class]="'px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all hover:opacity-80 ' + getEstadoColor()"
+              aria-label="Cambiar estado del campeonato">
+              {{ getEstadoLabel() }}
+              <span class="material-symbols-outlined text-lg">expand_more</span>
+            </button>
+
+            <div *ngIf="showEstadoDropdown()" 
+                 class="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-[#182c19] rounded-xl shadow-2xl border-2 border-gray-200 dark:border-[#2a452b] z-50">
+              <button 
+                (click)="cambiarEstado('planificacion')"
+                class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
+                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                <span class="text-gray-900 dark:text-white font-medium">Planificación</span>
+              </button>
+              <button 
+                (click)="cambiarEstado('inscripciones_abiertas')"
+                class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-gray-900 dark:text-white font-medium">Inscripciones Abiertas</span>
+              </button>
+              <button 
+                (click)="cambiarEstado('en_curso')"
+                class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
+                <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                <span class="text-gray-900 dark:text-white font-medium">En Curso</span>
+              </button>
+              <button 
+                (click)="cambiarEstado('finalizado')"
+                class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-3 border-b border-gray-100 dark:border-gray-700">
+                <span class="w-3 h-3 rounded-full bg-gray-500"></span>
+                <span class="text-gray-900 dark:text-white font-medium">Finalizado</span>
+              </button>
+              <button 
+                (click)="cambiarEstado('cancelado')"
+                class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-3">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="text-gray-900 dark:text-white font-medium">Cancelado</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="flex gap-4 sm:gap-8 border-b-2 border-gray-200 dark:border-[#2a452b] mt-6 overflow-x-auto">
+        <button 
+          (click)="setActiveTab('informacion')"
+          [class]="activeTab() === 'informacion' 
+            ? 'border-b-4 border-[#2E7D32] text-[#2E7D32] font-bold' 
+            : 'text-gray-600 dark:text-gray-400 hover:text-[#2E7D32]'"
+          class="px-4 py-3 -mb-0.5 transition-all whitespace-nowrap flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl">info</span>
+          <span>Información</span>
+        </button>
+        <button 
+          (click)="setActiveTab('equipos')"
+          [class]="activeTab() === 'equipos' 
+            ? 'border-b-4 border-[#2E7D32] text-[#2E7D32] font-bold' 
+            : 'text-gray-600 dark:text-gray-400 hover:text-[#2E7D32]'"
+          class="px-4 py-3 -mb-0.5 transition-all whitespace-nowrap flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl">groups</span>
+          <span>Equipos</span>
+          <span *ngIf="solicitudesPendientes().length > 0" 
+                class="px-2 py-1 rounded-full bg-red-500 text-white text-xs font-bold">
+            {{ solicitudesPendientes().length }}
+          </span>
+        </button>
+        <button 
+          (click)="setActiveTab('fixture')"
+          [class]="activeTab() === 'fixture' 
+            ? 'border-b-4 border-[#2E7D32] text-[#2E7D32] font-bold' 
+            : 'text-gray-600 dark:text-gray-400 hover:text-[#2E7D32]'"
+          class="px-4 py-3 -mb-0.5 transition-all whitespace-nowrap flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl">calendar_month</span>
+          <span>Fixture</span>
+        </button>
+        <button 
+          (click)="setActiveTab('configuracion')"
+          [class]="activeTab() === 'configuracion' 
+            ? 'border-b-4 border-[#2E7D32] text-[#2E7D32] font-bold' 
+            : 'text-gray-600 dark:text-gray-400 hover:text-[#2E7D32]'"
+          class="px-4 py-3 -mb-0.5 transition-all whitespace-nowrap flex items-center gap-2">
+          <span class="material-symbols-outlined text-xl">settings</span>
+          <span>Configuración</span>
+        </button>
+      </div>
     </div>
-  } @else {
-    <div class="page-header">
-      <div class="header-left">
-        <div class="campeonato-title">
-          <h1>{{ campeonato()?.nombre || 'Copa de Verano 2024' }}</h1>
-          <button type="button" class="btn-edit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
+  </div>
+
+  <!-- CONTENIDO POR TAB -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    
+    <!-- TAB: INFORMACIÓN -->
+    <div *ngIf="activeTab() === 'informacion'" class="space-y-6">
+      
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Equipos Registrados</p>
+            <span class="material-symbols-outlined text-[#2E7D32] text-2xl">groups</span>
+          </div>
+          <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ stats().equiposRegistrados }}</p>
+          <p class="text-sm text-gray-500 mt-2">de {{ campeonatoActual()?.max_equipos || 0 }} máximo</p>
+        </div>
+
+        <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Partidos Totales</p>
+            <span class="material-symbols-outlined text-[#2E7D32] text-2xl">sports_soccer</span>
+          </div>
+          <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ stats().partidosTotales }}</p>
+        </div>
+
+        <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Partidos Jugados</p>
+            <span class="material-symbols-outlined text-[#2E7D32] text-2xl">check_circle</span>
+          </div>
+          <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ stats().partidosJugados }}</p>
+          <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+            <div 
+              class="bg-[#2E7D32] h-2 rounded-full transition-all duration-500"
+              [style.width.%]="stats().partidosTotales > 0 ? (stats().partidosJugados / stats().partidosTotales * 100) : 0">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Goles Totales</p>
+            <span class="material-symbols-outlined text-[#2E7D32] text-2xl">sports_score</span>
+          </div>
+          <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ stats().golesTotales }}</p>
+        </div>
+      </div>
+
+      <!-- Acciones Rápidas -->
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 sm:p-8">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E7D32]">bolt</span>
+          Acciones Rápidas
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button 
+            (click)="generarFixture()"
+            class="p-6 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/10 transition-all text-center group">
+            <span class="material-symbols-outlined text-5xl text-[#2E7D32] mb-3 group-hover:scale-110 transition-transform">calendar_month</span>
+            <p class="font-bold text-gray-900 dark:text-white">Generar Fixture</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Programa los partidos</p>
+          </button>
+          <button 
+            (click)="verSolicitudes()"
+            class="p-6 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/10 transition-all text-center group relative">
+            <span *ngIf="solicitudesPendientes().length > 0" 
+                  class="absolute top-3 right-3 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+              {{ solicitudesPendientes().length }}
+            </span>
+            <span class="material-symbols-outlined text-5xl text-[#2E7D32] mb-3 group-hover:scale-110 transition-transform">how_to_reg</span>
+            <p class="font-bold text-gray-900 dark:text-white">Ver Solicitudes</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Gestiona inscripciones</p>
+          </button>
+          <button 
+            (click)="descargarReporte()"
+            class="p-6 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/10 transition-all text-center group">
+            <span class="material-symbols-outlined text-5xl text-[#2E7D32] mb-3 group-hover:scale-110 transition-transform">download</span>
+            <p class="font-bold text-gray-900 dark:text-white">Descargar Reporte</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Exporta estadísticas</p>
           </button>
         </div>
       </div>
-      <div class="header-right">
-        <div class="estado-dropdown">
-          <button type="button" class="estado-badge" [class]="getEstadoBadgeClass(campeonato()?.estado || 'en_curso')" (click)="toggleEstadoDropdown()">
-            {{ getEstadoLabel(campeonato()?.estado || 'en_curso') }}
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          @if (showEstadoDropdown()) {
-            <div class="dropdown-menu">
-              <button type="button" (click)="cambiarEstado('planificacion')">Planificación</button>
-              <button type="button" (click)="cambiarEstado('en_curso')">En Juego</button>
-              <button type="button" (click)="cambiarEstado('finalizado')">Finalizado</button>
+    </div>
+
+    <!-- TAB: EQUIPOS -->
+    <div *ngIf="activeTab() === 'equipos'">
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 sm:p-8">
+        
+        <!-- Sin equipos -->
+        <div *ngIf="equiposInscritos().length === 0" class="text-center py-12 sm:py-16">
+          <span class="material-symbols-outlined text-7xl sm:text-8xl text-gray-300 dark:text-gray-600 mb-4">groups</span>
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            No se encuentra ningún equipo registrado
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+            Aquí podrás ver y gestionar todos los equipos inscritos en tu campeonato.
+          </p>
+
+          <!-- Banner de solicitudes pendientes -->
+          <div *ngIf="solicitudesPendientes().length > 0" 
+               class="bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-200 dark:border-yellow-700 rounded-xl p-6 max-w-md mx-auto">
+            <div class="flex items-center justify-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-yellow-600">notifications_active</span>
+              <p class="text-yellow-800 dark:text-yellow-200 font-semibold">
+                Hay {{ solicitudesPendientes().length }} equipo(s) esperando aprobación
+              </p>
             </div>
-          }
+            <button 
+              (click)="verSolicitudes()"
+              class="px-6 py-3 rounded-lg bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] transition-all shadow-md hover:shadow-lg">
+              Ver Solicitudes Pendientes
+            </button>
+          </div>
         </div>
-        <button type="button" class="btn-save">Guardar Cambios</button>
+
+        <!-- Lista de equipos -->
+        <div *ngIf="equiposInscritos().length > 0">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+              Equipos Inscritos ({{ equiposInscritos().length }})
+            </h3>
+
+            <!-- Banner compacto de solicitudes -->
+            <button 
+              *ngIf="solicitudesPendientes().length > 0"
+              (click)="verSolicitudes()"
+              class="px-4 py-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 border-2 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200 font-semibold flex items-center gap-2 hover:bg-yellow-200 dark:hover:bg-yellow-900/50 transition-all">
+              <span class="material-symbols-outlined">notifications</span>
+              {{ solicitudesPendientes().length }} solicitud(es) pendiente(s)
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div 
+              *ngFor="let equipo of equiposInscritos()"
+              (click)="irAEquipoDetalle(equipo.id_equipo)"
+              class="p-6 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] hover:shadow-lg transition-all cursor-pointer group">
+              <div class="flex items-center gap-4 mb-4">
+                <app-image-placeholder 
+                  *ngIf="!equipo.logo_url"
+                  icon="shield" 
+                  size="small">
+                </app-image-placeholder>
+                <img 
+                  *ngIf="equipo.logo_url"
+                  [src]="equipo.logo_url"
+                  [alt]="equipo.nombre"
+                  class="w-12 h-12 rounded-lg object-cover border-2 border-gray-200 dark:border-gray-700 flex-shrink-0">
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-bold text-lg text-gray-900 dark:text-white truncate group-hover:text-[#2E7D32]">
+                    {{ equipo.nombre }}
+                  </h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 truncate">
+                    {{ equipo.nombre_lider || 'Sin líder asignado' }}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-sm pt-3 border-t border-gray-200 dark:border-gray-700">
+                <span class="text-gray-600 dark:text-gray-400">Jugadores:</span>
+                <span class="text-gray-900 dark:text-white font-semibold">{{ equipo.total_jugadores || 0 }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="tabs-container">
-      <div class="tabs-nav">
-        <button type="button" class="tab-item" [class.active]="activeTab() === 'informacion'" (click)="setActiveTab('informacion')">Información</button>
-        <button type="button" class="tab-item" [class.active]="activeTab() === 'equipos'" (click)="setActiveTab('equipos')">Equipos</button>
-        <button type="button" class="tab-item" [class.active]="activeTab() === 'fixture'" (click)="setActiveTab('fixture')">Fixture</button>
-        <button type="button" class="tab-item" [class.active]="activeTab() === 'configuracion'" (click)="setActiveTab('configuracion')">Configuración</button>
-      </div>
+    <!-- TAB: FIXTURE -->
+    <div *ngIf="activeTab() === 'fixture'">
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 sm:p-8">
+        
+        <!-- Sin partidos -->
+        <div *ngIf="partidos().length === 0" class="text-center py-12 sm:py-16">
+          <span class="material-symbols-outlined text-7xl sm:text-8xl text-gray-300 dark:text-gray-600 mb-4">calendar_month</span>
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Calendario de Partidos
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+            Aún no hay partidos programados. Genera el fixture para comenzar.
+          </p>
+          <button 
+            (click)="generarFixture()"
+            class="px-8 py-4 rounded-xl bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] transition-all shadow-lg hover:shadow-xl inline-flex items-center gap-2">
+            <span class="material-symbols-outlined">add_circle</span>
+            Generar Fixture
+          </button>
+        </div>
 
-      <div class="tabs-content">
-        @if (activeTab() === 'informacion') {
-          <div class="tab-panel">
-            <div class="hero-card">
-              <div class="hero-image-container">
-                <div class="hero-badge">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-                    <path d="M2 12h20"></path>
-                  </svg>
+        <!-- Calendario con partidos -->
+        <div *ngIf="partidos().length > 0 && jornadaActual() !== null">
+          <!-- Header con navegación de jornadas -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <!-- Título y estadísticas generales -->
+              <div class="flex-1">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Calendario de Partidos
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
+                  {{ partidos().length }} partidos totales • {{ stats().partidosJugados }} finalizados
+                </p>
+              </div>
+
+              <!-- Selector de jornada y navegación -->
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <!-- Selector de jornada -->
+                <div class="relative flex-1 sm:flex-initial sm:min-w-[200px]">
+                  <select 
+                    [value]="jornadaActual()!"
+                    (change)="seleccionarJornada(+$any($event.target).value)"
+                    class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-semibold appearance-none cursor-pointer hover:border-[#2E7D32] focus:outline-none focus:border-[#2E7D32] pr-10">
+                    <option *ngFor="let jornada of getJornadasDisponibles()" [value]="jornada">
+                      Jornada {{ jornada }}
+                    </option>
+                  </select>
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 pointer-events-none">
+                    expand_more
+                  </span>
                 </div>
-              </div>
-              <div class="hero-content">
-                <h2>{{ campeonato()?.nombre }}</h2>
-                <p>{{ campeonato()?.descripcion }}</p>
-                <button type="button" class="btn-edit-hero">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                  Editar
-                </button>
-              </div>
-            </div>
 
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-label">Equipos Registrados</div>
-                <div class="stat-value">{{ stats().equipos_registrados }}</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Partidos Totales</div>
-                <div class="stat-value">{{ stats().partidos_totales }}</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Partidos Jugados</div>
-                <div class="stat-value">{{ stats().partidos_jugados }}</div>
-                <div class="stat-progress">
-                  <div class="progress-bar" [style.width.%]="(stats().partidos_jugados / stats().partidos_totales) * 100"></div>
-                </div>
-                <div class="stat-meta">{{ stats().partidos_jugados }}/{{ stats().partidos_totales }}</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Goles Totales</div>
-                <div class="stat-value">{{ stats().goles_totales }}</div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header">
-                <h3>Acciones Rápidas</h3>
-              </div>
-              <div class="card-body">
-                <div class="actions-grid">
-                  <button type="button" class="action-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span>Generar Fixture</span>
+                <!-- Botones de navegación -->
+                <div class="flex items-center gap-2">
+                  <button 
+                    (click)="irAJornadaAnterior()"
+                    [disabled]="getJornadasDisponibles().indexOf(jornadaActual()!) === 0"
+                    [class]="getJornadasDisponibles().indexOf(jornadaActual()!) === 0
+                      ? 'px-4 py-2.5 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-400 cursor-not-allowed'
+                      : 'px-4 py-2.5 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#2E7D32] hover:bg-[#2E7D32] hover:text-white transition-colors'">
+                    <span class="material-symbols-outlined">chevron_left</span>
                   </button>
-                  <button type="button" class="action-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <polyline points="16 11 18 13 22 9"></polyline>
-                    </svg>
-                    <span>Cambiar Estado</span>
-                  </button>
-                  <button type="button" class="action-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="7 10 12 15 17 10"></polyline>
-                      <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    <span>Descargar Reporte</span>
+                  <button 
+                    (click)="irAJornadaSiguiente()"
+                    [disabled]="getJornadasDisponibles().indexOf(jornadaActual()!) === getJornadasDisponibles().length - 1"
+                    [class]="getJornadasDisponibles().indexOf(jornadaActual()!) === getJornadasDisponibles().length - 1
+                      ? 'px-4 py-2.5 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-400 cursor-not-allowed'
+                      : 'px-4 py-2.5 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#2E7D32] hover:bg-[#2E7D32] hover:text-white transition-colors'">
+                    <span class="material-symbols-outlined">chevron_right</span>
                   </button>
                 </div>
               </div>
             </div>
-          </div>
-        }
 
-        @if (activeTab() === 'equipos') {
-          <div class="tab-panel">
-            <div class="empty-tab">
-              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-              <h3>Gestión de Equipos</h3>
-              <p>Aquí podrás ver y gestionar todos los equipos inscritos en tu campeonato.</p>
-              <button type="button" class="btn-primary" routerLink="/organizador/equipos">Ver Equipos</button>
+            <!-- Estadísticas de jornada actual -->
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div class="flex flex-wrap items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[#2E7D32] text-lg">sports_soccer</span>
+                  <span class="text-gray-600 dark:text-gray-400">Jornada {{ jornadaActual() }}:</span>
+                  <span class="font-bold text-gray-900 dark:text-white">{{ getStatsJornadaActual().total }} partidos</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-blue-500 text-lg">schedule</span>
+                  <span class="text-gray-600 dark:text-gray-400">{{ getStatsJornadaActual().programados }} por jugar</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+                  <span class="text-gray-600 dark:text-gray-400">{{ getStatsJornadaActual().finalizados }} finalizados</span>
+                </div>
+              </div>
             </div>
           </div>
-        }
 
-        @if (activeTab() === 'fixture') {
-          <div class="tab-panel">
-            <div class="empty-tab">
-              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <h3>Calendario de Partidos</h3>
-              <p>Visualiza y gestiona todos los partidos de tu campeonato.</p>
-              <button type="button" class="btn-primary" routerLink="/organizador/partidos">Ver Fixture</button>
+          <!-- Filtro rápido por estado -->
+          <div class="flex items-center gap-2 mb-6">
+            <button 
+              (click)="filtroEstado.set('todos')"
+              [class]="filtroEstado() === 'todos' 
+                ? 'px-4 py-2 rounded-lg bg-[#2E7D32] text-white font-semibold' 
+                : 'px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#2E7D32]'">
+              Todos
+            </button>
+            <button 
+              (click)="filtroEstado.set('programado')"
+              [class]="filtroEstado() === 'programado' 
+                ? 'px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold' 
+                : 'px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-600'">
+              Por jugar
+            </button>
+            <button 
+              (click)="filtroEstado.set('finalizado')"
+              [class]="filtroEstado() === 'finalizado' 
+                ? 'px-4 py-2 rounded-lg bg-green-600 text-white font-semibold' 
+                : 'px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-green-600'">
+              Finalizados
+            </button>
+          </div>
+
+          <!-- Lista de partidos de la jornada actual agrupados por fecha -->
+          <div *ngIf="getPartidosJornadaActual().length > 0" class="space-y-6">
+            <div *ngFor="let fecha of getFechasJornadaActual()" class="space-y-3">
+              <!-- Encabezado de fecha -->
+              <div class="flex items-center gap-3 mb-4">
+                <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                <h4 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 px-4">
+                  <span class="material-symbols-outlined text-[#2E7D32]">event</span>
+                  {{ formatearFecha(fecha) }}
+                </h4>
+                <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+              </div>
+
+              <!-- Tarjetas de partidos -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div 
+                  *ngFor="let partido of getPartidosPorFechaEnJornada(fecha)"
+                  (click)="verDetallePartido(partido.id_partido)"
+                  class="partido-card group relative bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] hover:shadow-lg transition-all cursor-pointer overflow-hidden">
+                  
+                  <!-- Estado badge -->
+                  <div class="absolute top-3 right-3 z-10">
+                    <span [class]="getEstadoPartidoClasses(partido.estado)">
+                      {{ getEstadoPartidoLabel(partido.estado) }}
+                    </span>
+                  </div>
+
+                  <!-- Contenido del partido -->
+                  <div class="p-6">
+                    <!-- Hora -->
+                    <div class="flex items-center gap-3 mb-4">
+                      <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        <span class="material-symbols-outlined text-lg">schedule</span>
+                        <span class="font-semibold">{{ formatearHora(partido.fecha_partido) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Equipos VS -->
+                    <div class="flex items-center justify-between gap-4">
+                      <!-- Equipo Local -->
+                      <div class="flex-1 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] flex items-center justify-center mb-2 overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                          <img 
+                            *ngIf="obtenerLogoEquipo(partido.id_equipo_local)"
+                            [src]="obtenerLogoEquipo(partido.id_equipo_local)!"
+                            [alt]="obtenerNombreEquipo(partido.id_equipo_local)"
+                            class="w-full h-full object-cover">
+                          <span *ngIf="!obtenerLogoEquipo(partido.id_equipo_local)" class="material-symbols-outlined text-white text-3xl">shield</span>
+                        </div>
+                        <p class="font-bold text-gray-900 dark:text-white line-clamp-2">
+                          {{ obtenerNombreEquipo(partido.id_equipo_local) }}
+                        </p>
+                        
+                        <!-- Marcador si está finalizado -->
+                        <div *ngIf="partido.estado === 'finalizado'" 
+                             class="mt-2 w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                          <span class="text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ partido.goles_local || 0 }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- VS -->
+                      <div class="flex flex-col items-center gap-2">
+                        <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                          <span class="text-sm font-bold text-gray-600 dark:text-gray-400">VS</span>
+                        </div>
+                      </div>
+
+                      <!-- Equipo Visitante -->
+                      <div class="flex-1 flex flex-col items-center text-center">
+                        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center mb-2 overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                          <img 
+                            *ngIf="obtenerLogoEquipo(partido.id_equipo_visitante)"
+                            [src]="obtenerLogoEquipo(partido.id_equipo_visitante)!"
+                            [alt]="obtenerNombreEquipo(partido.id_equipo_visitante)"
+                            class="w-full h-full object-cover">
+                          <span *ngIf="!obtenerLogoEquipo(partido.id_equipo_visitante)" class="material-symbols-outlined text-white text-3xl">shield</span>
+                        </div>
+                        <p class="font-bold text-gray-900 dark:text-white line-clamp-2">
+                          {{ obtenerNombreEquipo(partido.id_equipo_visitante) }}
+                        </p>
+                        
+                        <!-- Marcador si está finalizado -->
+                        <div *ngIf="partido.estado === 'finalizado'" 
+                             class="mt-2 w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                          <span class="text-2xl font-bold text-gray-900 dark:text-white">
+                            {{ partido.goles_visitante || 0 }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="mt-4 pt-4 border-t-2 border-gray-100 dark:border-gray-700 flex items-center justify-between text-sm">
+                      <div *ngIf="partido.lugar" class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                        <span class="material-symbols-outlined text-lg">stadium</span>
+                        <span>{{ partido.lugar }}</span>
+                      </div>
+                      <button class="text-[#2E7D32] font-semibold hover:underline flex items-center gap-1">
+                        Ver detalles
+                        <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        }
 
-        @if (activeTab() === 'configuracion') {
-          <div class="tab-panel">
-            <div class="empty-tab">
-              <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2m5-11.2l-6 0m-6 0l-6 0m13.2 5.2l-4.2-4.2m0-6l-4.2-4.2"></path>
-              </svg>
-              <h3>Configuración del Campeonato</h3>
-              <p>Ajusta las configuraciones y reglas de tu campeonato.</p>
-            </div>
+          <!-- Mensaje cuando no hay partidos en la jornada -->
+          <div *ngIf="getPartidosJornadaActual().length === 0" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+            <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">sports_soccer</span>
+            <p class="text-lg font-semibold text-gray-600 dark:text-gray-400">
+              No hay partidos en esta jornada con el filtro seleccionado
+            </p>
           </div>
-        }
+        </div>
+
+        <!-- Mensaje cuando no hay partidos -->
+        <div *ngIf="partidos().length === 0" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+          <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">sports_soccer</span>
+          <p class="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-2">
+            No hay partidos programados aún
+          </p>
+          <p class="text-sm text-gray-500 dark:text-gray-500">
+            Genera el fixture para comenzar a programar los partidos
+          </p>
+        </div>
       </div>
     </div>
-  }
+
+    <!-- TAB: CONFIGURACIÓN -->
+    <div *ngIf="activeTab() === 'configuracion'">
+      <form [formGroup]="configuracionForm" class="space-y-6">
+        
+        <!-- Información General -->
+        <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 sm:p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="material-symbols-outlined text-4xl text-[#2E7D32]">settings</span>
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
+                Configuración del Campeonato
+              </h3>
+              <p class="text-gray-600 dark:text-gray-400 mt-1">
+                Ajusta las reglas y parámetros de tu torneo
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Tipo de Competición -->
+            <div>
+              <label class="block text-sm font-bold text-gray-900 dark:text-white mb-3">
+                Tipo de Competición
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <label class="relative">
+                  <input 
+                    type="radio" 
+                    formControlName="tipo_competicion" 
+                    value="liga"
+                    class="peer sr-only">
+                  <div class="p-6 rounded-xl border-3 cursor-pointer transition-all peer-checked:border-[#2E7D32] peer-checked:bg-green-50 dark:peer-checked:bg-green-900/20 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32]/50">
+                    <div class="flex flex-col items-center text-center gap-3">
+                      <span class="material-symbols-outlined text-4xl text-[#2E7D32]">emoji_events</span>
+                      <div>
+                        <p class="font-bold text-gray-900 dark:text-white">Liga</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Todos contra todos</p>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="relative">
+                  <input 
+                    type="radio" 
+                    formControlName="tipo_competicion" 
+                    value="eliminacion_directa"
+                    class="peer sr-only">
+                  <div class="p-6 rounded-xl border-3 cursor-pointer transition-all peer-checked:border-[#2E7D32] peer-checked:bg-green-50 dark:peer-checked:bg-green-900/20 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32]/50">
+                    <div class="flex flex-col items-center text-center gap-3">
+                      <span class="material-symbols-outlined text-4xl text-[#2E7D32]">trending_up</span>
+                      <div>
+                        <p class="font-bold text-gray-900 dark:text-white">Eliminación Directa</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Bracket de eliminación</p>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="relative">
+                  <input 
+                    type="radio" 
+                    formControlName="tipo_competicion" 
+                    value="mixto"
+                    class="peer sr-only">
+                  <div class="p-6 rounded-xl border-3 cursor-pointer transition-all peer-checked:border-[#2E7D32] peer-checked:bg-green-50 dark:peer-checked:bg-green-900/20 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32]/50">
+                    <div class="flex flex-col items-center text-center gap-3">
+                      <span class="material-symbols-outlined text-4xl text-[#2E7D32]">merge</span>
+                      <div>
+                        <p class="font-bold text-gray-900 dark:text-white">Mixto</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Grupos + Eliminación</p>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Máximo de Equipos -->
+            <div>
+              <label class="block text-sm font-bold text-gray-900 dark:text-white mb-3">
+                Máximo de Equipos
+              </label>
+              <div class="flex items-center gap-4">
+                <input 
+                  type="number"
+                  formControlName="max_equipos"
+                  min="2"
+                  max="64"
+                  class="flex-1 px-6 py-4 text-2xl font-bold text-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                  <p class="font-semibold">Inscritos actualmente:</p>
+                  <p class="text-2xl font-bold text-[#2E7D32]">{{ stats().equiposRegistrados }}</p>
+                </div>
+              </div>
+              <p class="mt-2 text-sm text-gray-500 text-center">Rango permitido: 2 - 64 equipos</p>
+            </div>
+
+            <!-- Toggle Inscripciones -->
+            <div class="flex items-center justify-between p-6 rounded-xl bg-gray-50 dark:bg-gray-800">
+              <div>
+                <p class="font-bold text-gray-900 dark:text-white">Estado de Inscripciones</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {{ configuracionForm.value.inscripciones_abiertas ? 'Los equipos pueden inscribirse' : 'Las inscripciones están cerradas' }}
+                </p>
+              </div>
+              <button 
+                type="button"
+                (click)="toggleInscripciones()"
+                [class]="configuracionForm.value.inscripciones_abiertas ? 'bg-[#2E7D32]' : 'bg-gray-300'"
+                class="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#2E7D32] focus:ring-offset-2">
+                <span 
+                  [class]="configuracionForm.value.inscripciones_abiertas ? 'translate-x-7' : 'translate-x-1'"
+                  class="inline-block h-6 w-6 transform rounded-full bg-white transition-transform">
+                </span>
+              </button>
+            </div>
+
+            <!-- Fechas de Inscripción -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+                  Fecha Inicio Inscripciones
+                </label>
+                <app-datepicker
+                  [value]="configuracionForm.value.fecha_inicio_inscripciones"
+                  (valueChange)="onConfigChange('fecha_inicio_inscripciones', $event)"
+                  placeholder="Selecciona la fecha">
+                </app-datepicker>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+                  Fecha Cierre Inscripciones
+                </label>
+                <app-datepicker
+                  [value]="configuracionForm.value.fecha_cierre_inscripciones"
+                  [minDate]="configuracionForm.value.fecha_inicio_inscripciones"
+                  (valueChange)="onConfigChange('fecha_cierre_inscripciones', $event)"
+                  placeholder="Selecciona la fecha">
+                </app-datepicker>
+              </div>
+            </div>
+
+            <!-- Botón Guardar -->
+            <div class="pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+              <button 
+                type="button"
+                (click)="guardarConfiguracion()"
+                [disabled]="configuracionForm.invalid"
+                class="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">save</span>
+                Guardar Configuración
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR CAMPEONATO -->
+<div *ngIf="showEditarModal()" 
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+     (click)="cerrarEditarModal()">
+  <div class="bg-white dark:bg-[#182c19] rounded-2xl max-w-2xl w-full shadow-2xl"
+       (click)="$event.stopPropagation()">
+    <div class="p-6 sm:p-8">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E7D32]">edit</span>
+          Editar Campeonato
+        </h3>
+        <button 
+          (click)="cerrarEditarModal()"
+          class="w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all"
+          aria-label="Cerrar modal">
+          <span class="material-symbols-outlined text-gray-400">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="editarForm" class="space-y-6">
+        <div>
+          <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+            Nombre del Campeonato *
+          </label>
+          <input 
+            type="text"
+            formControlName="nombre"
+            class="w-full px-4 py-4 text-lg rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+            Descripción *
+          </label>
+          <textarea 
+            formControlName="descripcion"
+            rows="4"
+            class="w-full px-4 py-4 text-lg rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+              Fecha de Inicio *
+            </label>
+            <app-datepicker
+              [value]="editarForm.value.fecha_inicio"
+              (valueChange)="editarForm.patchValue({fecha_inicio: $event})"
+              placeholder="Selecciona la fecha">
+            </app-datepicker>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+              Fecha de Fin *
+            </label>
+            <app-datepicker
+              [value]="editarForm.value.fecha_fin"
+              [minDate]="editarForm.value.fecha_inicio"
+              (valueChange)="editarForm.patchValue({fecha_fin: $event})"
+              placeholder="Selecciona la fecha">
+            </app-datepicker>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+          <button 
+            type="button"
+            (click)="cerrarEditarModal()"
+            class="flex-1 px-6 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+            Cancelar
+          </button>
+          <button 
+            type="button"
+            (click)="guardarEdicion()"
+            [disabled]="editarForm.invalid"
+            class="flex-1 px-6 py-3 rounded-xl bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

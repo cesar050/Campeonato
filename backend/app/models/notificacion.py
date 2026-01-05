@@ -12,6 +12,12 @@ class Notificacion(db.Model):
     leida = db.Column(db.Boolean, default=False, index=True)
     fecha_envio = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     
+    # NUEVOS CAMPOS para navegación
+    id_campeonato = db.Column(db.Integer, nullable=True)
+    id_partido = db.Column(db.Integer, nullable=True)
+    id_equipo = db.Column(db.Integer, nullable=True)
+    datos_adicionales = db.Column(db.JSON, nullable=True)
+    
     # RELACIONES
     usuario = db.relationship('Usuario', backref='notificaciones', lazy='joined')
     
@@ -27,5 +33,9 @@ class Notificacion(db.Model):
             'mensaje': self.mensaje,
             'tipo': self.tipo,
             'leida': self.leida,
-            'fecha_envio': self.fecha_envio.isoformat() if self.fecha_envio else None
+            'fecha_envio': self.fecha_envio.isoformat() if self.fecha_envio else None,
+            'id_campeonato': self.id_campeonato,
+            'id_partido': self.id_partido,
+            'id_equipo': self.id_equipo,
+            'datos_adicionales': self.datos_adicionales
         }

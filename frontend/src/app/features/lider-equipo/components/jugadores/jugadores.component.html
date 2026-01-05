@@ -1,0 +1,569 @@
+<div class="jugadores-container">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="material-symbols-outlined">group</span>
+        Gestión de Jugadores
+      </h1>
+      <p class="page-subtitle">Administra los jugadores de tus equipos</p>
+    </div>
+
+    <!-- SELECTOR DE EQUIPO Y BOTÓN AGREGAR -->
+    <div class="header-actions">
+      <select 
+        *ngIf="misEquipos().length > 0"
+        [(ngModel)]="equipoSeleccionado" 
+        (change)="cambiarEquipo()"
+        class="equipo-selector">
+        <option [value]="null" disabled>Selecciona un equipo</option>
+        <option *ngFor="let equipo of misEquipos()" [value]="equipo.id_equipo">
+          {{ equipo.nombre }}
+        </option>
+      </select>
+
+      <button 
+        *ngIf="equipoSeleccionado()"
+        class="btn-primary" 
+        (click)="abrirModal()">
+        <span class="material-symbols-outlined">add</span>
+        Agregar Jugador
+      </button>
+    </div>
+  </div>
+
+  <!-- BARRA DE FILTROS -->
+  <div *ngIf="equipoSeleccionado()" class="filtros-section">
+    <div class="filtros-container">
+      <div class="filtro-buscar">
+        <span class="material-symbols-outlined">search</span>
+        <input 
+          type="text" 
+          [(ngModel)]="buscarTexto"
+          (keyup.enter)="aplicarFiltros()"
+          placeholder="Buscar por nombre, apellido o documento..."
+          class="input-buscar">
+      </div>
+      
+      <select 
+        [(ngModel)]="posicionFilter"
+        (change)="aplicarFiltros()"
+        class="filtro-select">
+        <option value="">Todas las posiciones</option>
+        <option value="portero">Portero</option>
+        <option value="defensa">Defensa</option>
+        <option value="mediocampista">Mediocampista</option>
+        <option value="delantero">Delantero</option>
+      </select>
+
+      <button class="btn-filtrar" (click)="aplicarFiltros()">
+        <span class="material-symbols-outlined">filter_list</span>
+        Aplicar
+      </button>
+
+      <button 
+        *ngIf="buscarTexto() || posicionFilter()"
+        class="btn-limpiar" 
+        (click)="limpiarFiltros()">
+        <span class="material-symbols-outlined">clear</span>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando jugadores...</p>
+  </div>
+
+  <!-- EMPTY STATE - SIN EQUIPOS -->
+  <div *ngIf="!loading() && misEquipos().length === 0" class="empty-state">
+    <div class="empty-icon">
+      <span class="material-symbols-outlined">shield</span>
+    </div>
+    <h2>No tienes equipos registrados</h2>
+    <p>Primero debes tener un equipo para agregar jugadores</p>
+    <button 
+      [routerLink]="['/lider-equipo/mis-equipos']"
+      class="btn-primary">
+      <span class="material-symbols-outlined">shield</span>
+      Ver Mis Equipos
+    </button>
+  </div>
+
+  <!-- EMPTY STATE - SIN JUGADORES -->
+  <div *ngIf="!loading() && misEquipos().length > 0 && jugadores().length === 0 && equipoSeleccionado()" class="empty-state">
+    <div class="empty-icon">
+      <span class="material-symbols-outlined">person_add</span>
+    </div>
+    <h2>No hay jugadores{{ buscarTexto() || posicionFilter() ? ' que coincidan con los filtros' : ' en este equipo' }}</h2>
+    <p *ngIf="!buscarTexto() && !posicionFilter()">Agrega tu primer jugador para comenzar</p>
+    <p *ngIf="buscarTexto() || posicionFilter()">Intenta ajustar los filtros de búsqueda</p>
+    <button 
+      *ngIf="!buscarTexto() && !posicionFilter()"
+      class="btn-primary" 
+      (click)="abrirModal()">
+      <span class="material-symbols-outlined">add</span>
+      Agregar Primer Jugador
+    </button>
+    <button 
+      *ngIf="buscarTexto() || posicionFilter()"
+      class="btn-secondary" 
+      (click)="limpiarFiltros()">
+      <span class="material-symbols-outlined">clear</span>
+      Limpiar Filtros
+    </button>
+  </div>
+
+  <!-- TABLA DE JUGADORES -->
+  <div *ngIf="!loading() && jugadores().length > 0" class="jugadores-table-container">
+    <table class="jugadores-table">
+      <thead>
+        <tr>
+          <th>Dorsal</th>
+          <th>Nombre Completo</th>
+          <th>Documento</th>
+          <th>Posición</th>
+          <th>Edad</th>
+          <th>Documento PDF</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let jugador of jugadores()">
+          <td class="dorsal">
+            <span class="dorsal-badge">{{ jugador.dorsal }}</span>
+          </td>
+          <td class="nombre">
+            <div class="player-info">
+              <span class="material-symbols-outlined player-icon">account_circle</span>
+              <span class="player-name">{{ jugador.nombre }} {{ jugador.apellido }}</span>
+            </div>
+          </td>
+          <td>{{ jugador.documento }}</td>
+          <td>
+            <span class="posicion-badge" [class]="'posicion-' + jugador.posicion">
+              {{ getPosicionTexto(jugador.posicion) }}
+            </span>
+          </td>
+          <td>
+            {{ jugador.fecha_nacimiento ? calcularEdad(jugador.fecha_nacimiento) + ' años' : 'N/A' }}
+          </td>
+          <td class="documento-cell">
+            <div class="documento-actions">
+              <span 
+                *ngIf="jugador.documento_pdf" 
+                class="documento-status has-doc"
+                title="Documento subido">
+                <span class="material-symbols-outlined">check_circle</span>
+                Subido
+              </span>
+              <label 
+                class="btn-upload"
+                [class.uploading]="uploadingDocument()">
+                <span class="material-symbols-outlined">upload_file</span>
+                <span>{{ jugador.documento_pdf ? 'Reemplazar' : 'Subir' }}</span>
+                <input 
+                  type="file" 
+                  accept="application/pdf"
+                  (change)="onFileSelected($event, jugador)"
+                  [disabled]="uploadingDocument()">
+              </label>
+            </div>
+          </td>
+          <td class="acciones">
+            <!-- Ver PDF -->
+            <button 
+              *ngIf="jugador.documento_pdf"
+              class="btn-icon btn-view" 
+              (click)="verPDF(jugador)"
+              title="Ver documento PDF">
+              <span class="material-symbols-outlined">description</span>
+            </button>
+            
+            <!-- Editar -->
+            <button 
+              class="btn-icon btn-edit" 
+              (click)="abrirModal(jugador)"
+              title="Editar jugador">
+              <span class="material-symbols-outlined">edit</span>
+            </button>
+            
+            <!-- Eliminar -->
+            <button 
+              class="btn-icon btn-delete" 
+              (click)="eliminarJugador(jugador)"
+              title="Eliminar jugador">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- PAGINACIÓN -->
+    <div *ngIf="totalPaginas() > 1" class="pagination-container">
+      <div class="pagination-info">
+        <span class="info-text">
+          Mostrando 
+          <strong>{{ (paginaActual() - 1) * itemsPorPagina() + 1 }}</strong> - 
+          <strong>{{ Math.min(paginaActual() * itemsPorPagina(), totalItems()) }}</strong> 
+          de <strong>{{ totalItems() }}</strong> jugadores
+        </span>
+      </div>
+      
+      <div class="pagination-controls">
+        <button 
+          class="page-btn nav-btn"
+          [disabled]="paginaActual() === 1"
+          (click)="irAPagina(1)"
+          title="Primera página">
+          <span class="material-symbols-outlined">first_page</span>
+        </button>
+
+        <button 
+          class="page-btn nav-btn"
+          [disabled]="paginaActual() === 1"
+          (click)="irAPagina(paginaActual() - 1)"
+          title="Página anterior">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        
+        <button 
+          *ngFor="let p of getPaginas()"
+          class="page-btn number-btn"
+          [class.active]="p === paginaActual()"
+          (click)="irAPagina(p)">
+          {{ p }}
+        </button>
+        
+        <button 
+          class="page-btn nav-btn"
+          [disabled]="paginaActual() === totalPaginas()"
+          (click)="irAPagina(paginaActual() + 1)"
+          title="Página siguiente">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+
+        <button 
+          class="page-btn nav-btn"
+          [disabled]="paginaActual() === totalPaginas()"
+          (click)="irAPagina(totalPaginas())"
+          title="Última página">
+          <span class="material-symbols-outlined">last_page</span>
+        </button>
+      </div>
+
+      <div class="pagination-per-page">
+        <label for="per-page">Por página:</label>
+        <select 
+          id="per-page"
+          [(ngModel)]="itemsPorPagina"
+          (change)="aplicarFiltros()"
+          class="per-page-select">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Continúa en la siguiente parte... -->
+   <!-- ============================================ -->
+  <!-- MODAL DE FORMULARIO -->
+  <!-- ============================================ -->
+  <div *ngIf="showModal()" class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="material-symbols-outlined">
+            {{ isEditing() ? 'edit' : 'person_add' }}
+          </span>
+          {{ isEditing() ? 'Editar Jugador' : 'Agregar Jugador' }}
+        </h2>
+        <button class="btn-close" (click)="cerrarModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form [formGroup]="jugadorForm" (ngSubmit)="guardarJugador()" class="modal-body">
+        
+        <!-- ============================================ -->
+        <!-- SECCIÓN: DATOS PERSONALES -->
+        <!-- ============================================ -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">badge</span>
+            Datos Personales
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nombre">Nombre *</label>
+              <input 
+                type="text" 
+                id="nombre"
+                formControlName="nombre"
+                placeholder="Ej: Juan"
+                [class.invalid]="jugadorForm.get('nombre')?.invalid && jugadorForm.get('nombre')?.touched">
+              <span class="error" *ngIf="jugadorForm.get('nombre')?.invalid && jugadorForm.get('nombre')?.touched">
+                Nombre requerido (mín. 2 caracteres)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="apellido">Apellido *</label>
+              <input 
+                type="text" 
+                id="apellido"
+                formControlName="apellido"
+                placeholder="Ej: Pérez"
+                [class.invalid]="jugadorForm.get('apellido')?.invalid && jugadorForm.get('apellido')?.touched">
+              <span class="error" *ngIf="jugadorForm.get('apellido')?.invalid && jugadorForm.get('apellido')?.touched">
+                Apellido requerido (mín. 2 caracteres)
+              </span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="documento">Documento (CI) *</label>
+              <input 
+                type="text" 
+                id="documento"
+                formControlName="documento"
+                placeholder="1234567890"
+                maxlength="10"
+                [class.invalid]="jugadorForm.get('documento')?.invalid && jugadorForm.get('documento')?.touched">
+              <span class="error" *ngIf="jugadorForm.get('documento')?.invalid && jugadorForm.get('documento')?.touched">
+                Documento requerido (10 dígitos)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+              <input 
+                type="date" 
+                id="fecha_nacimiento"
+                formControlName="fecha_nacimiento"
+                [class.invalid]="jugadorForm.get('fecha_nacimiento')?.invalid && jugadorForm.get('fecha_nacimiento')?.touched">
+              <span class="error" *ngIf="jugadorForm.get('fecha_nacimiento')?.invalid && jugadorForm.get('fecha_nacimiento')?.touched">
+                Fecha de nacimiento requerida
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECCIÓN: DATOS DEPORTIVOS -->
+        <!-- ============================================ -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">sports_soccer</span>
+            Datos Deportivos
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dorsal">Dorsal *</label>
+              <input 
+                type="number" 
+                id="dorsal"
+                formControlName="dorsal"
+                placeholder="1-99"
+                min="1"
+                max="99"
+                [class.invalid]="jugadorForm.get('dorsal')?.invalid && jugadorForm.get('dorsal')?.touched">
+              <span class="error" *ngIf="jugadorForm.get('dorsal')?.invalid && jugadorForm.get('dorsal')?.touched">
+                Dorsal requerido (1-99)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="posicion">Posición *</label>
+              <select 
+                id="posicion"
+                formControlName="posicion"
+                [class.invalid]="jugadorForm.get('posicion')?.invalid && jugadorForm.get('posicion')?.touched">
+                <option value="portero">Portero</option>
+                <option value="defensa">Defensa</option>
+                <option value="mediocampista">Mediocampista</option>
+                <option value="delantero">Delantero</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECCIÓN: ARCHIVOS -->
+        <!-- ============================================ -->
+        <div class="form-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">upload_file</span>
+            Documentos
+          </h3>
+
+          <div class="form-row">
+            <!-- FOTO DEL JUGADOR -->
+            <div class="form-group">
+              <label>
+                <span class="icon">📷</span>
+                Foto del Jugador (Opcional)
+              </label>
+              
+              <!-- Preview de la foto -->
+              <div *ngIf="fotoPreview" class="foto-preview">
+                <img [src]="fotoPreview" alt="Preview de la foto">
+                <button 
+                  type="button" 
+                  class="btn-remove-preview"
+                  (click)="removeFotoPreview()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <!-- Input de archivo -->
+              <div class="file-input-wrapper" *ngIf="!fotoPreview">
+                <input 
+                  type="file" 
+                  id="foto-input"
+                  accept="image/*"
+                  (change)="onFotoSelected($event)"
+                  style="display: none;">
+                
+                <label 
+                  for="foto-input" 
+                  class="file-input-label">
+                  <span class="material-symbols-outlined">upload</span>
+                  <span>Seleccionar foto</span>
+                </label>
+              </div>
+
+              <small class="form-hint">JPG, PNG o GIF. Máximo 2MB</small>
+            </div>
+
+            <!-- DOCUMENTO PDF -->
+            <div class="form-group">
+              <label>
+                <span class="icon">📄</span>
+                Documento de Identidad {{ isEditing() ? '' : '*' }} (PDF)
+              </label>
+              
+              <!-- Indicador de documento cargado -->
+              <div *ngIf="documentoFile" class="documento-preview">
+                <div class="documento-info">
+                  <span class="material-symbols-outlined pdf-icon">picture_as_pdf</span>
+                  <div class="documento-details">
+                    <span class="documento-nombre">{{ documentoFile.name }}</span>
+                    <span class="documento-size">{{ (documentoFile.size / 1024).toFixed(2) }} KB</span>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  class="btn-remove-documento"
+                  (click)="removeDocumento()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <!-- Input de archivo -->
+              <div class="file-input-wrapper" *ngIf="!documentoFile">
+                <input 
+                  type="file" 
+                  id="documento-input"
+                  accept="application/pdf"
+                  (change)="onDocumentoSelected($event)"
+                  style="display: none;">
+                
+                <label 
+                  for="documento-input" 
+                  class="file-input-label documento-label">
+                  <span class="material-symbols-outlined">upload_file</span>
+                  <span>Seleccionar PDF</span>
+                </label>
+              </div>
+
+              <small class="form-hint">
+                Cédula, DNI o pasaporte en formato PDF. Máximo 5MB
+                <span *ngIf="!isEditing()" class="required-badge">Obligatorio</span>
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- BOTONES DEL MODAL -->
+        <!-- ============================================ -->
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModal()">
+            <span class="material-symbols-outlined">close</span>
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="jugadorForm.invalid">
+            <span class="material-symbols-outlined">
+              {{ isEditing() ? 'save' : 'add' }}
+            </span>
+            {{ isEditing() ? 'Guardar Cambios' : 'Agregar Jugador' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- VISOR DE PDF -->
+  <!-- ============================================ -->
+  <div *ngIf="showPDFViewer()" class="pdf-viewer-overlay" (click)="cerrarPDFViewer()">
+    <div class="pdf-viewer-container" (click)="$event.stopPropagation()">
+      <!-- Header del visor -->
+      <div class="pdf-viewer-header">
+        <div class="jugador-info">
+          <span class="material-symbols-outlined">person</span>
+          <div class="info-text">
+            <h3>{{ currentJugadorPDF()?.nombre }} {{ currentJugadorPDF()?.apellido }}</h3>
+            <p>Dorsal #{{ currentJugadorPDF()?.dorsal }} - {{ getPosicionTexto(currentJugadorPDF()?.posicion || '') }}</p>
+          </div>
+        </div>
+
+        <div class="navigation-info">
+          <span>{{ currentPDFIndex() + 1 }} de {{ allJugadoresConPDF.length }}</span>
+        </div>
+
+        <button class="btn-close-viewer" (click)="cerrarPDFViewer()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Contenedor del PDF -->
+      <div class="pdf-content">
+        <iframe 
+          *ngIf="currentPDFUrl()"
+          [src]="currentPDFUrl() | safe: 'resourceUrl'"
+          class="pdf-iframe">
+        </iframe>
+      </div>
+
+      <!-- Navegación entre PDFs -->
+      <div class="pdf-navigation">
+        <button 
+          class="nav-btn prev-btn"
+          [disabled]="currentPDFIndex() === 0"
+          (click)="anteriorPDF()">
+          <span class="material-symbols-outlined">chevron_left</span>
+          <span>Anterior</span>
+        </button>
+
+        <button 
+          class="nav-btn next-btn"
+          [disabled]="currentPDFIndex() === allJugadoresConPDF.length - 1"
+          (click)="siguientePDF()">
+          <span>Siguiente</span>
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10,4 +10,4 @@ class Config:
     JWT_SECRET_KEY = 'dev-secret-cambiar-en-produccion'
     
     # URL del backend principal
-    BACKEND_API_URL = 'http://localhost:5000/api'
+    BACKEND_API_URL = 'http://localhost:5000'

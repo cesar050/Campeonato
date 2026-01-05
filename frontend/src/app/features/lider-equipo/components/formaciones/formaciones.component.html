@@ -1,0 +1,293 @@
+<div class="formaciones-container">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="material-symbols-outlined">grid_view</span>
+        Formaciones
+      </h1>
+      <p class="page-subtitle">Crea y gestiona tus formaciones tácticas personalizadas</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-create" (click)="crearNuevaFormacion('11')">
+        <span class="material-symbols-outlined">add</span>
+        Nueva Formación 11
+      </button>
+      <button class="btn-create-indoor" (click)="crearNuevaFormacion('6')">
+        <span class="material-symbols-outlined">add</span>
+        Nueva Indoor
+      </button>
+    </div>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filtros-container">
+    <button 
+      class="filtro-btn" 
+      [class.active]="filtroTipo() === 'todas'"
+      (click)="cambiarFiltro('todas')">
+      <span class="material-symbols-outlined">apps</span>
+      Todas ({{ formaciones().length }})
+    </button>
+    <button 
+      class="filtro-btn" 
+      [class.active]="filtroTipo() === '11'"
+      (click)="cambiarFiltro('11')">
+      <span class="material-symbols-outlined">sports_soccer</span>
+      Fútbol 11 ({{ contarPorTipo11() }})
+    </button>
+    <button 
+      class="filtro-btn" 
+      [class.active]="filtroTipo() === '6'"
+      (click)="cambiarFiltro('6')">
+      <span class="material-symbols-outlined">stadium</span>
+      Indoor ({{ contarPorTipo6() }})
+    </button>
+  </div>
+
+  <!-- GRID DE FORMACIONES -->
+  <div class="formaciones-grid">
+    <div 
+      *ngFor="let formacion of formacionesFiltradas()" 
+      class="formacion-card"
+      [class.personalizada]="formacion.personalizada">
+      
+      <!-- BADGE TIPO -->
+      <div class="tipo-badge" [class.indoor]="formacion.tipo === '6'">
+        {{ formacion.tipo === '11' ? 'Fútbol 11' : 'Indoor' }}
+      </div>
+
+      <!-- CANCHA PREVIEW -->
+      <div class="cancha-preview" [class.cancha-indoor]="formacion.tipo === '6'">
+        <div class="cancha-lineas-mini">
+          <div class="linea-media-mini"></div>
+          <div class="circulo-central-mini"></div>
+        </div>
+        
+        <!-- POSICIONES -->
+        <div 
+          *ngFor="let pos of formacion.posiciones"
+          class="posicion-mini"
+          [style.left.%]="pos.x"
+          [style.top.%]="pos.y">
+          <div class="dot"></div>
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="formacion-info">
+        <h3 class="formacion-nombre">
+          {{ formacion.nombre }}
+          <span class="custom-badge" *ngIf="formacion.personalizada">
+            <span class="material-symbols-outlined">star</span>
+          </span>
+        </h3>
+        <p class="formacion-descripcion">
+          {{ formacion.posiciones.length }} jugadores • {{ formacion.codigo }}
+        </p>
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="formacion-acciones">
+        <button 
+          class="btn-accion edit" 
+          (click)="editarFormacion(formacion)"
+          *ngIf="formacion.personalizada"
+          title="Editar">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+        
+        <button 
+          class="btn-accion" 
+          (click)="duplicarFormacion(formacion)"
+          title="Duplicar">
+          <span class="material-symbols-outlined">content_copy</span>
+        </button>
+        
+        <button 
+          class="btn-accion danger" 
+          (click)="eliminarFormacion(formacion)"
+          *ngIf="formacion.personalizada"
+          title="Eliminar">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="formacionesFiltradas().length === 0">
+    <div class="empty-icon">
+      <span class="material-symbols-outlined">grid_view</span>
+    </div>
+    <h2>No hay formaciones {{ filtroTipo() === '11' ? 'de Fútbol 11' : filtroTipo() === '6' ? 'Indoor' : '' }}</h2>
+    <p>Crea tu primera formación personalizada haciendo clic en el botón "Nueva Formación"</p>
+  </div>
+
+  <!-- MODAL CREAR/EDITAR FORMACIÓN -->
+  <div class="modal-overlay" *ngIf="modoCreacion()" (click)="cancelarEdicion()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="material-symbols-outlined">edit</span>
+          {{ formacionEnEdicion()?.nombre ? 'Editar' : 'Crear' }} Formación Personalizada
+        </h2>
+        <button class="modal-close" (click)="cancelarEdicion()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="instrucciones-box">
+          <h3>
+            <span class="material-symbols-outlined">info</span>
+            Instrucciones
+          </h3>
+          <ol>
+            <li>Define el nombre de tu formación (ej: 5-2-2-1)</li>
+            <li>Selecciona el tipo de posición en el selector</li>
+            <li>Haz clic en la cancha para agregar cada posición</li>
+            <li>Debes colocar exactamente {{ formacionEnEdicion()?.tipo === '11' ? '11' : '6' }} jugadores</li>
+            <li>Haz clic en el número de una posición para eliminarla</li>
+          </ol>
+        </div>
+
+        <!-- NOMBRE DE FORMACIÓN -->
+        <div class="form-group">
+          <label for="nombre-formacion">
+            <span class="material-symbols-outlined">edit</span>
+            Nombre de la Formación
+          </label>
+          <input 
+            #nombreFormacion
+            id="nombre-formacion"
+            type="text" 
+            [value]="formacionEnEdicion()?.nombre || ''"
+            placeholder="Ej: 5-2-2-1 Ultra Ofensiva"
+            class="input-text"
+            maxlength="30">
+        </div>
+
+        <!-- TIPO DE POSICIÓN -->
+        <div class="form-group">
+          <label for="tipo-posicion">
+            <span class="material-symbols-outlined">person</span>
+            Tipo de Posición (selecciona antes de hacer clic en la cancha)
+          </label>
+          <select #tipoPosicion id="tipo-posicion" class="select-custom">
+            <option value="Portero">⚽ Portero</option>
+            <option value="Defensa" selected>🛡️ Defensa</option>
+            <option value="Mediocampista">🏃 Mediocampista</option>
+            <option value="Delantero">⚡ Delantero</option>
+          </select>
+        </div>
+
+        <!-- CONTADOR -->
+        <div class="contador-posiciones">
+          <div class="contador-item main">
+            <span class="material-symbols-outlined">groups</span>
+            <span><strong>{{ (formacionEnEdicion()?.posiciones?.length || 0) }}</strong> / {{ formacionEnEdicion()?.tipo === '11' ? '11' : '6' }}</span>
+          </div>
+          <div class="contador-item">
+            <span class="material-symbols-outlined">sports</span>
+            <span>{{ contarPorTipo('Portero') }} Porteros</span>
+          </div>
+          <div class="contador-item">
+            <span class="material-symbols-outlined">shield</span>
+            <span>{{ contarPorTipo('Defensa') }} Defensas</span>
+          </div>
+          <div class="contador-item">
+            <span class="material-symbols-outlined">directions_run</span>
+            <span>{{ contarPorTipo('Mediocampista') }} Medios</span>
+          </div>
+          <div class="contador-item">
+            <span class="material-symbols-outlined">sports_soccer</span>
+            <span>{{ contarPorTipo('Delantero') }} Delanteros</span>
+          </div>
+        </div>
+
+        <!-- CANCHA INTERACTIVA -->
+        <div class="cancha-editor-container">
+          <h4>
+            <span class="material-symbols-outlined">touch_app</span>
+            Haz clic en la cancha para agregar posiciones
+          </h4>
+          <div 
+            class="cancha-editor" 
+            [class.cancha-indoor]="formacionEnEdicion()?.tipo === '6'"
+            (click)="onCanchaClick($event, tipoPosicion.value)">
+            
+            <!-- LÍNEAS -->
+            <div class="cancha-lineas">
+              <div class="linea-media"></div>
+              <div class="circulo-central"></div>
+              <div class="area-grande area-grande-arriba"></div>
+              <div class="area-chica area-chica-arriba"></div>
+              <div class="area-grande area-grande-abajo"></div>
+              <div class="area-chica area-chica-abajo"></div>
+            </div>
+
+            <!-- POSICIONES AGREGADAS -->
+            <div 
+              *ngFor="let pos of formacionEnEdicion()?.posiciones; let i = index"
+              class="posicion-agregada"
+              [style.left.%]="pos.x"
+              [style.top.%]="pos.y"
+              (click)="$event.stopPropagation()">
+              <div class="posicion-dot" [class]="pos.posicion.toLowerCase()">
+                <span class="posicion-label">{{ i + 1 }}</span>
+              </div>
+              <button class="btn-eliminar-pos" (click)="eliminarPosicion(i)" title="Eliminar posición">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <!-- MENSAJE VACÍO -->
+            <div class="cancha-empty" *ngIf="(formacionEnEdicion()?.posiciones?.length || 0) === 0">
+              <span class="material-symbols-outlined">touch_app</span>
+              <p>Haz clic para agregar posiciones</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DE POSICIONES CREADAS -->
+        <div class="posiciones-list" *ngIf="(formacionEnEdicion()?.posiciones?.length || 0) > 0">
+          <h4>
+            <span class="material-symbols-outlined">format_list_numbered</span>
+            Posiciones Agregadas ({{ formacionEnEdicion()?.posiciones?.length || 0 }}):
+          </h4>
+          <div class="posicion-item" *ngFor="let pos of formacionEnEdicion()?.posiciones; let i = index">
+            <span class="posicion-numero">{{ i + 1 }}</span>
+            <span class="posicion-tipo" [class]="pos.posicion.toLowerCase()">
+              <span class="material-symbols-outlined">
+                {{ pos.posicion === 'Portero' ? 'sports' : 
+                   pos.posicion === 'Defensa' ? 'shield' : 
+                   pos.posicion === 'Mediocampista' ? 'directions_run' : 'sports_soccer' }}
+              </span>
+              {{ pos.posicion }}
+            </span>
+            <span class="posicion-coords">({{ pos.x }}%, {{ pos.y }}%)</span>
+            <button class="btn-remove-small" (click)="eliminarPosicion(i)" title="Eliminar">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cancelarEdicion()">
+          <span class="material-symbols-outlined">close</span>
+          Cancelar
+        </button>
+        
+        <button 
+          class="btn-primary"
+          (click)="guardarFormacion(nombreFormacion.value)"
+          [disabled]="!nombreFormacion.value || !esFormacionCompleta()">
+          <span class="material-symbols-outlined">save</span>
+          Guardar Formación
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

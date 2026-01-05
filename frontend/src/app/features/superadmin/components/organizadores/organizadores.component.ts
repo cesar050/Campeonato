@@ -71,7 +71,6 @@ export class OrganizadoresComponent implements OnInit {
   applyFilters() {
     let filtered = this.organizadores();
 
-    // Filter by search term
     if (this.searchTerm()) {
       const term = this.searchTerm().toLowerCase();
       filtered = filtered.filter(org => 
@@ -80,7 +79,6 @@ export class OrganizadoresComponent implements OnInit {
       );
     }
 
-    // Filter by status
     if (this.filterStatus() !== 'Todos') {
       const isActive = this.filterStatus() === 'Activo';
       filtered = filtered.filter(org => org.activo === isActive);
@@ -127,7 +125,21 @@ export class OrganizadoresComponent implements OnInit {
     this.superadminService.createOrganizador(this.createForm.value).subscribe({
       next: (response) => {
         this.isSubmitting.set(false);
-        this.successMessage.set('¡Organizador creado exitosamente!');
+        this.successMessage.set('Organizador creado exitosamente');
+        
+        if (response.credenciales_temporales) {
+          const credenciales = response.credenciales_temporales;
+          const mensaje = `
+Organizador creado exitosamente
+
+Email: ${credenciales.email}
+Password: ${credenciales.password}
+
+IMPORTANTE: Guarda estas credenciales de forma segura y envialas al organizador
+          `.trim();
+          
+          alert(mensaje);
+        }
         
         setTimeout(() => {
           this.closeModal();
@@ -143,10 +155,6 @@ export class OrganizadoresComponent implements OnInit {
 
   getStatusBadgeClass(activo: boolean): string {
     return activo ? 'status-active' : 'status-inactive';
-  }
-
-  getVerifiedIcon(verified: boolean): string {
-    return verified ? 'check-circle' : 'clock';
   }
 
   get nombreInvalid(): boolean {

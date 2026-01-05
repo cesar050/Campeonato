@@ -1,7 +1,12 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../../../core/services/auth.service';
+
+interface MenuItem {
+  label: string;
+  route: string;
+  icon: string;
+}
 
 @Component({
   selector: 'app-superadmin-sidebar',
@@ -11,88 +16,36 @@ import { AuthService } from '../../../../core/services/auth.service';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
-  private authService = inject(AuthService);
   private router = inject(Router);
 
-  currentUser = this.authService.currentUser;
   isCollapsed = signal(false);
-  private isMobile = signal(false);
+  currentUser = signal({ nombre: 'Admin User' });
 
-  menuItems = [
-    {
-      icon: 'grid',
-      label: 'Dashboard',
-      route: '/superadmin/dashboard'
-    },
-    {
-      icon: 'trophy',
-      label: 'Campeonatos',
-      route: '/superadmin/campeonatos'
-    },
-    {
-      icon: 'users',
-      label: 'Organizadores',
-      route: '/superadmin/organizadores'
-    },
-    {
-      icon: 'user',
-      label: 'Usuarios',
-      route: '/superadmin/usuarios'
-    },
-    {
-      icon: 'bar-chart',
-      label: 'Analíticas',
-      route: '/superadmin/analytics'
-    },
-    {
-      icon: 'settings',
-      label: 'Configuración',
-      route: '/superadmin/configuracion'
-    }
+  menuItems: MenuItem[] = [
+    { label: 'Dashboard', route: '/superadmin/dashboard', icon: 'grid' },
+    { label: 'Campeonatos', route: '/superadmin/campeonatos', icon: 'trophy' },
+    { label: 'Organizadores', route: '/superadmin/organizadores', icon: 'users' },
+    { label: 'Usuarios', route: '/superadmin/usuarios', icon: 'user' },
+    { label: 'Analiticas', route: '/superadmin/analytics', icon: 'bar-chart' },
+    { label: 'Configuracion', route: '/superadmin/configuracion', icon: 'settings' }
   ];
 
-  constructor() {
-    this.checkScreenSize();
-  }
-
-  @HostListener('window:resize')
-  onResize() {
-    this.checkScreenSize();
-  }
-
-  private checkScreenSize() {
-    const wasMobile = this.isMobile();
-    this.isMobile.set(window.innerWidth <= 768);
-    
-    // Si cambiamos de móvil a escritorio, mostrar sidebar
-    if (wasMobile && !this.isMobile()) {
-      this.isCollapsed.set(false);
-    }
-    // Si cambiamos a móvil, ocultar sidebar
-    if (!wasMobile && this.isMobile()) {
-      this.isCollapsed.set(true);
-    }
-  }
-
   toggleSidebar() {
-    this.isCollapsed.update(value => !value);
+    this.isCollapsed.update(v => !v);
   }
 
   closeSidebar() {
-    if (this.isMobile()) {
+    if (window.innerWidth <= 768) {
       this.isCollapsed.set(true);
     }
   }
 
   onNavigate() {
-    // Cerrar sidebar en móvil después de navegar
-    if (this.isMobile()) {
-      this.isCollapsed.set(true);
-    }
+    this.closeSidebar();
   }
 
   logout() {
-    this.authService.logout();
+    localStorage.removeItem('access_token');
     this.router.navigate(['/auth/login']);
   }
 }

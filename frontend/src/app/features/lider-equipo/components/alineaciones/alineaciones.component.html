@@ -1,0 +1,643 @@
+<div class="alineaciones-container">
+  <!-- TOAST -->
+  <app-toast [show]="showToast()" [type]="toastType()" [title]="toastTitle()" [message]="toastMessage()"
+    (close)="cerrarToast()">
+  </app-toast>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="material-symbols-outlined">sports</span>
+        Alineaciones
+      </h1>
+      <p class="page-subtitle">Configura la alineación de tu equipo</p>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- EMPTY STATE - SIN EQUIPOS -->
+  <div *ngIf="!loading() && misEquipos().length === 0" class="empty-state">
+    <div class="empty-icon">
+      <span class="material-symbols-outlined">shield</span>
+    </div>
+    <h2>No tienes equipos registrados</h2>
+    <p>Primero debes crear un equipo para gestionar alineaciones</p>
+    <button [routerLink]="['/lider-equipo/mis-equipos']" class="btn-primary">
+      <span class="material-symbols-outlined">add</span>
+      Crear Equipo
+    </button>
+  </div>
+
+  <!-- MODO VISTA PREVIA - SIN PARTIDOS -->
+  <div *ngIf="!loading() && misEquipos().length > 0 && partidosDisponibles().length === 0" class="content">
+
+    <div class="preview-mode-banner">
+      <span class="material-symbols-outlined">visibility</span>
+      <div class="banner-text">
+        <strong>Modo Vista Previa</strong>
+        <p>
+          <span *ngIf="!campeonatoSeleccionado()">No estás inscrito en ningún campeonato.</span>
+          <span *ngIf="campeonatoSeleccionado()">No hay partidos programados aún.</span>
+          Explora las formaciones y practica tus alineaciones.
+        </p>
+      </div>
+    </div>
+
+    <!-- SELECTOR DE EQUIPO Y FORMACIÓN -->
+    <div class="config-section">
+      <!-- SELECTOR DE EQUIPO (si tiene más de uno) -->
+      <div class="partido-selector" *ngIf="misEquipos().length > 1">
+        <label for="equipo-select">
+          <span class="material-symbols-outlined">shield</span>
+          Mi Equipo:
+        </label>
+        <select id="equipo-select" [value]="equipoSeleccionado()?.id_equipo"
+          (change)="onEquipoChange($any($event.target).value)" class="custom-select">
+          <option *ngFor="let equipo of misEquipos()" [value]="equipo.id_equipo">
+            {{ equipo.nombre }} - {{ equipo.tipo_deporte === 'indoor' ? 'Indoor' : 'Fútbol 11' }}
+          </option>
+        </select>
+      </div>
+
+      <!-- INFO DEL EQUIPO ACTUAL -->
+      <div class="info-badge" *ngIf="equipoSeleccionado()">
+        <span class="material-symbols-outlined">shield</span>
+        {{ equipoSeleccionado()!.nombre }}
+      </div>
+
+      <div class="formacion-selector">
+        <label for="formacion-preview-select">
+          <span class="material-symbols-outlined">grid_view</span>
+          Formación:
+        </label>
+        <select id="formacion-preview-select" [value]="formacionActual()"
+          (change)="cambiarFormacion($any($event.target).value)" class="custom-select">
+          <option *ngFor="let formacion of formacionesDisponibles()" [value]="formacion.codigo">
+            {{ formacion.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="info-badge">
+        <span class="material-symbols-outlined">info</span>
+        {{ tipoFutbol() === '11' ? 'Fútbol 11 - 11 titulares' : 'Indoor - 6 titulares' }}
+      </div>
+    </div>
+
+    <!-- CANCHA EN MODO PREVIEW CON DRAG & DROP -->
+    <div class="alineacion-content">
+      <div class="cancha-container">
+        <div class="cancha" [class.cancha-indoor]="tipoFutbol() === '6'">
+          <!-- LÍNEAS Y ÁREAS DE LA CANCHA -->
+          <div class="cancha-lineas">
+            <div class="linea-media"></div>
+            <div class="circulo-central"></div>
+            <div class="area-grande area-grande-arriba"></div>
+            <div class="area-chica area-chica-arriba"></div>
+            <div class="area-grande area-grande-abajo"></div>
+            <div class="area-chica area-chica-abajo"></div>
+          </div>
+
+          <!-- POSICIONES CON JUGADORES (DRAG & DROP ACTIVO) -->
+          <div *ngFor="let pos of posicionesCancha(); let i = index" class="posicion-drop-zone" [style.left.%]="pos.x"
+            [style.top.%]="pos.y" cdkDropList [id]="'drop-pos-' + i" [cdkDropListData]="titularesEnCancha()"
+            [cdkDropListConnectedTo]="['disponibles-list', 'suplentes-list']"
+            (cdkDropListDropped)="onDrop($event, pos)">
+
+            <!-- JUGADOR ASIGNADO -->
+            <div *ngFor="let jugador of titularesEnCancha()"
+              [hidden]="jugador.posicion_x !== pos.x || jugador.posicion_y !== pos.y">
+              <div class="jugador-cancha" cdkDrag>
+                <div class="jugador-dorsal">{{ jugador.dorsal }}</div>
+                <div class="jugador-nombre-cancha">
+                  {{ jugador.nombre }} {{ jugador.dorsal }}
+                </div>
+                <div class="jugador-posicion-badge">{{ jugador.posicion }}</div>
+              </div>
+            </div>
+
+            <!-- PLACEHOLDER VACÍO -->
+            <div *ngIf="!jugadorEnPosicion(pos.x, pos.y)" class="posicion-placeholder">
+              <span class="material-symbols-outlined">add</span>
+              <span class="placeholder-text">{{ pos.posicion }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- INFO DE FORMACIÓN -->
+        <div class="formacion-info">
+          <h3>{{ formacionActual() }}</h3>
+          <p>{{ posicionesCancha().length }} jugadores en esta formación</p>
+          <div class="posiciones-breakdown">
+            <div class="breakdown-item">
+              <span class="material-symbols-outlined">sports</span>
+              <span>1 Portero</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="material-symbols-outlined">shield</span>
+              <span>{{ contarPorPosicion('Defensa') }} Defensas</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="material-symbols-outlined">directions_run</span>
+              <span>{{ contarPorPosicion('Mediocampista') }} Mediocampistas</span>
+            </div>
+            <div class="breakdown-item">
+              <span class="material-symbols-outlined">sports_soccer</span>
+              <span>{{ contarPorPosicion('Delantero') }} Delanteros</span>
+            </div>
+          </div>
+
+          <!-- CONTADOR DE TITULARES EN CANCHA -->
+          <div class="titulares-counter" style="margin-top: 1rem;">
+            <span class="counter-icon material-symbols-outlined">groups</span>
+            <span class="counter-text">
+              En cancha: <strong>{{ titularesEnCancha().length }}</strong> / {{ maxTitulares() }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL LATERAL CON JUGADORES -->
+      <div class="jugadores-panel">
+
+        <!-- JUGADORES DISPONIBLES -->
+        <div class="panel-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">person</span>
+            Jugadores Disponibles ({{ jugadoresSinAsignar().length }})
+          </h3>
+
+          <div id="disponibles-list" class="jugadores-list" cdkDropList [cdkDropListData]="jugadoresSinAsignar()"
+            [cdkDropListConnectedTo]="getDropZoneIds()" (cdkDropListDropped)="onDrop($event)">
+            <div *ngFor="let jugador of jugadoresSinAsignar()" class="jugador-item" cdkDrag>
+              <div class="jugador-dorsal-badge">{{ jugador.dorsal }}</div>
+              <div class="jugador-info">
+                <div class="jugador-nombre-full">
+                  {{ jugador.nombre }} {{ jugador.apellido }}
+                </div>
+                <div class="jugador-posicion-text">{{ jugador.posicion }}</div>
+              </div>
+              <span class="drag-icon material-symbols-outlined">drag_indicator</span>
+            </div>
+
+            <div *ngIf="jugadoresSinAsignar().length === 0" class="empty-list">
+              <span class="material-symbols-outlined">check_circle</span>
+              <span>Todos en cancha</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUPLENTES -->
+        <div class="panel-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">swap_horiz</span>
+            Suplentes ({{ suplentes().length }} / {{ maxSuplentes() }})
+          </h3>
+
+          <div id="suplentes-list" class="jugadores-list suplentes-list" cdkDropList [cdkDropListData]="suplentes()"
+            [cdkDropListConnectedTo]="['disponibles-list']" (cdkDropListDropped)="onDrop($event)">
+            <div *ngFor="let jugador of suplentes()" class="jugador-item" cdkDrag>
+              <div class="jugador-dorsal-badge">{{ jugador.dorsal }}</div>
+              <div class="jugador-info">
+                <div class="jugador-nombre-full">
+                  {{ jugador.nombre }} {{ jugador.apellido }}
+                </div>
+                <div class="jugador-posicion-text">{{ jugador.posicion }}</div>
+              </div>
+              <span class="drag-icon material-symbols-outlined">drag_indicator</span>
+            </div>
+
+            <div *ngIf="suplentes().length === 0" class="empty-list">
+              <span class="material-symbols-outlined">group_off</span>
+              <span>Sin suplentes</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCIONES - MODO VISTA PREVIA -->
+        <div class="panel-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined">event</span>
+            Próximos pasos
+          </h3>
+          <ul class="next-steps">
+            <li>
+              <span class="material-symbols-outlined">check_circle</span>
+              <span>Inscribe tu equipo en un campeonato</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined">check_circle</span>
+              <span>Espera a que el organizador genere los partidos</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined">check_circle</span>
+              <span>Vuelve aquí para asignar jugadores reales</span>
+            </li>
+          </ul>
+
+          <div class="panel-actions">
+            <button class="btn-secondary" (click)="limpiarAlineacion()"
+              [disabled]="titularesEnCancha().length === 0 && suplentes().length === 0">
+              <span class="material-symbols-outlined">refresh</span>
+              Limpiar
+            </button>
+
+            <button [routerLink]="['/lider-equipo/campeonatos-disponibles']" class="btn-primary">
+              <span class="material-symbols-outlined">search</span>
+              Buscar Campeonatos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- CONTENIDO PRINCIPAL - CON PARTIDOS -->
+  <!-- ========================================== -->
+  <div *ngIf="!loading() && partidosDisponibles().length > 0" class="content">
+
+    <!-- SELECTOR DE PARTIDO MEJORADO -->
+    <div class="partidos-selector-container" *ngIf="!partidoSeleccionado()">
+      <div class="selector-header">
+        <h2 class="selector-title">
+          <span class="material-symbols-outlined">sports_soccer</span>
+          Selecciona un Partido
+        </h2>
+        <p class="selector-subtitle">Elige el partido para el que quieres configurar la alineación</p>
+      </div>
+
+      <div class="partidos-grid">
+        <div *ngFor="let partido of partidosDisponibles()" class="partido-card"
+          (click)="abrirModalConfiguracion(partido)">
+          <div class="partido-card-header">
+            <div class="jornada-badge">Jornada {{ partido.jornada }}</div>
+            <div class="estado-badge programado">Programado</div>
+          </div>
+
+          <div class="partido-equipos">
+            <div class="equipo-item">
+              <div class="equipo-logo-small">
+                <img *ngIf="obtenerLogoEquipo(partido.id_equipo_local)"
+                  [src]="obtenerLogoEquipo(partido.id_equipo_local)!" [alt]="partido.equipo_local"
+                  (error)="$event.target.style.display='none'">
+                <div *ngIf="!obtenerLogoEquipo(partido.id_equipo_local)" class="equipo-logo-placeholder-small">
+                  <span class="material-symbols-outlined">shield</span>
+                </div>
+              </div>
+              <div class="equipo-info-item">
+                <div class="equipo-nombre">{{ partido.equipo_local }}</div>
+                <div class="equipo-rol">{{ partido.es_local ? 'Tu equipo (Local)' : 'Rival' }}</div>
+              </div>
+            </div>
+
+            <div class="vs-separator">
+              <span class="material-symbols-outlined">sports_soccer</span>
+              <span class="vs-text">VS</span>
+            </div>
+
+            <div class="equipo-item">
+              <div class="equipo-logo-small">
+                <img *ngIf="obtenerLogoEquipo(partido.id_equipo_visitante)"
+                  [src]="obtenerLogoEquipo(partido.id_equipo_visitante)!" [alt]="partido.equipo_visitante"
+                  (error)="$event.target.style.display='none'">
+                <div *ngIf="!obtenerLogoEquipo(partido.id_equipo_visitante)" class="equipo-logo-placeholder-small">
+                  <span class="material-symbols-outlined">shield</span>
+                </div>
+              </div>
+              <div class="equipo-info-item">
+                <div class="equipo-nombre">{{ partido.equipo_visitante }}</div>
+                <div class="equipo-rol">{{ !partido.es_local ? 'Tu equipo (Visitante)' : 'Rival' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="partido-info">
+            <div class="info-item">
+              <span class="material-symbols-outlined">calendar_today</span>
+              <span>{{ formatearFecha(partido.fecha_partido) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="material-symbols-outlined">schedule</span>
+              <span>{{ formatearHora(partido.fecha_partido) }}</span>
+            </div>
+            <div class="info-item" *ngIf="partido.lugar">
+              <span class="material-symbols-outlined">stadium</span>
+              <span>{{ partido.lugar }}</span>
+            </div>
+          </div>
+
+          <div class="partido-card-footer">
+            <button class="btn-select-partido">
+              <span class="material-symbols-outlined">edit</span>
+              Configurar Alineación
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CONFIGURACIÓN DE ALINEACIÓN -->
+    <!-- ========================================== -->
+    <div *ngIf="partidoSeleccionado()" class="alineacion-config-container">
+
+      <!-- HEADER CON INFO DEL PARTIDO -->
+      <div class="partido-seleccionado-header">
+        <div class="partido-info-header">
+          <button class="btn-back" (click)="partidoSeleccionado.set(null); limpiarAlineacion()">
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+
+          <div class="partido-header-content">
+            <div class="partido-header-equipos">
+              <div class="equipo-header-item">
+                <div class="equipo-logo-header">
+                  <img *ngIf="obtenerLogoEquipo(partidoSeleccionado()!.id_equipo_local)"
+                    [src]="obtenerLogoEquipo(partidoSeleccionado()!.id_equipo_local)!"
+                    [alt]="partidoSeleccionado()!.equipo_local" (error)="$event.target.style.display='none'">
+                  <div *ngIf="!obtenerLogoEquipo(partidoSeleccionado()!.id_equipo_local)"
+                    class="equipo-logo-placeholder-header">
+                    <span class="material-symbols-outlined">shield</span>
+                  </div>
+                </div>
+                <span class="equipo-header">{{ partidoSeleccionado()!.equipo_local }}</span>
+              </div>
+              <span class="vs-header">VS</span>
+              <div class="equipo-header-item">
+                <div class="equipo-logo-header">
+                  <img *ngIf="obtenerLogoEquipo(partidoSeleccionado()!.id_equipo_visitante)"
+                    [src]="obtenerLogoEquipo(partidoSeleccionado()!.id_equipo_visitante)!"
+                    [alt]="partidoSeleccionado()!.equipo_visitante" (error)="$event.target.style.display='none'">
+                  <div *ngIf="!obtenerLogoEquipo(partidoSeleccionado()!.id_equipo_visitante)"
+                    class="equipo-logo-placeholder-header">
+                    <span class="material-symbols-outlined">shield</span>
+                  </div>
+                </div>
+                <span class="equipo-header">{{ partidoSeleccionado()!.equipo_visitante }}</span>
+              </div>
+            </div>
+            <div class="partido-header-details">
+              <span class="detail-item">
+                <span class="material-symbols-outlined">calendar_today</span>
+                {{ formatearFecha(partidoSeleccionado()!.fecha_partido) }}
+              </span>
+              <span class="detail-item">
+                <span class="material-symbols-outlined">schedule</span>
+                {{ formatearHora(partidoSeleccionado()!.fecha_partido) }}
+              </span>
+              <span class="detail-item" *ngIf="partidoSeleccionado()!.lugar">
+                <span class="material-symbols-outlined">stadium</span>
+                {{ partidoSeleccionado()!.lugar }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SELECTOR DE FORMACIÓN -->
+        <div class="formacion-selector-header">
+          <label for="formacion-select">
+            <span class="material-symbols-outlined">grid_view</span>
+            Formación:
+          </label>
+          <select id="formacion-select" [value]="formacionActual()"
+            (change)="cambiarFormacion($any($event.target).value)" class="custom-select-modern">
+            <option *ngFor="let formacion of formacionesDisponibles()" [value]="formacion.codigo">
+              {{ formacion.nombre }}
+            </option>
+          </select>
+
+          <div class="info-badge-modern">
+            <span class="material-symbols-outlined">info</span>
+            {{ tipoFutbol() === '11' ? 'Fútbol 11' : 'Indoor' }} -
+            {{ maxTitulares() }} titulares + {{ maxSuplentes() }} suplentes
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- MENSAJE DE VALIDACIÓN -->
+      <!-- ========================================== -->
+      <div *ngIf="!puedeGuardar && partidoSeleccionado()" class="validation-message-top">
+        <span class="material-symbols-outlined">info</span>
+        <span>Completa la alineación: {{ titularesEnCancha().length }} / {{ maxTitulares() }} titulares</span>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- CANCHA Y JUGADORES -->
+      <!-- ========================================== -->
+      <div class="alineacion-content">
+
+        <!-- CANCHA DE FÚTBOL -->
+        <div class="cancha-container">
+          <div class="cancha" [class.cancha-indoor]="tipoFutbol() === '6'">
+            <!-- LÍNEAS Y ÁREAS DE LA CANCHA -->
+            <div class="cancha-lineas">
+              <div class="linea-media"></div>
+              <div class="circulo-central"></div>
+              <div class="area-grande area-grande-arriba"></div>
+              <div class="area-chica area-chica-arriba"></div>
+              <div class="area-grande area-grande-abajo"></div>
+              <div class="area-chica area-chica-abajo"></div>
+            </div>
+
+            <!-- POSICIONES DE LA CANCHA (DROP ZONES) -->
+            <div *ngFor="let pos of posicionesCancha(); let i = index" class="posicion-drop-zone" [style.left.%]="pos.x"
+              [style.top.%]="pos.y" cdkDropList [id]="'drop-pos-' + i" [cdkDropListData]="titularesEnCancha()"
+              [cdkDropListConnectedTo]="['disponibles-list', 'suplentes-list']"
+              (cdkDropListDropped)="onDrop($event, pos)">
+
+              <!-- JUGADOR EN POSICIÓN -->
+              <div *ngFor="let jugador of titularesEnCancha()"
+                [hidden]="jugador.posicion_x !== pos.x || jugador.posicion_y !== pos.y">
+                <div class="jugador-cancha" cdkDrag>
+                  <div class="jugador-dorsal">{{ jugador.dorsal }}</div>
+                  <div class="jugador-nombre-cancha">
+                    {{ jugador.nombre.charAt(0) }}. {{ jugador.apellido }}
+                  </div>
+                  <div class="jugador-posicion-badge">{{ jugador.posicion }}</div>
+                </div>
+              </div>
+
+              <!-- PLACEHOLDER DE POSICIÓN VACÍA -->
+              <div *ngIf="!jugadorEnPosicion(pos.x, pos.y)" class="posicion-placeholder">
+                <span class="material-symbols-outlined">add</span>
+                <span class="placeholder-text">{{ pos.posicion }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTADOR DE TITULARES -->
+          <div class="titulares-counter">
+            <span class="counter-icon material-symbols-outlined">groups</span>
+            <span class="counter-text">
+              Titulares: <strong>{{ titularesEnCancha().length }}</strong> / {{ maxTitulares() }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PANEL LATERAL -->
+        <!-- ========================================== -->
+        <div class="jugadores-panel">
+
+          <!-- JUGADORES SIN ASIGNAR -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined">person</span>
+              Jugadores Disponibles ({{ jugadoresSinAsignar().length }})
+            </h3>
+
+            <div id="disponibles-list" class="jugadores-list" cdkDropList [cdkDropListData]="jugadoresSinAsignar()"
+              [cdkDropListConnectedTo]="getDropZoneIds()" (cdkDropListDropped)="onDrop($event)">
+              <div *ngFor="let jugador of jugadoresSinAsignar()" class="jugador-item" cdkDrag>
+                <div class="jugador-dorsal-badge">{{ jugador.dorsal }}</div>
+                <div class="jugador-info">
+                  <div class="jugador-nombre-full">
+                    {{ jugador.nombre }} {{ jugador.apellido }}
+                  </div>
+                  <div class="jugador-posicion-text">{{ jugador.posicion }}</div>
+                </div>
+                <span class="drag-icon material-symbols-outlined">drag_indicator</span>
+              </div>
+
+              <div *ngIf="jugadoresSinAsignar().length === 0" class="empty-list">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Todos asignados</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUPLENTES -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined">swap_horiz</span>
+              Suplentes ({{ suplentes().length }} / {{ maxSuplentes() }})
+            </h3>
+
+            <div id="suplentes-list" class="jugadores-list suplentes-list" cdkDropList [cdkDropListData]="suplentes()"
+              [cdkDropListConnectedTo]="['disponibles-list']" (cdkDropListDropped)="onDrop($event)">
+              <div *ngFor="let jugador of suplentes()" class="jugador-item" cdkDrag>
+                <div class="jugador-dorsal-badge">{{ jugador.dorsal }}</div>
+                <div class="jugador-info">
+                  <div class="jugador-nombre-full">
+                    {{ jugador.nombre }} {{ jugador.apellido }}
+                  </div>
+                  <div class="jugador-posicion-text">{{ jugador.posicion }}</div>
+                </div>
+                <span class="drag-icon material-symbols-outlined">drag_indicator</span>
+              </div>
+
+              <div *ngIf="suplentes().length === 0" class="empty-list">
+                <span class="material-symbols-outlined">group_off</span>
+                <span>Sin suplentes</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================== -->
+          <!-- ACCIONES - BOTONES LIMPIAR Y GUARDAR -->
+          <!-- ========================================== -->
+          <div class="panel-section">
+            <h3 class="section-title">
+              <span class="material-symbols-outlined">build</span>
+              Acciones
+            </h3>
+
+            <div class="panel-actions">
+              <button class="btn-secondary" (click)="limpiarAlineacion()"
+                [disabled]="titularesEnCancha().length === 0 && suplentes().length === 0">
+                <span class="material-symbols-outlined">refresh</span>
+                Limpiar
+              </button>
+
+              <button class="btn-primary" (click)="guardarAlineacion()" [disabled]="!puedeGuardar || guardando()"
+                [title]="!puedeGuardar ? 'Completa la alineación: ' + titularesEnCancha().length + ' / ' + maxTitulares() + ' titulares' : 'Guardar alineación'">
+                <span class="material-symbols-outlined" [class.animate-spin]="guardando()">
+                  {{ guardando() ? 'hourglass_empty' : 'save' }}
+                </span>
+                {{ guardando() ? 'Guardando...' : 'Guardar Alineación' }}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL CONFIGURAR PARTIDO CON COUNTDOWN -->
+  <!-- ========================================== -->
+  <div class="modal-overlay" *ngIf="modalAbierto()" (click)="cerrarModal()">
+    <div class="modal-content partido-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="material-symbols-outlined">sports_soccer</span>
+          Configurar Alineación
+        </h2>
+        <button class="modal-close" (click)="cerrarModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="partidoParaConfigurar()">
+        <!-- INFO DEL PARTIDO -->
+        <div class="partido-info-box">
+          <h3>{{ partidoParaConfigurar()!.equipo_local }} vs {{ partidoParaConfigurar()!.equipo_visitante }}</h3>
+          <div class="partido-detalles">
+            <div class="detalle-item">
+              <span class="material-symbols-outlined">calendar_today</span>
+              <span>{{ formatearFecha(partidoParaConfigurar()!.fecha_partido) }}</span>
+            </div>
+            <div class="detalle-item">
+              <span class="material-symbols-outlined">schedule</span>
+              <span>{{ formatearHora(partidoParaConfigurar()!.fecha_partido) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COUNTDOWN TIMER -->
+        <div class="countdown-box" [class.expirado]="partidoAtrasado()">
+          <div class="countdown-icon">
+            <span class="material-symbols-outlined">
+              {{ partidoAtrasado() ? 'warning' : 'timer' }}
+            </span>
+          </div>
+          <div class="countdown-info">
+            <h4>{{ partidoAtrasado() ? '⚠️ Penalización aplicada' : 'Tiempo restante para subir alineación' }}</h4>
+            <p class="countdown-tiempo">{{ tiempoRestante() }}</p>
+            <p class="countdown-descripcion" *ngIf="!partidoAtrasado()">
+              Debes subir tu alineación 10 minutos antes del partido
+            </p>
+            <p class="countdown-descripcion warning" *ngIf="partidoAtrasado() && minutosPenalizacion() > 0">
+              ⚠️ El partido se retrasará {{ minutosPenalizacion() }} minutos por subir la alineación tarde
+            </p>
+            <p class="countdown-descripcion warning" *ngIf="partidoAtrasado() && minutosPenalizacion() === 0">
+              ⚠️ Puedes subir la alineación, pero se aplicará una penalización de 5 minutos
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModal()">
+          <span class="material-symbols-outlined">close</span>
+          Cancelar
+        </button>
+
+        <button class="btn-primary" (click)="confirmarYConfigurarAlineacion()">
+          <span class="material-symbols-outlined">check</span>
+          {{ partidoAtrasado() ? 'Configurar Alineación (con penalización)' : 'Configurar Alineación' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

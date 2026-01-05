@@ -1,5 +1,4 @@
 <div class="organizadores-container">
-  <!-- HEADER -->
   <div class="page-header">
     <div class="header-content">
       <h1>Organizadores</h1>
@@ -14,7 +13,6 @@
     </button>
   </div>
 
-  <!-- FILTERS -->
   <div class="filters-bar">
     <div class="search-box">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
@@ -39,14 +37,13 @@
     <div class="filter-group">
       <label>Ordenar por:</label>
       <select>
-        <option value="recent">Más recientes</option>
+        <option value="recent">Mas recientes</option>
         <option value="name">Nombre A-Z</option>
         <option value="email">Email A-Z</option>
       </select>
     </div>
   </div>
 
-  <!-- TABLE -->
   @if (isLoading()) {
     <div class="loading-state">
       <div class="spinner"></div>
@@ -83,7 +80,6 @@
         <tbody>
           @for (org of filteredOrganizadores(); track org.id_usuario) {
             <tr>
-              <!-- ORGANIZADOR -->
               <td>
                 <div class="user-cell">
                   <div class="user-avatar">
@@ -99,12 +95,10 @@
                 </div>
               </td>
 
-              <!-- CAMPEONATO -->
               <td>
-                <span class="campeonato-name">{{ org.campeonato || 'Copa Primavera 2024' }}</span>
+                <span class="campeonato-name">{{ org.campeonato || 'Sin campeonato' }}</span>
               </td>
 
-              <!-- ESTADO -->
               <td>
                 <span class="status-badge" [class]="getStatusBadgeClass(org.activo)">
                   <span class="status-dot"></span>
@@ -112,12 +106,10 @@
                 </span>
               </td>
 
-              <!-- EQUIPOS -->
               <td>
-                <span class="equipos-count">16</span>
+                <span class="equipos-count">0</span>
               </td>
 
-              <!-- EMAIL VERIFICADO -->
               <td>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [class]="org.email_verified ? 'icon-verified' : 'icon-pending'">
                   @if (org.email_verified) {
@@ -130,12 +122,10 @@
                 </svg>
               </td>
 
-              <!-- REGISTRADO -->
               <td>
                 <span class="date-text">{{ org.fecha_registro | date: 'dd MMM, yyyy' }}</span>
               </td>
 
-              <!-- ACCIONES -->
               <td>
                 <div class="action-buttons">
                   <button type="button" class="action-btn" title="Ver detalles" [routerLink]="['/superadmin/organizadores', org.id_usuario]">
@@ -163,14 +153,11 @@
         </tbody>
       </table>
 
-      <!-- PAGINATION -->
       <div class="table-footer">
-        <span>Mostrando 1-10 de 1000</span>
+        <span>Mostrando {{ filteredOrganizadores().length }} organizadores</span>
         <div class="pagination">
           <button class="page-btn" disabled>Anterior</button>
           <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn">3</button>
           <button class="page-btn">Siguiente</button>
         </div>
       </div>
@@ -178,11 +165,9 @@
   }
 </div>
 
-<!-- CREATE MODAL -->
 @if (showModal()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <!-- MODAL HEADER -->
       <div class="modal-header">
         <div class="modal-title-group">
           <div class="modal-icon">
@@ -206,7 +191,6 @@
         </button>
       </div>
 
-      <!-- SUCCESS MESSAGE -->
       @if (successMessage()) {
         <div class="alert alert-success">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -217,7 +201,6 @@
         </div>
       }
 
-      <!-- ERROR MESSAGE -->
       @if (errorMessage()) {
         <div class="alert alert-error">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -229,10 +212,8 @@
         </div>
       }
 
-      <!-- MODAL BODY -->
       <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
         <div class="modal-body">
-          <!-- NOMBRE -->
           <div class="form-group">
             <label for="nombre">Nombre Completo del Organizador</label>
             <div class="input-wrapper">
@@ -248,13 +229,12 @@
                 [class.invalid]="nombreInvalid">
             </div>
             @if (nombreInvalid) {
-              <span class="error-text">El nombre es requerido (mínimo 3 caracteres)</span>
+              <span class="error-text">El nombre es requerido (minimo 3 caracteres)</span>
             }
           </div>
 
-          <!-- EMAIL -->
           <div class="form-group">
-            <label for="email">Correo Electrónico (Solo Gmail)</label>
+            <label for="email">Correo Electronico (Solo Gmail)</label>
             <div class="input-wrapper">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="input-icon">
                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
@@ -264,19 +244,18 @@
                 type="email" 
                 id="email" 
                 formControlName="email" 
-                placeholder="usuario@dominio.com"
+                placeholder="usuario@gmail.com"
                 [class.invalid]="emailInvalid">
             </div>
             @if (createForm.get('email')?.hasError('notGmail') && createForm.get('email')?.touched) {
-              <span class="error-text">Por favor, ingrese un correo de Gmail válido.</span>
+              <span class="error-text">Por favor, ingrese un correo de Gmail valido.</span>
             } @else if (emailInvalid) {
               <span class="error-text">El email es requerido</span>
             }
           </div>
 
-          <!-- CAMPEONATO -->
           <div class="form-group">
-            <label for="nombre_campeonato">Nombre del Campeonato que Gestionará</label>
+            <label for="nombre_campeonato">Nombre del Campeonato que Gestionara</label>
             <div class="input-wrapper">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="input-icon">
                 <circle cx="12" cy="8" r="7"></circle>
@@ -294,7 +273,6 @@
             }
           </div>
 
-          <!-- INFO BOX -->
           <div class="info-box">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
@@ -302,13 +280,12 @@
               <path d="M12 8h.01"></path>
             </svg>
             <div>
-              <strong>Envío automático de credenciales</strong>
-              <p>Una vez creada la cuenta, las credenciales de inicio de sesión se generarán y enviarán automáticamente al correo electrónico del organizador.</p>
+              <strong>Envio automatico de credenciales</strong>
+              <p>Una vez creada la cuenta, las credenciales de inicio de sesion se generaran y mostraran una sola vez.</p>
             </div>
           </div>
         </div>
 
-        <!-- MODAL FOOTER -->
         <div class="modal-footer">
           <button type="button" class="btn-secondary" (click)="closeModal()" [disabled]="isSubmitting()">
             Cancelar

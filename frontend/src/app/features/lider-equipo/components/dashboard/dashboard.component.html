@@ -1,0 +1,329 @@
+<div class="dashboard-lider-container">
+    <!-- LOADING STATE -->
+    <div *ngIf="loading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando tu dashboard...</p>
+    </div>
+  
+    <!-- CONTENT -->
+    <div *ngIf="!loading()">
+      <!-- HEADER CON SELECTOR DE EQUIPO -->
+      <div class="dashboard-header">
+        <div class="header-content">
+          <div class="welcome-section">
+            <h1 class="dashboard-title">
+              <span class="material-symbols-outlined">sports_soccer</span>
+              Panel del Líder
+            </h1>
+            <p class="dashboard-subtitle">Gestiona tus equipos y partidos desde un solo lugar</p>
+          </div>
+  
+          <!-- SELECTOR DE EQUIPO -->
+          <div *ngIf="misEquipos().length > 0" class="equipo-selector-card">
+            <label for="selector-equipo" class="selector-label">
+              <span class="material-symbols-outlined">shield</span>
+              Equipo Activo
+            </label>
+            <select 
+              id="selector-equipo"
+              [(ngModel)]="equipoSeleccionado" 
+              (change)="cambiarEquipo()"
+              class="equipo-select"
+              [attr.aria-label]="'Seleccionar equipo activo'">
+              <option *ngFor="let equipo of misEquipos()" [value]="equipo.id_equipo">
+                {{ equipo.nombre }} - {{ getEstadoBadge(equipo.estado) }}
+              </option>
+            </select>
+          </div>
+        </div>
+  
+        <!-- EQUIPO ACTUAL INFO -->
+        <div *ngIf="equipoActual()" class="equipo-actual-card">
+          <div class="equipo-logo">
+            <img 
+              *ngIf="equipoActual()?.logo_url" 
+              [src]="equipoActual()!.logo_url" 
+              [alt]="'Logo de ' + equipoActual()!.nombre"
+              class="logo-img">
+            <span *ngIf="!equipoActual()?.logo_url" class="material-symbols-outlined logo-placeholder">
+              shield
+            </span>
+          </div>
+          <div class="equipo-info">
+            <h2 class="equipo-nombre">{{ equipoActual()!.nombre }}</h2>
+            <div class="equipo-meta">
+              <span class="meta-item">
+                <span class="material-symbols-outlined">stadium</span>
+                {{ equipoActual()!.estadio || 'Sin estadio asignado' }}
+              </span>
+              <span class="meta-item">
+                <span class="material-symbols-outlined">sports</span>
+                {{ equipoActual()!.tipo_deporte === 'futbol' ? 'Fútbol 11' : 'Indoor/Fútbol 5' }}
+              </span>
+              <span class="meta-item" [class]="'estado-' + equipoActual()!.estado">
+                <span class="material-symbols-outlined">
+                  {{ equipoActual()!.estado === 'aprobado' ? 'check_circle' : 
+                     equipoActual()!.estado === 'rechazado' ? 'cancel' : 'schedule' }}
+                </span>
+                {{ getEstadoBadge(equipoActual()!.estado) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- EMPTY STATE - SIN EQUIPOS -->
+      <div *ngIf="misEquipos().length === 0" class="empty-state-equipos">
+        <div class="empty-icon">
+          <span class="material-symbols-outlined">shield</span>
+        </div>
+        <h2>No tienes equipos registrados</h2>
+        <p>Crea tu primer equipo o solicita la inscripción a un campeonato disponible</p>
+        <div class="empty-actions">
+          <button 
+            [routerLink]="['/lider-equipo/campeonatos-disponibles']"
+            class="btn-primary">
+            <span class="material-symbols-outlined">search</span>
+            Buscar Campeonatos
+          </button>
+        </div>
+      </div>
+  
+      <!-- DASHBOARD CONTENT -->
+      <div *ngIf="misEquipos().length > 0 && equipoActual()" class="dashboard-content">
+        <!-- STATS CARDS -->
+        <div class="stats-grid">
+          <!-- TOTAL JUGADORES -->
+          <div class="stat-card stat-jugadores">
+            <div class="stat-icon">
+              <span class="material-symbols-outlined">group</span>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Jugadores Registrados</span>
+              <span class="stat-value">{{ stats().totalJugadores }}</span>
+              <span class="stat-meta">
+                de {{ equipoActual()!.max_jugadores }} máximo
+              </span>
+            </div>
+            <button 
+              [routerLink]="['/lider-equipo/jugadores']"
+              class="stat-action"
+              [attr.aria-label]="'Gestionar jugadores'">
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+  
+          <!-- PRÓXIMO PARTIDO -->
+          <div class="stat-card stat-partido">
+            <div class="stat-icon">
+              <span class="material-symbols-outlined">event</span>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Próximo Partido</span>
+              <span *ngIf="stats().proximoPartido" class="stat-value">
+                {{ calcularDiasRestantes(stats().proximoPartido!.fecha_partido) }} días
+              </span>
+              <span *ngIf="!stats().proximoPartido" class="stat-value">N/A</span>
+              <span *ngIf="stats().proximoPartido" class="stat-meta">
+                {{ formatearFecha(stats().proximoPartido!.fecha_partido).split(',')[0] }}
+              </span>
+            </div>
+            <button 
+              [routerLink]="['/lider-equipo/partidos']"
+              class="stat-action"
+              [attr.aria-label]="'Ver partidos'">
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+  
+          <!-- NOTIFICACIONES -->
+          <div class="stat-card stat-notificaciones">
+            <div class="stat-icon">
+              <span class="material-symbols-outlined">notifications</span>
+              <span *ngIf="stats().notificacionesPendientes > 0" class="notification-badge">
+                {{ stats().notificacionesPendientes }}
+              </span>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Notificaciones</span>
+              <span class="stat-value">{{ stats().notificacionesPendientes }}</span>
+              <span class="stat-meta">sin leer</span>
+            </div>
+            <button 
+              [routerLink]="['/lider-equipo/notificaciones']"
+              class="stat-action"
+              [attr.aria-label]="'Ver notificaciones'">
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+  
+          <!-- CAMPEONATOS -->
+          <div class="stat-card stat-campeonatos">
+            <div class="stat-icon">
+              <span class="material-symbols-outlined">emoji_events</span>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Campeonatos</span>
+              <span class="stat-value">{{ equipoActual()!.campeonatos?.length || 0 }}</span>
+              <span class="stat-meta">activos</span>
+            </div>
+            <button 
+              [routerLink]="['/lider-equipo/mis-equipos']"
+              class="stat-action"
+              [attr.aria-label]="'Ver campeonatos'">
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+  
+        <!-- MAIN GRID -->
+        <div class="content-grid">
+          <!-- PRÓXIMOS PARTIDOS -->
+          <section class="card partidos-card" aria-labelledby="proximos-partidos-title">
+            <div class="card-header">
+              <h3 id="proximos-partidos-title">
+                <span class="material-symbols-outlined">calendar_today</span>
+                Próximos Partidos
+              </h3>
+              <a 
+                [routerLink]="['/lider-equipo/partidos']" 
+                class="header-link"
+                [attr.aria-label]="'Ver todos los partidos'">
+                Ver todos
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+            <div class="card-body">
+              <!-- EMPTY STATE -->
+              <div *ngIf="proximosPartidos().length === 0" class="empty-state">
+                <span class="material-symbols-outlined">sports_soccer</span>
+                <p>No hay partidos programados</p>
+              </div>
+  
+              <!-- LISTA DE PARTIDOS -->
+              <div *ngIf="proximosPartidos().length > 0" class="partidos-list">
+                <div 
+                  *ngFor="let partido of proximosPartidos()" 
+                  class="partido-item"
+                  [class.es-local]="partido.es_local">
+                  <div class="partido-fecha">
+                    <span class="dia">{{ obtenerDia(partido.fecha_partido) }}</span>
+                    <span class="mes">{{ obtenerMes(partido.fecha_partido) }}</span>
+                  </div>
+                  <div class="partido-info">
+                    <div class="partido-equipos">
+                      <span class="equipo" [class.local]="partido.es_local">
+                        {{ partido.equipo_local }}
+                      </span>
+                      <span class="vs">vs</span>
+                      <span class="equipo" [class.visitante]="!partido.es_local">
+                        {{ partido.equipo_visitante }}
+                      </span>
+                    </div>
+                    <div class="partido-meta">
+                      <span class="meta-item">
+                        <span class="material-symbols-outlined">schedule</span>
+                        {{ obtenerHora(partido.fecha_partido) }}
+                      </span>
+                      <span class="meta-item">
+                        <span class="material-symbols-outlined">location_on</span>
+                        {{ partido.lugar || 'Por definir' }}
+                      </span>
+                    </div>
+                  </div>
+                  <span class="partido-badge">
+                    {{ partido.es_local ? 'LOCAL' : 'VISITANTE' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+  
+          <!-- NOTIFICACIONES RECIENTES -->
+          <section class="card notificaciones-card" aria-labelledby="notificaciones-title">
+            <div class="card-header">
+              <h3 id="notificaciones-title">
+                <span class="material-symbols-outlined">notifications</span>
+                Notificaciones Recientes
+              </h3>
+              <a 
+                [routerLink]="['/lider-equipo/notificaciones']" 
+                class="header-link"
+                [attr.aria-label]="'Ver todas las notificaciones'">
+                Ver todas
+                <span class="material-symbols-outlined">arrow_forward</span>
+              </a>
+            </div>
+            <div class="card-body">
+              <!-- EMPTY STATE -->
+              <div *ngIf="notificaciones().length === 0" class="empty-state">
+                <span class="material-symbols-outlined">check_circle</span>
+                <p>No tienes notificaciones pendientes</p>
+              </div>
+  
+              <!-- LISTA DE NOTIFICACIONES -->
+              <div *ngIf="notificaciones().length > 0" class="notificaciones-list">
+                <div 
+                  *ngFor="let notif of notificaciones()" 
+                  class="notificacion-item"
+                  [class]="'tipo-' + notif.tipo">
+                  <div class="notif-icon" [class]="'tipo-' + notif.tipo">
+                    <span class="material-symbols-outlined">
+                      {{ notif.tipo === 'success' ? 'check_circle' :
+                         notif.tipo === 'error' ? 'error' :
+                         notif.tipo === 'warning' ? 'warning' : 'info' }}
+                    </span>
+                  </div>
+                  <div class="notif-content">
+                    <h4 class="notif-titulo">{{ notif.titulo }}</h4>
+                    <p class="notif-mensaje">{{ notif.mensaje }}</p>
+                    <span class="notif-fecha">
+                        {{ formatearFechaNotificacion(notif.fecha_envio) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+  
+        <!-- ACCIONES RÁPIDAS -->
+        <section class="quick-actions" aria-labelledby="acciones-title">
+          <h3 id="acciones-title" class="section-title">Acciones Rápidas</h3>
+          <div class="actions-grid">
+            <a 
+              [routerLink]="['/lider-equipo/jugadores']" 
+              class="action-card"
+              [attr.aria-label]="'Gestionar jugadores del equipo'">
+              <span class="material-symbols-outlined">group_add</span>
+              <span class="action-label">Gestionar Jugadores</span>
+            </a>
+  
+            <a 
+              [routerLink]="['/lider-equipo/alineaciones']" 
+              class="action-card"
+              [attr.aria-label]="'Configurar alineaciones'">
+              <span class="material-symbols-outlined">format_list_numbered</span>
+              <span class="action-label">Configurar Alineación</span>
+            </a>
+  
+            <a 
+              [routerLink]="['/lider-equipo/estadisticas']" 
+              class="action-card"
+              [attr.aria-label]="'Ver estadísticas del equipo'">
+              <span class="material-symbols-outlined">analytics</span>
+              <span class="action-label">Ver Estadísticas</span>
+            </a>
+  
+            <a 
+              [routerLink]="['/lider-equipo/campeonatos-disponibles']" 
+              class="action-card"
+              [attr.aria-label]="'Buscar campeonatos disponibles'">
+              <span class="material-symbols-outlined">search</span>
+              <span class="action-label">Buscar Campeonatos</span>
+            </a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>

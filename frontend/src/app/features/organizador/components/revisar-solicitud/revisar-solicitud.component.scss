@@ -1,0 +1,147 @@
+// ============================================
+// REVISAR SOLICITUD - ESTILOS
+// ============================================
+
+// Animaciones suaves
+* {
+    transition: all 0.3s ease;
+  }
+  
+  // Animación para el modal de PDF
+  .fixed {
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  // Mejorar el iframe del PDF
+  iframe {
+    background: white;
+    
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+      
+      &:hover {
+        background: #555;
+      }
+    }
+  }
+  
+  // Estilos para checkbox personalizado
+  input[type="checkbox"] {
+    cursor: pointer;
+    
+    &:checked {
+      background-color: #2E7D32;
+      border-color: #2E7D32;
+    }
+  }
+  
+  // Hover effects para tarjetas de jugadores
+  .hover\:border-\[\#2E7D32\]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+  }
+  
+  // Estados de validación
+  .border-green-300 {
+    animation: pulse-green 2s infinite;
+  }
+  
+  .border-red-300 {
+    animation: pulse-red 2s infinite;
+  }
+  
+  @keyframes pulse-green {
+    0%, 100% {
+      border-color: rgb(134, 239, 172);
+    }
+    50% {
+      border-color: rgb(74, 222, 128);
+    }
+  }
+  
+  @keyframes pulse-red {
+    0%, 100% {
+      border-color: rgb(252, 165, 165);
+    }
+    50% {
+      border-color: rgb(248, 113, 113);
+    }
+  }
+  
+  // Botones con estado disabled
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    
+    &:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+  }
+  
+  // Scrollbar personalizado para el contenedor principal
+  .overflow-auto {
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 5px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(46, 125, 50, 0.3);
+      border-radius: 5px;
+      
+      &:hover {
+        background: rgba(46, 125, 50, 0.5);
+      }
+    }
+  }
+  
+  // Dark mode improvements
+  @media (prefers-color-scheme: dark) {
+    iframe {
+      background: #1f2937;
+    }
+    
+    .overflow-auto::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .overflow-auto::-webkit-scrollbar-thumb {
+      background: rgba(46, 125, 50, 0.4);
+      
+      &:hover {
+        background: rgba(46, 125, 50, 0.6);
+      }
+    }
+  }
+  
+  // Responsive adjustments
+  @media (max-width: 640px) {
+    .fixed > div {
+      max-width: 95vw !important;
+      max-height: 95vh !important;
+    }
+  }

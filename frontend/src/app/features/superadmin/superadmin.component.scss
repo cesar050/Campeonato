@@ -8,10 +8,8 @@
   flex: 1;
   margin-left: 260px;
   overflow-x: hidden;
-}
 
-@media (max-width: 968px) {
-  .main-content {
+  @media (max-width: 768px) {
     margin-left: 0;
   }
 }

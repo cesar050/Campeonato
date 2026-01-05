@@ -1,0 +1,364 @@
+<!-- TOAST -->
+<app-toast
+  [show]="showToast()"
+  [type]="toastType()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  (close)="cerrarToast()">
+</app-toast>
+
+<!-- CONTAINER PRINCIPAL -->
+<div class="min-h-screen bg-gray-50 dark:bg-[#102211]">
+  
+  <!-- HEADER -->
+  <div class="bg-white dark:bg-[#182c19] border-b-2 border-gray-200 dark:border-[#2a452b] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div class="flex items-center gap-4">
+        <button 
+          (click)="volver()"
+          class="w-12 h-12 rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center transition-all group"
+          aria-label="Volver">
+          <span class="material-symbols-outlined text-gray-600 dark:text-gray-400 group-hover:text-[#2E7D32]">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#2E7D32]">fact_check</span>
+            Revisar Solicitud de Inscripción
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-1">
+            Valida la información del equipo antes de aprobar
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading()" class="flex items-center justify-center py-20">
+    <div class="text-center">
+      <div class="inline-block w-16 h-16 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400 font-medium">Cargando solicitud...</p>
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div *ngIf="!loading() && equipo()" class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+
+    <!-- INFORMACIÓN DEL EQUIPO -->
+    <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6">
+      <div class="flex items-start gap-6">
+        <!-- Logo -->
+        <div class="flex-shrink-0">
+          <app-image-placeholder 
+            *ngIf="!equipo()?.logo_url"
+            [size]="'large'"
+            [icon]="'shield'">
+          </app-image-placeholder>
+          <img 
+            *ngIf="equipo()?.logo_url"
+            [src]="equipo()!.logo_url"
+            [alt]="equipo()!.nombre"
+            class="w-24 h-24 rounded-2xl object-cover border-4 border-gray-200 dark:border-gray-700 shadow-lg">
+        </div>
+
+        <!-- Info -->
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {{ equipo()?.nombre }}
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <span class="material-symbols-outlined text-[#2E7D32]">stadium</span>
+              <span>{{ equipo()?.estadio || 'Sin estadio' }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <span class="material-symbols-outlined text-[#2E7D32]">sports_soccer</span>
+              <span>{{ equipo()?.tipo_deporte === 'futbol' ? 'Fútbol 11' : 'Fútbol Indoor' }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+              <span class="material-symbols-outlined text-[#2E7D32]">calendar_today</span>
+              <span>{{ formatearFecha(equipo()!.fecha_registro) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFORMACIÓN DEL LÍDER -->
+    <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6">
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#2E7D32]">person</span>
+        Información del Líder
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Nombre completo</p>
+          <p class="font-bold text-gray-900 dark:text-white">
+            {{ equipo()?.lider?.nombre || equipo()?.nombre_lider || 'No especificado' }}
+          </p>
+        </div>
+        <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
+          <p class="font-bold text-gray-900 dark:text-white">
+            {{ equipo()?.lider?.email || equipo()?.email_lider || 'No especificado' }}
+          </p>
+        </div>
+        <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Teléfono</p>
+          <p class="font-bold text-gray-900 dark:text-white">
+            {{ equipo()?.lider?.telefono || equipo()?.telefono_lider || 'No especificado' }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- RESUMEN DE VALIDACIÓN -->
+    <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E7D32]">task_alt</span>
+          Validación de Requisitos
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Jugadores -->
+          <div class="p-4 rounded-xl border-2 transition-all"
+               [class]="cumpleRequisitos() 
+                 ? 'border-green-300 bg-green-50 dark:bg-green-900/20 dark:border-green-700' 
+                 : 'border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700'">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold" 
+                   [class]="cumpleRequisitos() ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'">
+                  Número de jugadores
+                </p>
+                <p class="text-2xl font-bold mt-1"
+                   [class]="cumpleRequisitos() ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'">
+                  {{ jugadores().length }} / {{ jugadoresRequeridos() }}
+                </p>
+              </div>
+              <span class="material-symbols-outlined text-4xl"
+                    [class]="cumpleRequisitos() ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                {{ cumpleRequisitos() ? 'check_circle' : 'cancel' }}
+              </span>
+            </div>
+          </div>
+  
+          <!-- PDFs Revisados -->
+          <div class="p-4 rounded-xl border-2 border-gray-300 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Documentos revisados
+                </p>
+                <label class="flex items-center gap-2 mt-2 cursor-pointer">
+                  <input 
+                    type="checkbox"
+                    [(ngModel)]="pdfsRevisados"
+                    class="w-5 h-5 rounded border-2 border-gray-300 text-[#2E7D32] focus:ring-4 focus:ring-[#2E7D32]/20">
+                  <span class="text-sm text-gray-600 dark:text-gray-400">
+                    He revisado todos los PDFs
+                  </span>
+                </label>
+              </div>
+              <span class="material-symbols-outlined text-4xl text-blue-600 dark:text-blue-400">
+                verified
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- LISTA DE JUGADORES -->
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#2E7D32]">group</span>
+            Jugadores Registrados ({{ jugadores().length }})
+          </h3>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            Página {{ paginaActual() }} de {{ totalPaginas() }}
+          </div>
+        </div>
+  
+        <!-- Empty state -->
+        <div *ngIf="jugadores().length === 0" class="text-center py-12">
+          <span class="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">group_off</span>
+          <p class="text-gray-600 dark:text-gray-400">No hay jugadores registrados</p>
+        </div>
+  
+        <!-- Lista de jugadores -->
+        <div *ngIf="jugadores().length > 0" class="space-y-3">
+          <div *ngFor="let jugador of jugadoresPaginados()" 
+               class="p-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] transition-all">
+            <div class="flex items-center justify-between">
+              <!-- Info del jugador -->
+              <div class="flex items-center gap-4 flex-1">
+                <!-- Dorsal -->
+                <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] flex items-center justify-center text-white font-bold text-xl flex-shrink-0">
+                  {{ jugador.dorsal }}
+                </div>
+  
+                <!-- Datos -->
+                <div class="flex-1">
+                  <p class="font-bold text-gray-900 dark:text-white text-lg">
+                    {{ jugador.nombre }} {{ jugador.apellido }}
+                  </p>
+                  <div class="flex items-center gap-4 mt-1">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                      <span class="font-semibold">CI:</span> {{ jugador.documento }}
+                    </span>
+                    <span class="text-sm text-gray-600 dark:text-gray-400">
+                      <span class="font-semibold">Edad:</span> {{ jugador.fecha_nacimiento ? calcularEdad(jugador.fecha_nacimiento) : 'N/A' }} años
+                    </span>
+                    <span [class]="'px-3 py-1 rounded-full text-xs font-bold ' + getPosicionColor(jugador.posicion)">
+                      {{ jugador.posicion | titlecase }}
+                    </span>
+                  </div>
+                </div>
+  
+                <!-- Botón Ver PDF -->
+                <button 
+                  (click)="verPDF(jugador)"
+                  [disabled]="!jugador.documento_url"
+                  class="px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2"
+                  [class]="jugador.documento_url 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'">
+                  <span class="material-symbols-outlined">picture_as_pdf</span>
+                  Ver PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Paginación -->
+        <div *ngIf="totalPaginas() > 1" class="flex items-center justify-center gap-2 mt-6">
+          <button 
+            (click)="cambiarPagina(paginaActual() - 1)"
+            [disabled]="paginaActual() === 1"
+            class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+  
+          <div class="flex items-center gap-1">
+            <button 
+              *ngFor="let pagina of [].constructor(totalPaginas()); let i = index"
+              (click)="cambiarPagina(i + 1)"
+              [class]="(i + 1) === paginaActual() 
+                ? 'w-10 h-10 rounded-lg bg-[#2E7D32] text-white font-bold flex items-center justify-center'
+                : 'w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center transition-all'">
+              {{ i + 1 }}
+            </button>
+          </div>
+  
+          <button 
+            (click)="cambiarPagina(paginaActual() + 1)"
+            [disabled]="paginaActual() === totalPaginas()"
+            class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      </div>
+  
+      <!-- DECISIÓN: APROBAR/RECHAZAR -->
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E7D32]">rate_review</span>
+          Decisión Final
+        </h3>
+  
+        <!-- Mensaje -->
+        <div class="mb-6">
+          <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+            Mensaje para el líder *
+          </label>
+          <textarea 
+            [(ngModel)]="mensaje"
+            rows="4"
+            placeholder="Escribe un mensaje explicando tu decisión..."
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all resize-none"></textarea>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Este mensaje será enviado al líder del equipo
+          </p>
+        </div>
+  
+        <!-- Botones -->
+        <div class="flex gap-4">
+          <button 
+            (click)="rechazarSolicitud()"
+            [disabled]="procesando()"
+            class="flex-1 px-6 py-4 rounded-xl border-2 border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">cancel</span>
+            Rechazar Solicitud
+          </button>
+  
+          <button 
+            (click)="aprobarSolicitud()"
+            [disabled]="procesando() || !cumpleRequisitos() || !pdfsRevisados()"
+            class="flex-1 px-6 py-4 rounded-xl bg-green-600 text-white font-bold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg">
+            <span class="material-symbols-outlined">check_circle</span>
+            Aprobar Solicitud
+          </button>
+        </div>
+  
+        <!-- Ayuda -->
+        <div *ngIf="!cumpleRequisitos() || !pdfsRevisados()" 
+             class="mt-4 p-4 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-300 dark:border-yellow-700">
+          <p class="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
+            ⚠️ Requisitos para aprobar:
+          </p>
+          <ul class="text-sm text-yellow-800 dark:text-yellow-200 mt-2 space-y-1 ml-4 list-disc">
+            <li *ngIf="!cumpleRequisitos()">
+              El equipo debe tener {{ jugadoresRequeridos() }} jugadores (actualmente tiene {{ jugadores().length }})
+            </li>
+            <li *ngIf="!pdfsRevisados()">
+              Debes confirmar que has revisado todos los documentos PDF
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- MODAL: VER PDF -->
+  <div *ngIf="showPdfModal()" 
+       class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
+       (click)="cerrarPdfModal()">
+    <div class="bg-white dark:bg-[#182c19] rounded-2xl max-w-6xl w-full h-[90vh] shadow-2xl flex flex-col"
+         (click)="$event.stopPropagation()">
+      
+      <!-- Header del modal -->
+      <div class="p-4 border-b-2 border-gray-200 dark:border-gray-700 flex items-center justify-between flex-shrink-0">
+        <div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+            Documento de {{ jugadorActual()?.nombre }} {{ jugadorActual()?.apellido }}
+          </h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            CI: {{ jugadorActual()?.documento }} | Posición: {{ jugadorActual()?.posicion }}
+          </p>
+        </div>
+        <button 
+          (click)="cerrarPdfModal()"
+          class="w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all"
+          aria-label="Cerrar modal">
+          <span class="material-symbols-outlined text-gray-400">close</span>
+        </button>
+      </div>
+  
+      <!-- Visor de PDF -->
+      <div class="flex-1 overflow-hidden">
+        <iframe 
+          *ngIf="pdfUrl()"
+          [src]="pdfUrl()!"
+          class="w-full h-full border-0"
+          title="Documento PDF">
+        </iframe>
+      </div>
+  
+      <!-- Footer con info -->
+      <div class="p-4 border-t-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
+        <p class="text-sm text-gray-600 dark:text-gray-400 text-center">
+          💡 <span class="font-semibold">Consejo:</span> Verifica que la foto, nombre, CI y fecha de nacimiento coincidan con los datos registrados
+        </p>
+      </div>
+    </div>
+  </div>

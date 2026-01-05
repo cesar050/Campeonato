@@ -1,0 +1,368 @@
+<!-- TOAST -->
+<app-toast [show]="showToast()" [type]="toastType()" [title]="toastTitle()" [message]="toastMessage()"
+  (close)="cerrarToast()">
+</app-toast>
+
+<!-- CONTAINER PRINCIPAL -->
+<div class="min-h-screen bg-gray-50 dark:bg-[#102211]">
+
+  <!-- HEADER -->
+  <div class="bg-white dark:bg-[#182c19] border-b-2 border-gray-200 dark:border-[#2a452b] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <button (click)="volver()"
+            class="w-12 h-12 rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center transition-all group"
+            aria-label="Volver">
+            <span
+              class="material-symbols-outlined text-gray-600 dark:text-gray-400 group-hover:text-[#2E7D32]">arrow_back</span>
+          </button>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#2E7D32]">pending_actions</span>
+              Ver Solicitudes
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-1">
+              Gestiona las inscripciones de equipos
+            </p>
+          </div>
+        </div>
+
+        <!-- Badge de pendientes -->
+        <div *ngIf="tieneSolicitudesPendientes()"
+          class="px-4 py-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 border-2 border-yellow-300 animate-pulse">
+          <p class="text-xs font-semibold text-yellow-700 dark:text-yellow-300">
+            Solicitudes Pendientes
+          </p>
+          <p class="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+            {{ getSolicitudesPendientes() }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- FILTROS Y BÚSQUEDA -->
+    <div
+      class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 mb-6">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#2E7D32]">filter_list</span>
+        Filtros de búsqueda
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <!-- Filtro por estado -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Estado
+          </label>
+          <select [(ngModel)]="filtroEstado" (change)="cambiarFiltroEstado($any($event.target).value)"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+            <option value="todas">Todas</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="aprobado">Aprobadas</option>
+            <option value="rechazado">Rechazadas</option>
+          </select>
+        </div>
+
+        <!-- Ordenar por fecha -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Ordenar por
+          </label>
+          <select [(ngModel)]="ordenamiento" (change)="cambiarOrdenamiento($any($event.target).value)"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+            <option value="fecha_desc">Más recientes primero</option>
+            <option value="fecha_asc">Más antiguos primero</option>
+          </select>
+        </div>
+
+        <!-- Búsqueda por líder -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            Buscar por líder
+          </label>
+          <div class="relative">
+            <input type="text" [(ngModel)]="busquedaLider" (keyup.enter)="buscarPorLider()"
+              placeholder="Nombre del líder..."
+              class="w-full px-4 py-3 pr-12 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+            <button (click)="buscarPorLider()"
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-[#2E7D32] text-white hover:bg-[#1B5E20] flex items-center justify-center transition-all">
+              <span class="material-symbols-outlined text-xl">search</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Limpiar filtros -->
+        <div class="flex items-end">
+          <button (click)="limpiarBusqueda()"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center gap-2 transition-all">
+            <span class="material-symbols-outlined">filter_alt_off</span>
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Resumen de resultados -->
+      <div class="mt-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          Mostrando <span class="font-bold text-[#2E7D32]">{{ getInscripcionesPaginadas().length }}</span>
+          de <span class="font-bold">{{ totalInscripciones() }}</span> solicitudes
+        </p>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="flex items-center justify-center py-20">
+      <div class="text-center">
+        <div class="inline-block w-16 h-16 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4">
+        </div>
+        <p class="text-gray-600 dark:text-gray-400 font-medium">Cargando solicitudes...</p>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div *ngIf="!loading() && inscripciones().length === 0"
+      class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-12">
+      <div class="text-center">
+        <div class="w-24 h-24 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6">
+          <span class="material-symbols-outlined text-6xl text-gray-400">inbox</span>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          No hay solicitudes
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+          No se encontraron solicitudes con los filtros aplicados
+        </p>
+        <button (click)="limpiarBusqueda()"
+          class="px-6 py-3 rounded-xl bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] transition-all flex items-center gap-2 mx-auto">
+          <span class="material-symbols-outlined">refresh</span>
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLA DE SOLICITUDES -->
+    <div *ngIf="!loading() && inscripciones().length > 0">
+      <div
+        class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th
+                  class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Equipo
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Líder
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Jugadores
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Fecha
+                </th>
+                <th
+                  class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Estado
+                </th>
+                <th
+                  class="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr *ngFor="let inscripcion of getInscripcionesPaginadas()"
+                class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+
+                <!-- Equipo -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <app-image-placeholder [size]="'small'" [icon]="'shield'">
+                    </app-image-placeholder>
+                    <div>
+                      <p class="font-bold text-gray-900 dark:text-white">
+                        {{ inscripcion.equipo?.nombre || 'Sin nombre' }}
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ inscripcion.equipo?.tipo_deporte || 'Fútbol' }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Líder -->
+                <td class="px-6 py-4">
+                  <p class="font-semibold text-gray-900 dark:text-white">
+                    {{ inscripcion.equipo?.nombre_lider || 'No especificado' }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ inscripcion.equipo?.email_lider || '' }}
+                  </p>
+                </td>
+
+                <!-- Jugadores -->
+                <td class="px-6 py-4">
+                  <button (click)="verJugadores(inscripcion)"
+                    class="px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-all flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">group</span>
+                    {{ inscripcion.equipo?.total_jugadores || 0 }}
+                  </button>
+                </td>
+
+                <!-- Fecha -->
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ formatearFecha(inscripcion.fecha_inscripcion) }}
+                  </p>
+                </td>
+
+                <!-- Estado -->
+                <td class="px-6 py-4">
+                  <span
+                    [class]="'px-3 py-1.5 rounded-full text-xs font-bold border-2 ' + getEstadoBadgeClass(inscripcion.estado_inscripcion)">
+                    {{ inscripcion.estado_inscripcion | uppercase }}
+                  </span>
+                </td>
+
+                <!-- Acciones -->
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-center gap-2">
+                    <button (click)="verDetalleEquipo(inscripcion.id_equipo)"
+                      class="w-10 h-10 rounded-lg border-2 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 flex items-center justify-center transition-all"
+                      title="Ver detalle">
+                      <span class="material-symbols-outlined text-xl">visibility</span>
+                    </button>
+
+                    <button
+                      (click)="router.navigate(['/organizador/revisar-solicitud', idCampeonato, inscripcion.id]); $event.stopPropagation()"
+                      class="w-10 h-10 rounded-lg border-2 border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 flex items-center justify-center transition-all"
+                      title="Revisar solicitud detallada">
+                      <span class="material-symbols-outlined text-xl">fact_check</span>
+                    </button>
+
+                    <button *ngIf="inscripcion.estado_inscripcion === 'pendiente'"
+                      (click)="aprobarInscripcion(inscripcion)"
+                      class="w-10 h-10 rounded-lg border-2 border-green-300 dark:border-green-700 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center transition-all"
+                      title="Aprobar">
+                      <span class="material-symbols-outlined text-xl">check_circle</span>
+                    </button>
+
+                    <button *ngIf="inscripcion.estado_inscripcion === 'pendiente'"
+                      (click)="abrirModalRechazo(inscripcion)"
+                      class="w-10 h-10 rounded-lg border-2 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center justify-center transition-all"
+                      title="Rechazar">
+                      <span class="material-symbols-outlined text-xl">cancel</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div *ngIf="totalPaginas() > 1" class="px-6 py-4 border-t-2 border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Página {{ paginaActual() }} de {{ totalPaginas() }}
+            </p>
+
+            <div class="flex items-center gap-2">
+              <button (click)="cambiarPagina(1)" [disabled]="paginaActual() === 1"
+                class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                title="Primera página">
+                <span class="material-symbols-outlined">first_page</span>
+              </button>
+
+              <button (click)="cambiarPagina(paginaActual() - 1)" [disabled]="paginaActual() === 1"
+                class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                title="Anterior">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+
+              <div class="flex items-center gap-1">
+                <button *ngFor="let pagina of getPaginasArray()" (click)="cambiarPagina(pagina)"
+                  [class]="pagina === paginaActual() 
+                    ? 'w-10 h-10 rounded-lg bg-[#2E7D32] text-white font-bold flex items-center justify-center'
+                    : 'w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center justify-center transition-all'">
+                  {{ pagina }}
+                </button>
+              </div>
+
+              <button (click)="cambiarPagina(paginaActual() + 1)" [disabled]="paginaActual() === totalPaginas()"
+                class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                title="Siguiente">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+
+              <button (click)="cambiarPagina(totalPaginas())" [disabled]="paginaActual() === totalPaginas()"
+                class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-[#2E7D32] hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                title="Última página">
+                <span class="material-symbols-outlined">last_page</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: RECHAZAR INSCRIPCIÓN -->
+<div *ngIf="showRechazarModal()" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+  (click)="cerrarModalRechazo()">
+  <div class="bg-white dark:bg-[#182c19] rounded-2xl max-w-lg w-full shadow-2xl" (click)="$event.stopPropagation()">
+    <div class="p-6 sm:p-8">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-red-600">cancel</span>
+          Rechazar Solicitud
+        </h3>
+        <button (click)="cerrarModalRechazo()"
+          class="w-10 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-all"
+          aria-label="Cerrar modal">
+          <span class="material-symbols-outlined text-gray-400">close</span>
+        </button>
+      </div>
+
+      <div class="mb-6">
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
+          ¿Estás seguro de rechazar la solicitud de
+          <span class="font-bold text-gray-900 dark:text-white">
+            {{ inscripcionSeleccionada()?.equipo?.nombre }}
+          </span>?
+        </p>
+
+        <label class="block text-sm font-bold text-gray-900 dark:text-white mb-2">
+          Motivo del rechazo *
+        </label>
+        <textarea [(ngModel)]="motivoRechazo" rows="4"
+          placeholder="Ejemplo: Documentación incompleta, no cumple requisitos..."
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-red-500/20 focus:border-red-500 transition-all resize-none"
+          [class.border-red-500]="motivoRechazo().trim() === ''"></textarea>
+      </div>
+
+      <div class="flex gap-3">
+        <button (click)="cerrarModalRechazo()"
+          class="flex-1 px-6 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+          Cancelar
+        </button>
+        <button (click)="confirmarRechazo()"
+          class="flex-1 px-6 py-3 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined">cancel</span>
+          Confirmar Rechazo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

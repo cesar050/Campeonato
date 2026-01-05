@@ -1,0 +1,949 @@
+.formaciones-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+// ============================================
+// HEADER
+// ============================================
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .material-symbols-outlined {
+    font-size: 2.5rem;
+    color: #2E7D32;
+  }
+}
+
+.page-subtitle {
+  color: #666;
+  font-size: 1rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-create,
+.btn-create-indoor {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-create {
+  background: linear-gradient(135deg, #2E7D32, #1B5E20);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #1B5E20, #0D3A16);
+  }
+}
+
+.btn-create-indoor {
+  background: linear-gradient(135deg, #1976D2, #0D47A1);
+  color: white;
+
+  &:hover {
+    background: linear-gradient(135deg, #0D47A1, #01579B);
+  }
+}
+
+// ============================================
+// FILTROS
+// ============================================
+.filtros-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
+}
+
+.filtro-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f5f5f5;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+
+  &:hover {
+    background: #e8f5e9;
+    color: #2E7D32;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+    border-color: #2E7D32;
+    color: #1B5E20;
+  }
+}
+
+// ============================================
+// GRID DE FORMACIONES
+// ============================================
+.formaciones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.formacion-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  &.personalizada {
+    border: 2px solid #FFB300;
+  }
+}
+
+.tipo-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(46, 125, 50, 0.9);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 10;
+
+  &.indoor {
+    background: rgba(25, 118, 210, 0.9);
+  }
+}
+
+// ============================================
+// CANCHA PREVIEW
+// ============================================
+.cancha-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 14;
+  background: linear-gradient(180deg, #2d7d3a 0%, #1e5a28 100%);
+  overflow: hidden;
+
+  &.cancha-indoor {
+    aspect-ratio: 9 / 12;
+  }
+}
+
+.cancha-lineas-mini {
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+
+  .linea-media-mini {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: white;
+    transform: translateY(-50%);
+  }
+
+  .circulo-central-mini {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    border: 2px solid white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.posicion-mini {
+  position: absolute;
+  transform: translate(-50%, -50%);
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    background: white;
+    border: 2px solid #FFD700;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// ============================================
+// INFO FORMACIÓN
+// ============================================
+.formacion-info {
+  padding: 1.25rem;
+  background: white;
+}
+
+.formacion-nombre {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .custom-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #FFB300, #FF8F00);
+    border-radius: 50%;
+    
+    .material-symbols-outlined {
+      font-size: 0.875rem;
+      color: white;
+    }
+  }
+}
+
+.formacion-descripcion {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+// ============================================
+// ACCIONES
+// ============================================
+.formacion-acciones {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-accion {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+
+  &:hover {
+    background: #2E7D32;
+    border-color: #2E7D32;
+    color: white;
+  }
+
+  &.edit:hover {
+    background: #1976D2;
+    border-color: #1976D2;
+  }
+
+  &.danger:hover {
+    background: #f44336;
+    border-color: #f44336;
+  }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.empty-icon {
+  margin-bottom: 1.5rem;
+
+  .material-symbols-outlined {
+    font-size: 5rem;
+    color: #e0e0e0;
+  }
+}
+
+.empty-state h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #666;
+  margin: 0 0 1rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: #999;
+  margin: 0;
+}
+
+// ============================================
+// MODAL
+// ============================================
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e0e0e0;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+
+    .material-symbols-outlined {
+      font-size: 2rem;
+      color: #2E7D32;
+    }
+  }
+}
+
+.modal-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .material-symbols-outlined {
+    font-size: 1.5rem;
+    color: #666;
+  }
+
+  &:hover {
+    background: #e0e0e0;
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.instrucciones-box {
+  background: #E8F5E9;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1B5E20;
+    margin: 0 0 1rem;
+
+    .material-symbols-outlined {
+      font-size: 1.5rem;
+    }
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #2E7D32;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+// ============================================
+// FORM
+// ============================================
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+
+    .material-symbols-outlined {
+      font-size: 1.25rem;
+      color: #2E7D32;
+    }
+  }
+}
+
+.input-text,
+.select-custom {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+  }
+}
+
+// ============================================
+// CONTADOR
+// ============================================
+.contador-posiciones {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.contador-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #666;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+    color: #2E7D32;
+  }
+
+  &.main {
+    background: linear-gradient(135deg, #2E7D32, #1B5E20);
+    color: white;
+    font-size: 1.125rem;
+
+    .material-symbols-outlined {
+      color: white;
+    }
+  }
+}
+
+// ============================================
+// CANCHA EDITOR
+// ============================================
+.cancha-editor-container {
+  margin-bottom: 2rem;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    margin: 0 0 1rem;
+
+    .material-symbols-outlined {
+      font-size: 1.5rem;
+      color: #2E7D32;
+    }
+  }
+}
+
+.cancha-editor {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 9 / 14;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #2d7d3a 0%, #1e5a28 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: crosshair;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+  &.cancha-indoor {
+    aspect-ratio: 9 / 12;
+  }
+}
+
+.cancha-lineas {
+  position: absolute;
+  inset: 0;
+  opacity: 0.4;
+  pointer-events: none;
+
+  .linea-media {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: white;
+    transform: translateY(-50%);
+  }
+
+  .circulo-central {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    border: 2px solid white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .area-grande {
+    position: absolute;
+    left: 50%;
+    width: 60%;
+    height: 20%;
+    border: 2px solid white;
+    transform: translateX(-50%);
+
+    &.area-grande-arriba {
+      top: 0;
+      border-top: none;
+    }
+
+    &.area-grande-abajo {
+      bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  .area-chica {
+    position: absolute;
+    left: 50%;
+    width: 35%;
+    height: 10%;
+    border: 2px solid white;
+    transform: translateX(-50%);
+
+    &.area-chica-arriba {
+      top: 0;
+      border-top: none;
+    }
+
+    &.area-chica-abajo {
+      bottom: 0;
+      border-bottom: none;
+    }
+  }
+}
+
+.cancha-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+
+  .material-symbols-outlined {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+// ============================================
+// POSICIONES AGREGADAS EN CANCHA
+// ============================================
+.posicion-agregada {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.posicion-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 3px solid white;
+  
+  // Colores según posición
+  &.portero {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+  }
+  
+  &.defensa {
+    background: linear-gradient(135deg, #1976D2, #0D47A1);
+  }
+  
+  &.mediocampista {
+    background: linear-gradient(135deg, #2E7D32, #1B5E20);
+  }
+  
+  &.delantero {
+    background: linear-gradient(135deg, #D32F2F, #B71C1C);
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.posicion-label {
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.btn-eliminar-pos {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: #f44336;
+  border: 2px solid white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  .material-symbols-outlined {
+    font-size: 0.75rem;
+    color: white;
+  }
+
+  &:hover {
+    background: #c62828;
+    transform: scale(1.2);
+  }
+}
+
+// ============================================
+// LISTA POSICIONES
+// ============================================
+.posiciones-list {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 1rem;
+
+    .material-symbols-outlined {
+      color: #2E7D32;
+    }
+  }
+}
+
+.posicion-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.posicion-numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2E7D32, #1B5E20);
+  color: white;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.posicion-tipo {
+  flex: 1;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+
+  &.portero {
+    color: #FF8F00;
+  }
+
+  &.defensa {
+    color: #1976D2;
+  }
+
+  &.mediocampista {
+    color: #2E7D32;
+  }
+
+  &.delantero {
+    color: #D32F2F;
+  }
+}
+
+.posicion-coords {
+  color: #999;
+  font-size: 0.8125rem;
+  font-family: 'Courier New', monospace;
+}
+
+.btn-remove-small {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #ffebee;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+
+  .material-symbols-outlined {
+    font-size: 1.125rem;
+    color: #f44336;
+  }
+
+  &:hover {
+    background: #f44336;
+
+    .material-symbols-outlined {
+      color: white;
+    }
+  }
+}
+
+// ============================================
+// MODAL FOOTER
+// ============================================
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e0e0e0;
+  justify-content: flex-end;
+}
+
+.btn-secondary,
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .material-symbols-outlined {
+    font-size: 1.25rem;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #666;
+
+  &:hover:not(:disabled) {
+    background: #e0e0e0;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2E7D32, #1B5E20);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1B5E20, #0D3A16);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 768px) {
+  .formaciones-container {
+    padding: 1rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions {
+    flex-direction: column;
+  }
+
+  .formaciones-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .modal-content {
+    margin: 1rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+}

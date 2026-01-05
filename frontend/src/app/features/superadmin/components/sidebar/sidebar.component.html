@@ -1,16 +1,12 @@
-<!-- OVERLAY for mobile -->
 <div class="sidebar-overlay" [class.active]="!isCollapsed()" (click)="closeSidebar()"></div>
 
 <aside class="sidebar" [class.collapsed]="isCollapsed()">
-  <!-- TOGGLE BUTTON DENTRO DEL SIDEBAR -->
   <button class="sidebar-toggle" (click)="toggleSidebar()" type="button">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       @if (!isCollapsed()) {
-        <!-- Icono X cuando está abierto -->
         <line x1="18" y1="6" x2="6" y2="18"></line>
         <line x1="6" y1="6" x2="18" y2="18"></line>
       } @else {
-        <!-- Icono hamburguesa cuando está cerrado -->
         <line x1="3" y1="6" x2="21" y2="6"></line>
         <line x1="3" y1="12" x2="21" y2="12"></line>
         <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -18,7 +14,6 @@
     </svg>
   </button>
 
-  <!-- LOGO & BRAND -->
   <div class="sidebar-header">
     <div class="brand">
       <div class="brand-icon">
@@ -32,7 +27,6 @@
     </div>
   </div>
 
-  <!-- USER INFO -->
   <div class="user-info">
     <div class="user-avatar">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -41,12 +35,11 @@
       </svg>
     </div>
     <div class="user-details">
-      <div class="user-name">{{ currentUser()?.nombre || 'Admin User' }}</div>
+      <div class="user-name">{{ currentUser() ? currentUser().nombre : 'Admin User' }}</div>
       <div class="user-role">Super Administrador</div>
     </div>
   </div>
 
-  <!-- NAVIGATION -->
   <nav class="sidebar-nav">
     @for (item of menuItems; track item.route) {
       <a 
@@ -92,7 +85,6 @@
     }
   </nav>
 
-  <!-- BOTTOM SECTION -->
   <div class="sidebar-bottom">
     <a href="#" class="nav-item">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
@@ -108,7 +100,7 @@
         <polyline points="16 17 21 12 16 7"></polyline>
         <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
-      <span class="nav-label">Cerrar Sesión</span>
+      <span class="nav-label">Cerrar Sesion</span>
     </button>
   </div>
 </aside>

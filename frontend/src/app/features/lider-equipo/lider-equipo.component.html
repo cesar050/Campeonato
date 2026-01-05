@@ -1,0 +1,120 @@
+<div class="layout-wrapper" [class.sidebar-collapsed]="isSidebarCollapsed()">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <!-- Sidebar Header -->
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="material-symbols-outlined logo-icon">shield</span>
+          <span class="logo-text" *ngIf="!isSidebarCollapsed()">Líder de Equipo</span>
+        </div>
+        <button 
+          class="collapse-btn" 
+          (click)="toggleSidebar()"
+          [attr.aria-label]="isSidebarCollapsed() ? 'Expandir menú' : 'Contraer menú'"
+          [attr.aria-expanded]="!isSidebarCollapsed()">
+          <span class="material-symbols-outlined">
+            {{ isSidebarCollapsed() ? 'menu' : 'menu_open' }}
+          </span>
+        </button>
+      </div>
+  
+      <!-- Navigation -->
+      <nav class="sidebar-nav">
+        <a 
+          routerLink="/lider-equipo/dashboard" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="nav-item">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Dashboard</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/mis-equipos" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">shield</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Mis Equipos</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/jugadores" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">group</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Jugadores</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/partidos" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">sports_soccer</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Partidos</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/alineaciones" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">format_list_numbered</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Alineaciones</span>
+        </a>
+
+        <a routerLink="formaciones" routerLinkActive="active" class="nav-item">
+          <span class="material-symbols-outlined">grid_view</span>
+          <span>Formaciones</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/estadisticas" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Estadísticas</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/campeonatos-disponibles" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">search</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Campeonatos</span>
+        </a>
+  
+        <a 
+          routerLink="/lider-equipo/notificaciones" 
+          routerLinkActive="active"
+          class="nav-item">
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="nav-label" *ngIf="!isSidebarCollapsed()">Notificaciones</span>
+        </a>
+      </nav>
+  
+      <!-- User Profile -->
+      <div class="sidebar-footer">
+        <div class="user-profile" *ngIf="!isSidebarCollapsed()">
+          <div class="user-avatar">
+            <span class="material-symbols-outlined">account_circle</span>
+          </div>
+          <div class="user-info">
+            <p class="user-name">{{ currentUser()?.nombre || 'Usuario' }}</p>
+            <p class="user-role">LÍDER</p>
+          </div>
+        </div>
+        
+        <button 
+          class="logout-btn" 
+          (click)="logout()"
+          [title]="'Cerrar sesión'">
+          <span class="material-symbols-outlined">logout</span>
+          <span *ngIf="!isSidebarCollapsed()">Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+  
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>

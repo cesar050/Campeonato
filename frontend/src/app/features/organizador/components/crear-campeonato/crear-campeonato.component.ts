@@ -1,152 +1,213 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrganizadorService } from '../../services/organizador.service';
+import { DatepickerComponent } from '../../../../shared/components/datepicker/datepicker.component';
 
 @Component({
   selector: 'app-crear-campeonato',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,DatepickerComponent],
   templateUrl: './crear-campeonato.component.html',
   styleUrls: ['./crear-campeonato.component.scss']
 })
 export class CrearCampeonatoComponent {
-  private fb = inject(FormBuilder);
-  private organizadorService = inject(OrganizadorService);
-  private router = inject(Router);
+  pasoActual = signal(1);
+  formulario: FormGroup;
+  loading = signal(false);
+  
+  // Alertas
+  mostrarAlerta = signal(false);
+  tipoAlerta = signal<'success' | 'error' | 'warning'>('error');
+  mensajeAlerta = signal('');
+  codigoGenerado = signal<string | null>(null);
 
-  currentStep = signal(1);
-  isSubmitting = signal(false);
-  errorMessage = signal('');
-
-  infoForm: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.minLength(3)]],
-    descripcion: ['', [Validators.required, Validators.minLength(10)]]
-  });
-
-  configForm: FormGroup = this.fb.group({
-    fecha_inicio: ['', [Validators.required]],
-    fecha_fin: ['', [Validators.required]],
-    max_equipos: [16, [Validators.required, Validators.min(2)]],
-    tipo_competicion: ['eliminacion_directa', [Validators.required]]
-  });
+  tiposDeporte = [
+    { value: 'futbol', label: 'Fútbol 11', icon: 'sports_soccer', descripcion: 'Fútbol tradicional con 11 jugadores por equipo' },
+    { value: 'indoor', label: 'Fútbol Indoor', icon: 'sports', descripcion: 'Fútbol sala con 12 jugadores por equipo' }
+  ];
 
   tiposCompeticion = [
-    {
-      id: 'liga',
-      nombre: 'Liga',
+    { 
+      value: 'liga', 
+      label: 'Liga', 
       descripcion: 'Todos los equipos juegan entre sí. Ideal para torneos largos.',
-      icon: 'list'
+      icon: 'emoji_events'
     },
-    {
-      id: 'eliminacion_directa',
-      nombre: 'Eliminación Directa',
+    { 
+      value: 'eliminacion_directa', 
+      label: 'Eliminación Directa', 
       descripcion: 'El ganador avanza, el perdedor es eliminado. Rápido y emocionante.',
-      icon: 'zap'
+      icon: 'whatshot'
     },
-    {
-      id: 'mixto',
-      nombre: 'Mixto',
+    { 
+      value: 'mixto', 
+      label: 'Mixto', 
       descripcion: 'Combina una fase de grupos (liga) con una fase de eliminación.',
-      icon: 'shuffle'
+      icon: 'sync_alt'
     }
   ];
 
-  nextStep() {
-    if (this.currentStep() === 1) {
-      if (this.infoForm.invalid) {
-        this.infoForm.markAllAsTouched();
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private organizadorService: OrganizadorService
+  ) {
+    this.formulario = this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      descripcion: ['', [Validators.required, Validators.minLength(10)]],
+      tipo_deporte: ['futbol', Validators.required],
+      fecha_inicio: ['', Validators.required],
+      fecha_fin: ['', Validators.required],
+      max_equipos: ['16', [Validators.required, Validators.min(2), Validators.max(64)]],
+      tipo_competicion: ['eliminacion_directa', Validators.required],
+      fecha_inicio_inscripciones: [''],
+      fecha_cierre_inscripciones: [''], 
+      es_publico: [true]
+    });
+  }
+
+  mostrarMensaje(tipo: 'success' | 'error' | 'warning', mensaje: string): void {
+    this.tipoAlerta.set(tipo);
+    this.mensajeAlerta.set(mensaje);
+    this.mostrarAlerta.set(true);
+    
+    setTimeout(() => {
+      this.mostrarAlerta.set(false);
+    }, 5000);
+  }
+
+  cerrarAlerta(): void {
+    this.mostrarAlerta.set(false);
+  }
+
+  siguientePaso(): void {
+    if (this.pasoActual() === 1) {
+      const paso1Valid = this.formulario.get('nombre')?.valid && 
+                         this.formulario.get('descripcion')?.valid &&
+                         this.formulario.get('tipo_deporte')?.valid;
+      
+      if (!paso1Valid) {
+        this.mostrarMensaje('warning', 'Por favor completa todos los campos requeridos del paso 1');
         return;
       }
-      this.currentStep.set(2);
-    } else if (this.currentStep() === 2) {
-      if (this.configForm.invalid) {
-        this.configForm.markAllAsTouched();
+      this.pasoActual.set(2);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (this.pasoActual() === 2) {
+      const paso2Valid = this.formulario.get('fecha_inicio')?.valid && 
+                         this.formulario.get('fecha_fin')?.valid &&
+                         this.formulario.get('max_equipos')?.valid &&
+                         this.formulario.get('tipo_competicion')?.valid;
+      
+      if (!paso2Valid) {
+        this.mostrarMensaje('warning', 'Por favor completa todos los campos requeridos del paso 2');
         return;
       }
-      this.currentStep.set(3);
+      this.pasoActual.set(3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  prevStep() {
-    if (this.currentStep() > 1) {
-      this.currentStep.update(step => step - 1);
+  pasoAnterior(): void {
+    if (this.pasoActual() > 1) {
+      this.pasoActual.update(p => p - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
-  onSubmit() {
-    if (this.infoForm.invalid || this.configForm.invalid) {
-      this.errorMessage.set('Por favor completa todos los campos requeridos');
+  volver(): void {
+    this.router.navigate(['/organizador/dashboard']);
+  }
+
+  crearCampeonato(): void {
+    if (this.formulario.invalid) {
+      this.mostrarMensaje('error', 'Por favor completa todos los campos requeridos');
       return;
     }
-
-    this.isSubmitting.set(true);
-    this.errorMessage.set('');
-
-    const campeonatoData = {
-      ...this.infoForm.value,
-      ...this.configForm.value
+  
+    this.loading.set(true);
+    const datos = {
+      ...this.formulario.value,
+      max_equipos: parseInt(this.formulario.value.max_equipos)
     };
-
-    this.organizadorService.crearCampeonato(campeonatoData).subscribe({
+  
+    this.organizadorService.crearCampeonato(datos).subscribe({
       next: (response) => {
-        this.isSubmitting.set(false);
+        // Si es privado, guardar el código
+        if (!datos.es_publico && response.campeonato?.codigo_inscripcion) {
+          this.codigoGenerado.set(response.campeonato.codigo_inscripcion);
+          this.mostrarMensaje('success', 
+            `¡Campeonato creado! Código de inscripción: ${response.campeonato.codigo_inscripcion}`
+          );
+        } else {
+          this.mostrarMensaje('success', '¡Campeonato público creado exitosamente!');
+        }
+        
         setTimeout(() => {
           this.router.navigate(['/organizador/mi-campeonato']);
-        }, 1500);
+        }, 3000);  // Dar más tiempo para ver el código
       },
-      error: (err) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(err.error?.error || 'Error al crear el campeonato');
+      error: (error) => {
+        console.error('Error al crear campeonato:', error);
+        this.mostrarMensaje('error', error.error?.mensaje || 'Error al crear campeonato');
+        this.loading.set(false);
       }
     });
   }
 
-  getTipoCompeticionNombre(): string {
-    const tipoId = this.configForm.get('tipo_competicion')?.value;
-    const tipo = this.tiposCompeticion.find(t => t.id === tipoId);
-    return tipo?.nombre || '';
+  seleccionarTipoDeporte(tipo: string): void {
+    this.formulario.patchValue({ tipo_deporte: tipo });
   }
 
-  get nombreInvalid(): boolean {
-    const control = this.infoForm.get('nombre');
-    return !!(control?.invalid && control?.touched);
+  seleccionarTipoCompeticion(tipo: string): void {
+    this.formulario.patchValue({ tipo_competicion: tipo });
   }
 
-  get descripcionInvalid(): boolean {
-    const control = this.infoForm.get('descripcion');
-    return !!(control?.invalid && control?.touched);
+  onMaxEquiposChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const valor = input.value;
+    
+    // Permitir escribir mientras tipea
+    if (valor === '' || valor === '0') {
+      return;
+    }
+
+    const numero = parseInt(valor);
+    
+    if (isNaN(numero)) {
+      input.value = '2';
+      this.formulario.patchValue({ max_equipos: '2' });
+      this.mostrarMensaje('error', 'Ingresa un número válido');
+      return;
+    }
+
+    if (numero < 2) {
+      input.value = '2';
+      this.formulario.patchValue({ max_equipos: '2' });
+      this.mostrarMensaje('error', 'No se puede crear un campeonato con menos de 2 equipos');
+      return;
+    }
+
+    if (numero > 64) {
+      input.value = '64';
+      this.formulario.patchValue({ max_equipos: '64' });
+      this.mostrarMensaje('error', 'El máximo de equipos es 64');
+      return;
+    }
+
+    this.formulario.patchValue({ max_equipos: valor });
   }
 
-  get fechaInicioInvalid(): boolean {
-    const control = this.configForm.get('fecha_inicio');
-    return !!(control?.invalid && control?.touched);
-  }
-
-  get fechaFinInvalid(): boolean {
-    const control = this.configForm.get('fecha_fin');
-    return !!(control?.invalid && control?.touched);
-  }
-
-  get maxEquiposInvalid(): boolean {
-    const control = this.configForm.get('max_equipos');
-    return !!(control?.invalid && control?.touched);
-  }
-
-  incrementEquipos() {
-    const current = this.configForm.get('max_equipos')?.value || 16;
-    this.configForm.patchValue({ max_equipos: current + 1 });
-  }
-
-  decrementEquipos() {
-    const current = this.configForm.get('max_equipos')?.value || 16;
-    if (current > 2) {
-      this.configForm.patchValue({ max_equipos: current - 1 });
+  onMaxEquiposBlur(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value === '' || input.value === '0') {
+      input.value = '2';
+      this.formulario.patchValue({ max_equipos: '2' });
     }
   }
-
-  selectTipoCompeticion(tipo: string) {
-    this.configForm.patchValue({ tipo_competicion: tipo });
+  
+  onFechaChange(campo: string, valor: string): void {
+    this.formulario.patchValue({ [campo]: valor });
   }
 }

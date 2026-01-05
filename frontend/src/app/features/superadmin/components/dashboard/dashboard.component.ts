@@ -6,13 +6,17 @@ import { SuperadminService } from '../../services/superadmin.service';
 
 interface DashboardStats {
   total_organizadores: number;
-  total_campeonatos: number;
-  total_equipos: number;
-  total_partidos: number;
   organizadores_activos: number;
+  total_campeonatos: number;
   campeonatos_activos: number;
+  campeonatos_planificacion?: number;
+  campeonatos_finalizados?: number;
+  total_equipos?: number;
+  total_partidos?: number;
   solicitudes_pendientes: number;
   usuarios_totales: number;
+  usuarios_espectadores?: number;
+  usuarios_lideres?: number;
   trend_organizadores?: number;
   trend_campeonatos?: number;
   trend_usuarios?: number;
@@ -25,6 +29,11 @@ interface RecentActivity {
   usuario: string;
   fecha: string;
   estado: string;
+}
+
+interface CrecimientoData {
+  fecha: string;
+  usuarios: number;
 }
 
 @Component({
@@ -46,14 +55,21 @@ export class DashboardComponent implements OnInit {
 
   stats = signal<DashboardStats>({
     total_organizadores: 0,
+    organizadores_activos: 0,
     total_campeonatos: 0,
+    campeonatos_activos: 0,
+    campeonatos_planificacion: 0,
+    campeonatos_finalizados: 0,
     total_equipos: 0,
     total_partidos: 0,
-    organizadores_activos: 0,
-    campeonatos_activos: 0,
     solicitudes_pendientes: 0,
-    usuarios_totales: 0
+    usuarios_totales: 0,
+    usuarios_espectadores: 0,
+    usuarios_lideres: 0
   });
+
+  recentActivities = signal<RecentActivity[]>([]);
+  crecimientoUsuarios = signal<CrecimientoData[]>([]);
 
   nuevoOrganizadorForm: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
@@ -61,95 +77,57 @@ export class DashboardComponent implements OnInit {
     nombre_campeonato: ['', [Validators.required, Validators.minLength(3)]]
   });
 
-  recentActivities = signal<RecentActivity[]>([
-    {
-      id: 1,
-      accion: 'Nuevo Organizador',
-      usuario: 'Juan Pérez',
-      fecha: '2024-07-15',
-      estado: 'Aprobado'
-    },
-    {
-      id: 2,
-      accion: 'Campeonato Creado',
-      usuario: 'Ana Gómez',
-      fecha: '2024-07-14',
-      estado: 'Completado'
-    },
-    {
-      id: 3,
-      accion: 'Solicitud de Retiro',
-      usuario: 'Carlos Ruiz',
-      fecha: '2024-07-14',
-      estado: 'Pendiente'
-    },
-    {
-      id: 4,
-      accion: 'Actualización de Perfil',
-      usuario: 'Laura Fernández',
-      fecha: '2024-07-13',
-      estado: 'Completado'
-    }
-  ]);
-
   ngOnInit() {
     this.loadDashboard();
   }
 
   loadDashboard() {
+    console.log('📊 Cargando dashboard...');
     this.isLoading.set(true);
+    
     this.superadminService.getDashboard().subscribe({
       next: (response) => {
         console.log('📊 Dashboard response:', response);
         
+        // Manejar la respuesta con la estructura correcta
         if (response.estadisticas) {
           this.stats.set({
             total_organizadores: response.estadisticas.total_organizadores || 0,
-            total_campeonatos: response.estadisticas.total_campeonatos || 0,
-            total_equipos: response.estadisticas.total_equipos || 0,
-            total_partidos: response.estadisticas.total_partidos || 0,
             organizadores_activos: response.estadisticas.organizadores_activos || 0,
+            total_campeonatos: response.estadisticas.total_campeonatos || 0,
             campeonatos_activos: response.estadisticas.campeonatos_activos || 0,
+            campeonatos_planificacion: response.estadisticas.campeonatos_planificacion || 0,
+            campeonatos_finalizados: response.estadisticas.campeonatos_finalizados || 0,
             solicitudes_pendientes: response.estadisticas.solicitudes_pendientes || 0,
             usuarios_totales: response.estadisticas.usuarios_totales || 0,
+            usuarios_espectadores: response.estadisticas.usuarios_espectadores || 0,
+            usuarios_lideres: response.estadisticas.usuarios_lideres || 0,
             trend_organizadores: response.estadisticas.trend_organizadores,
             trend_campeonatos: response.estadisticas.trend_campeonatos,
             trend_usuarios: response.estadisticas.trend_usuarios,
             trend_solicitudes: response.estadisticas.trend_solicitudes
           });
-        } else {
-          this.stats.set({
-            total_organizadores: response.total_organizadores || 0,
-            total_campeonatos: response.total_campeonatos || 0,
-            total_equipos: response.total_equipos || 0,
-            total_partidos: response.total_partidos || 0,
-            organizadores_activos: response.organizadores_activos || 0,
-            campeonatos_activos: response.campeonatos_activos || 0,
-            solicitudes_pendientes: response.solicitudes_pendientes || 0,
-            usuarios_totales: response.usuarios_totales || 0,
-            trend_organizadores: response.trend_organizadores,
-            trend_campeonatos: response.trend_campeonatos,
-            trend_usuarios: response.trend_usuarios,
-            trend_solicitudes: response.trend_solicitudes
-          });
+        }
+
+        // Actividad reciente
+        if (response.actividad_reciente && Array.isArray(response.actividad_reciente)) {
+          this.recentActivities.set(response.actividad_reciente);
+        }
+
+        // Crecimiento de usuarios
+        if (response.crecimiento_usuarios && Array.isArray(response.crecimiento_usuarios)) {
+          this.crecimientoUsuarios.set(response.crecimiento_usuarios);
         }
         
         this.isLoading.set(false);
+        console.log('✅ Dashboard cargado exitosamente');
       },
       error: (err) => {
         console.error('❌ Error loading dashboard:', err);
         this.isLoading.set(false);
         
-        this.stats.set({
-          total_organizadores: 1,
-          total_campeonatos: 3,
-          total_equipos: 0,
-          total_partidos: 0,
-          organizadores_activos: 1,
-          campeonatos_activos: 0,
-          solicitudes_pendientes: 0,
-          usuarios_totales: 2
-        });
+        // Mantener valores por defecto en caso de error
+        console.log('⚠️ Usando valores por defecto debido al error');
       }
     });
   }
@@ -173,13 +151,6 @@ export class DashboardComponent implements OnInit {
     
     if (this.nuevoOrganizadorForm.invalid) {
       console.log('❌ Formulario inválido');
-      console.log('Errores:', this.nuevoOrganizadorForm.errors);
-      Object.keys(this.nuevoOrganizadorForm.controls).forEach(key => {
-        const control = this.nuevoOrganizadorForm.get(key);
-        if (control?.invalid) {
-          console.log(`Campo ${key} inválido:`, control.errors);
-        }
-      });
       this.nuevoOrganizadorForm.markAllAsTouched();
       this.organizadorError.set('Por favor completa todos los campos correctamente');
       return;
@@ -196,19 +167,29 @@ export class DashboardComponent implements OnInit {
       next: (response) => {
         console.log('✅ Respuesta del servidor:', response);
         this.isCreatingOrganizador.set(false);
-        this.organizadorSuccess.set('Organizador creado exitosamente');
+        this.organizadorSuccess.set('¡Organizador creado exitosamente!');
         
         // Mostrar credenciales temporales
         if (response.credenciales_temporales) {
           const credenciales = response.credenciales_temporales;
-          alert(`✅ Organizador creado exitosamente!\n\n` +
-                `📧 Email: ${credenciales.email}\n` +
-                `🔑 Contraseña temporal: ${credenciales.password}\n\n` +
-                `⚠️ IMPORTANTE: Guarda estas credenciales de forma segura.\n` +
-                `El organizador debe cambiar su contraseña en el primer inicio de sesión.`);
+          
+          // Crear mensaje formateado para alert
+          const mensaje = `
+✅ ¡Organizador creado exitosamente!
+
+📧 Email: ${credenciales.email}
+🔑 Contraseña temporal: ${credenciales.password}
+
+⚠️ IMPORTANTE: 
+${credenciales.nota}
+
+Copia estas credenciales ahora, no se volverán a mostrar.
+          `.trim();
+          
+          alert(mensaje);
         }
         
-        // Cerrar modal y recargar
+        // Cerrar modal y recargar después de 1.5 segundos
         setTimeout(() => {
           this.closeNuevoOrganizadorModal();
           this.loadDashboard();
@@ -216,8 +197,6 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('❌ Error completo:', err);
-        console.error('❌ Status:', err.status);
-        console.error('❌ Error body:', err.error);
         this.isCreatingOrganizador.set(false);
         
         let errorMessage = 'Error al crear el organizador';
@@ -253,6 +232,7 @@ export class DashboardComponent implements OnInit {
     return !!(control?.invalid && control?.touched);
   }
 
+  // Utilidades
   getStatusClass(estado: string): string {
     const classes: { [key: string]: string } = {
       'Aprobado': 'status-success',
@@ -263,14 +243,24 @@ export class DashboardComponent implements OnInit {
     return classes[estado] || 'status-default';
   }
 
-  getTrendClass(trend: number | undefined): string {
-    if (!trend) return '';
-    return trend > 0 ? 'trend-up' : trend < 0 ? 'trend-down' : '';
+  getTrendClass(trend: number): string {
+    if (trend > 0) return 'trend-up';
+    if (trend < 0) return 'trend-down';
+    return 'trend-neutral';
   }
 
-  formatTrend(trend: number | undefined): string {
-    if (!trend) return '';
+  formatTrend(trend: number): string {
+    if (trend === 0) return '0%';
     const sign = trend > 0 ? '+' : '';
     return `${sign}${trend}%`;
+  }
+
+  getCurrentDate(): string {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return new Date().toLocaleDateString('es-ES', options);
   }
 }

@@ -1,0 +1,142 @@
+// ==================== VARIABLES ====================
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$green-dark: #1B5E20;
+
+// ==================== ANIMACIONES ====================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// ==================== TABLA RESPONSIVE ====================
+table {
+  animation: fadeIn 0.5s ease-out;
+}
+
+tbody tr {
+  animation: fadeIn 0.3s ease-out;
+  animation-fill-mode: both;
+  
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.05}s;
+    }
+  }
+}
+
+// ==================== HOVER EFFECTS ====================
+tbody tr:hover {
+  transform: translateX(4px);
+  transition: transform 0.2s ease;
+}
+
+// ==================== SCROLLBAR ====================
+.overflow-x-auto {
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $green-primary;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: $green-dark;
+  }
+}
+
+// ==================== BADGES ====================
+.badge-animate {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+// ==================== BUTTONS ====================
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.95);
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 1024px) {
+  table {
+    font-size: 0.875rem;
+  }
+  
+  th, td {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+// ==================== ACCESIBILIDAD ====================
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// ==================== DARK MODE ====================
+.dark {
+  table {
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .overflow-x-auto {
+    &::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #2a452b;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #3d5e3e;
+    }
+  }
+}

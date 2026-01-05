@@ -11,6 +11,12 @@ class Alineacion(db.Model):
     titular = db.Column(db.Boolean, default=True)
     minuto_entrada = db.Column(db.Integer, default=0)
     minuto_salida = db.Column(db.Integer, nullable=True)
+    
+    # NUEVO: Posición en cancha para drag & drop
+    posicion_x = db.Column(db.Float, nullable=True)  # 0-100
+    posicion_y = db.Column(db.Float, nullable=True)  # 0-100
+    formacion = db.Column(db.String(20), nullable=True)  # '4-4-2', '3-5-2', etc.
+    
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -22,5 +28,8 @@ class Alineacion(db.Model):
             'titular': self.titular,
             'minuto_entrada': self.minuto_entrada,
             'minuto_salida': self.minuto_salida,
+            'posicion_x': self.posicion_x,
+            'posicion_y': self.posicion_y,
+            'formacion': self.formacion,
             'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None
         }

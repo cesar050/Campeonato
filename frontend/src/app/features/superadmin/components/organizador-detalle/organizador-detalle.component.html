@@ -1,0 +1,257 @@
+<div class="detalle-container">
+    <div class="top-bar">
+      <button type="button" class="btn-back" (click)="volver()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Organizadores</span>
+      </button>
+    </div>
+  
+    @if (isLoading()) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando detalles...</p>
+      </div>
+    } @else if (organizador()) {
+      <div class="page-header">
+        <h1>Detalle de Organizador</h1>
+        <p class="subtitle">Gestiona la informacion, campeonatos y actividad del organizador.</p>
+      </div>
+  
+      <div class="organizador-card">
+        <div class="organizador-header">
+          <div class="organizador-avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          
+          <div class="organizador-info">
+            <h2>{{ organizador()!.nombre }}</h2>
+            <p class="email">{{ organizador()!.email }}</p>
+            <span class="status-badge" [class.active]="organizador()!.activo">
+              {{ organizador()!.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+  
+          <div class="organizador-actions">
+            <button type="button" class="btn-action">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              <span>Editar</span>
+            </button>
+            
+            <button type="button" class="btn-action success" (click)="showReenviarModal.set(true)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m2 7 10 7 10-7"></path>
+              </svg>
+              <span>Reenviar Credenciales</span>
+            </button>
+            
+            <button type="button" class="btn-action danger" (click)="showEliminarModal.set(true)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              <span>Eliminar</span>
+            </button>
+          </div>
+        </div>
+  
+        <div class="tabs">
+          <button 
+            type="button"
+            [class.active]="activeTab() === 'informacion'" 
+            (click)="setActiveTab('informacion')">
+            Informacion
+          </button>
+          <button 
+            type="button"
+            [class.active]="activeTab() === 'campeonato'" 
+            (click)="setActiveTab('campeonato')">
+            Campeonato
+          </button>
+          <button 
+            type="button"
+            [class.active]="activeTab() === 'actividad'" 
+            (click)="setActiveTab('actividad')">
+            Actividad
+          </button>
+        </div>
+  
+        @if (activeTab() === 'informacion') {
+          <div class="tab-content">
+            <div class="info-grid">
+              <div class="info-card">
+                <label>Email</label>
+                <p>{{ organizador()!.email }}</p>
+              </div>
+  
+              <div class="info-card">
+                <label>Rol</label>
+                <p>Organizador</p>
+              </div>
+  
+              <div class="info-card">
+                <label>Fecha de Registro</label>
+                <p>{{ organizador()!.fecha_registro | date: 'dd \'de\' MMMM, yyyy' }}</p>
+              </div>
+  
+              <div class="info-card">
+                <label>Ultimo Acceso</label>
+                <p>{{ getRelativeTime(organizador()!.last_login_at) }}</p>
+              </div>
+  
+              <div class="info-card">
+                <label>Campeonato Asignado</label>
+                <p>{{ organizador()!.campeonato.nombre }}</p>
+              </div>
+  
+              <div class="info-card">
+                <label>Estado</label>
+                <div class="estado-toggle">
+                  <span>{{ organizador()!.activo ? 'Activo' : 'Inactivo' }}</span>
+                  <label class="switch">
+                    <input 
+                      type="checkbox" 
+                      [checked]="organizador()!.activo"
+                      (change)="toggleEstado()">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+  
+        @if (activeTab() === 'campeonato') {
+          <div class="tab-content">
+            <div class="campeonato-info">
+              <div class="campeonato-header">
+                <div class="campeonato-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="7"></circle>
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <h3>{{ organizador()!.campeonato.nombre }}</h3>
+                  <span class="campeonato-estado" [class]="organizador()!.campeonato.estado">
+                    {{ organizador()!.campeonato.estado }}
+                  </span>
+                </div>
+              </div>
+  
+              <div class="campeonato-stats">
+                <div class="stat-item">
+                  <label>Equipos Registrados</label>
+                  <p>{{ organizador()!.campeonato.equipos_count }}</p>
+                </div>
+                <div class="stat-item">
+                  <label>Estado del Campeonato</label>
+                  <p>{{ organizador()!.campeonato.estado }}</p>
+                </div>
+              </div>
+  
+              <a [routerLink]="['/superadmin/campeonatos', organizador()!.campeonato]" class="btn-view-campeonato">
+                Ver Detalles del Campeonato
+              </a>
+            </div>
+          </div>
+        }
+  
+        @if (activeTab() === 'actividad') {
+          <div class="tab-content">
+            @if (actividadReciente().length > 0) {
+              <div class="actividad-list">
+                @for (actividad of actividadReciente(); track actividad.id) {
+                  <div class="actividad-item">
+                    <div class="actividad-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <div class="actividad-content">
+                      <p class="actividad-accion">{{ actividad.accion }}</p>
+                      <p class="actividad-detalles">{{ actividad.detalles }}</p>
+                      <span class="actividad-fecha">{{ actividad.fecha | date: 'dd MMM, yyyy - HH:mm' }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p>No hay actividad registrada</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+  
+  @if (showReenviarModal()) {
+    <div class="modal-overlay" (click)="showReenviarModal.set(false)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Reenviar Credenciales</h3>
+          <button type="button" class="close-btn" (click)="showReenviarModal.set(false)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Se generaran nuevas credenciales temporales y se enviaran al email del organizador.</p>
+          <p><strong>Email:</strong> {{ organizador()?.email }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showReenviarModal.set(false)">Cancelar</button>
+          <button type="button" class="btn-primary" (click)="reenviarCredenciales()">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  }
+  
+  @if (showEliminarModal()) {
+    <div class="modal-overlay" (click)="showEliminarModal.set(false)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Eliminar Organizador</h3>
+          <button type="button" class="close-btn" (click)="showEliminarModal.set(false)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="warning-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <p>Esta accion es irreversible. Se eliminara el organizador y su campeonato asociado.</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="showEliminarModal.set(false)">Cancelar</button>
+          <button type="button" class="btn-danger" (click)="eliminarOrganizador()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  }

@@ -1,0 +1,467 @@
+// ==================== VARIABLES ====================
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$green-dark: #1B5E20;
+$red-primary: #DC2626;
+$blue-primary: #3B82F6;
+$yellow-primary: #F59E0B;
+
+// ==================== ANIMACIONES ====================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+// ==================== COMPONENTES PRINCIPALES ====================
+
+// Breadcrumb animado
+.flex.items-center.gap-2 {
+  animation: fadeIn 0.5s ease-out;
+  
+  > div {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Cards de selección de tipo
+.grid-cols-1.md\:grid-cols-3 {
+  > button {
+    animation: scaleIn 0.4s ease-out;
+    animation-fill-mode: both;
+    
+    &:nth-child(1) { animation-delay: 0s; }
+    &:nth-child(2) { animation-delay: 0.1s; }
+    &:nth-child(3) { animation-delay: 0.2s; }
+    
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(46, 125, 50, 0.2);
+    }
+    
+    &:active {
+      transform: translateY(-4px);
+    }
+  }
+}
+
+// Iconos en cards
+.group {
+  .material-symbols-outlined {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  &:hover {
+    .material-symbols-outlined {
+      transform: rotate(5deg) scale(1.1);
+    }
+  }
+}
+
+// ==================== FORMULARIOS ====================
+
+// Inputs con animación de focus
+input[type="number"],
+input[type="time"],
+input[type="date"],
+select,
+textarea {
+  transition: all 0.3s ease;
+  
+  &:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(46, 125, 50, 0.15);
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Toggle switch animado
+button[type="button"] {
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  span {
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+// ==================== GRUPOS PREVIEW ====================
+
+// Cards de grupos con animación
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+  > div {
+    animation: slideInUp 0.4s ease-out;
+    animation-fill-mode: both;
+    transition: all 0.3s ease;
+    
+    @for $i from 1 through 8 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.05}s;
+      }
+    }
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      border-color: $green-primary;
+    }
+  }
+  
+  // Números de equipos en grupos
+  li span {
+    transition: all 0.2s ease;
+  }
+  
+  li:hover span {
+    transform: scale(1.15);
+    background: $green-dark;
+  }
+}
+
+// ==================== PARTIDOS ====================
+
+// Jornadas con animación
+.space-y-4 > div {
+  animation: fadeIn 0.5s ease-out;
+  animation-fill-mode: both;
+  
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.05}s;
+    }
+  }
+}
+
+// Header de jornada con gradiente
+.bg-gradient-to-r {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+// Cards de partidos
+.grid.grid-cols-1.md\:grid-cols-2 {
+  > div {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(46, 125, 50, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      
+      &::before {
+        left: 100%;
+      }
+    }
+  }
+}
+
+// ==================== ALERTS ====================
+
+// Alert de error/warning
+.bg-red-50,
+.bg-yellow-50 {
+  animation: scaleIn 0.4s ease-out;
+  
+  .material-symbols-outlined {
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+// ==================== RESPONSIVE ====================
+
+// Mobile
+@media (max-width: 640px) {
+  // Header más compacto
+  .text-2xl.sm\:text-3xl {
+    font-size: 1.5rem;
+  }
+  
+  // Cards de selección en una columna
+  .grid.grid-cols-1.md\:grid-cols-3 {
+    gap: 1rem;
+    
+    > button {
+      padding: 1.5rem;
+    }
+  }
+  
+  // Formulario más compacto
+  .space-y-6 {
+    gap: 1rem;
+  }
+  
+  // Botones full width en mobile
+  button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  // Partidos en una sola columna
+  .grid.grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Tablet
+@media (min-width: 641px) and (max-width: 1024px) {
+  // Cards de selección en 2 columnas
+  .grid.grid-cols-1.md\:grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+    
+    > button:last-child {
+      grid-column: span 2;
+    }
+  }
+}
+
+// Desktop grande
+@media (min-width: 1440px) {
+  // Más espacio en desktop
+  .max-w-7xl {
+    max-width: 1600px;
+  }
+  
+  // Grupos en 4 columnas
+  .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// ==================== ACCESIBILIDAD ====================
+
+// Focus visible para teclado
+*:focus-visible {
+  outline: 3px solid $green-primary;
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+// Reducir movimiento si está activado
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Alto contraste
+@media (prefers-contrast: high) {
+  .border-gray-200,
+  .border-gray-300 {
+    border-color: #000 !important;
+    border-width: 3px !important;
+  }
+  
+  .text-gray-600 {
+    color: #000 !important;
+  }
+}
+
+// ==================== DARK MODE ====================
+
+.dark {
+  // Mejores sombras en dark mode
+  .shadow-sm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .shadow-lg {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  }
+  
+  .shadow-xl {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+  
+  // Cards más visibles
+  .bg-white {
+    background: #182c19;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  
+  // Hover effects en dark mode
+  .hover\:bg-green-50:hover {
+    background: rgba(46, 125, 50, 0.15);
+  }
+}
+
+// ==================== LOADING ====================
+
+// Spinner
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ==================== UTILIDADES ====================
+
+// Smooth scroll
+html {
+  scroll-behavior: smooth;
+}
+
+// Selección de texto
+::selection {
+  background: rgba(46, 125, 50, 0.3);
+  color: inherit;
+}
+
+::-moz-selection {
+  background: rgba(46, 125, 50, 0.3);
+  color: inherit;
+}
+
+// Scrollbar personalizado
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $green-primary;
+  border-radius: 4px;
+  
+  &:hover {
+    background: $green-dark;
+  }
+}
+
+.dark {
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #2a452b;
+    
+    &:hover {
+      background: #3d5e3e;
+    }
+  }
+}
+
+// ==================== PRINT ====================
+
+@media print {
+  // Ocultar elementos no necesarios
+  button,
+  .no-print {
+    display: none !important;
+  }
+  
+  // Fondo blanco para imprimir
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+// ==================== TOUCH OPTIMIZATIONS ====================
+
+// Áreas táctiles más grandes en móvil
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+// Prevenir tap highlight en móvil
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+// ==================== PERFORMANCE ====================
+
+// GPU acceleration para animaciones
+.group,
+button,
+.transition-all {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+// Lazy load optimization
+img {
+  content-visibility: auto;
+}

@@ -1,0 +1,305 @@
+<div class="partido-detalle-container">
+  <!-- TOAST -->
+  <app-toast
+    [show]="showToast()"
+    [type]="toastType()"
+    [title]="toastTitle()"
+    [message]="toastMessage()"
+    (close)="cerrarToast()">
+  </app-toast>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <button class="btn-back" (click)="volver()">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Volver
+    </button>
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="material-symbols-outlined">sports_soccer</span>
+        Detalle del Partido
+      </h1>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando partido...</p>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div *ngIf="!loading() && partido()" class="content">
+    
+    <!-- INFO DEL PARTIDO -->
+    <div class="partido-info-card">
+      <div class="partido-header">
+        <div class="equipos-header">
+          <div class="equipo-header-card" [class.mi-equipo]="esLocal">
+            <div class="equipo-logo-container">
+              <img 
+                *ngIf="obtenerLogoEquipo(partido()!.id_equipo_local)"
+                [src]="obtenerLogoEquipo(partido()!.id_equipo_local)!"
+                [alt]="partido()!.equipo_local"
+                class="equipo-logo"
+                (error)="$event.target.style.display='none'">
+              <div 
+                *ngIf="!obtenerLogoEquipo(partido()!.id_equipo_local)"
+                class="equipo-logo-placeholder">
+                <span class="material-symbols-outlined">shield</span>
+              </div>
+            </div>
+            <div class="equipo-info-header">
+              <h2>{{ partido()!.equipo_local }}</h2>
+              <span *ngIf="esLocal" class="mi-equipo-badge">TU EQUIPO</span>
+            </div>
+          </div>
+          
+          <div class="vs-container-header">
+            <div class="vs-divider"></div>
+            <div class="vs-content-header">
+              <span *ngIf="partido()!.estado !== 'finalizado' && partido()!.estado !== 'en_juego'" class="vs-text">VS</span>
+              <span *ngIf="partido()!.estado === 'finalizado' || partido()!.estado === 'en_juego'" class="resultado-text">
+                {{ partido()!.goles_local }} - {{ partido()!.goles_visitante }}
+              </span>
+            </div>
+            <div class="vs-divider"></div>
+          </div>
+          
+          <div class="equipo-header-card" [class.mi-equipo]="!esLocal">
+            <div class="equipo-logo-container">
+              <img 
+                *ngIf="obtenerLogoEquipo(partido()!.id_equipo_visitante)"
+                [src]="obtenerLogoEquipo(partido()!.id_equipo_visitante)!"
+                [alt]="partido()!.equipo_visitante"
+                class="equipo-logo"
+                (error)="$event.target.style.display='none'">
+              <div 
+                *ngIf="!obtenerLogoEquipo(partido()!.id_equipo_visitante)"
+                class="equipo-logo-placeholder">
+                <span class="material-symbols-outlined">shield</span>
+              </div>
+            </div>
+            <div class="equipo-info-header">
+              <h2>{{ partido()!.equipo_visitante }}</h2>
+              <span *ngIf="!esLocal" class="mi-equipo-badge">TU EQUIPO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="partido-details">
+        <div class="detail-item">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span>{{ formatearFecha(partido()!.fecha_partido) }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-symbols-outlined">schedule</span>
+          <span>{{ formatearHora(partido()!.fecha_partido) }}</span>
+        </div>
+        <div class="detail-item" *ngIf="partido()!.lugar">
+          <span class="material-symbols-outlined">stadium</span>
+          <span>{{ partido()!.lugar }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="material-symbols-outlined">flag</span>
+          <span class="estado-badge" [class]="'estado-' + partido()!.estado">
+            {{ partido()!.estado === 'programado' ? 'Programado' : 
+               partido()!.estado === 'en_juego' ? 'En Juego' : 
+               partido()!.estado === 'finalizado' ? 'Finalizado' : 'Cancelado' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALINEACIÓN -->
+    <div class="alineacion-card" *ngIf="alineacionMiEquipo()">
+      <h3 class="section-title">
+        <span class="material-symbols-outlined">sports</span>
+        Mi Alineación
+      </h3>
+
+      <div class="alineacion-content">
+          <div class="titulares-section">
+          <h4>Titulares</h4>
+          <div class="jugadores-grid">
+            <div 
+              *ngFor="let jugador of titularesDisponibles()" 
+              class="jugador-card"
+              [class.puede-cambiar]="partido()!.estado === 'en_juego' && !jugador.minuto_salida"
+              [class.selected]="jugadorActivo() && jugadorActivo()!.id_jugador === jugador.id_jugador"
+              [class.expulsado]="estadoJugadoresMap()[jugador.id_jugador]?.expulsado"
+              (click)="partido()!.estado === 'en_juego' && !jugador.minuto_salida ? seleccionarJugador(jugador) : null">
+              <div class="jugador-dorsal">{{ jugador.dorsal }}</div>
+              <div class="jugador-nombre">
+                {{ jugador.nombre || jugador.jugador_nombre || 'Jugador' }}
+                {{ jugador.apellido || '' }}
+              </div>
+              <div class="jugador-posicion">{{ jugador.posicion }}</div>
+              <div class="jugador-badges">
+                <span *ngIf="estadoJugadoresMap()[jugador.id_jugador]?.amarillas" class="badge-yellow">🟨{{ estadoJugadoresMap()[jugador.id_jugador].amarillas }}</span>
+                <span *ngIf="estadoJugadoresMap()[jugador.id_jugador]?.rojas" class="badge-red">🟥</span>
+                <span *ngIf="estadoJugadoresMap()[jugador.id_jugador]?.expulsado" class="badge-expelled">🚫</span>
+              </div>
+              <button 
+                *ngIf="partido()!.estado === 'en_juego' && !jugador.minuto_salida"
+                class="btn-cambiar">
+                <span class="material-symbols-outlined">swap_horiz</span>
+                Cambiar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="suplentes-section">
+          <h4>Suplentes</h4>
+          <div class="jugadores-grid">
+            <div 
+              *ngFor="let jugador of suplentesDisponibles()" 
+              class="jugador-card suplente"
+              [class.selected]="jugadorActivo() && jugadorActivo()!.id_jugador === jugador.id_jugador"
+              [class.expulsado]="estadoJugadoresMap()[jugador.id_jugador]?.expulsado"
+              (click)="partido()!.estado === 'en_juego' ? seleccionarJugador(jugador) : null">
+              <div class="jugador-dorsal">{{ jugador.dorsal }}</div>
+              <div class="jugador-nombre">
+                {{ jugador.nombre || jugador.jugador_nombre || 'Jugador' }}
+                {{ jugador.apellido || '' }}
+              </div>
+              <div class="jugador-posicion">{{ jugador.posicion }}</div>
+              <div class="jugador-badges">
+                <span *ngIf="estadoJugadoresMap()[jugador.id_jugador]?.amarillas" class="badge-yellow">🟨{{ estadoJugadoresMap()[jugador.id_jugador].amarillas }}</span>
+                <span *ngIf="estadoJugadoresMap()[jugador.id_jugador]?.rojas" class="badge-red">🟥</span>
+                <span *ngIf="estadoJugadoresMap()[jugador.id_jugador]?.expulsado" class="badge-expelled">🚫</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL COMPACTO DE EVENTOS (aparece cuando hay jugador activo) -->
+    <div *ngIf="jugadorActivo()" class="panel-eventos-compacto">
+      <div class="panel-header">
+        <strong>#{{ jugadorActivo()!.dorsal }} {{ jugadorActivo()!.nombre || jugadorActivo()!.jugador_nombre }} {{ jugadorActivo()!.apellido }}</strong>
+        <span class="team-name">{{ jugadorActivo() && (esLocal ? partido()!.equipo_local : partido()!.equipo_visitante) }}</span>
+      </div>
+      <div class="panel-actions">
+        <button class="btn-event btn-goal" (click)="registrarEventoParaJugador('gol')">⚽ Gol</button>
+        <button class="btn-event btn-yellow" (click)="registrarEventoParaJugador('tarjeta_amarilla')">🟨 Amarilla</button>
+        <button class="btn-event btn-red" (click)="registrarEventoParaJugador('tarjeta_roja')">🟥 Roja</button>
+        <button class="btn-event btn-cancel" (click)="jugadorActivo.set(null)">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- CRONOLOGÍA -->
+    <div class="cronologia-card">
+      <h3 class="section-title">
+        <span class="material-symbols-outlined">timeline</span>
+        Cronología del Partido
+      </h3>
+
+      <div *ngIf="eventos().length === 0" class="empty-events">
+        <span class="material-symbols-outlined">event_note</span>
+        <p>No hay eventos registrados</p>
+        <p class="subtitle">Los goles, tarjetas y cambios aparecerán aquí</p>
+      </div>
+
+      <div *ngIf="eventos().length > 0" class="eventos-list">
+        <div 
+          *ngFor="let evento of eventosOrdenados()" 
+          class="evento-item"
+          [class.evento-local]="evento.equipo === 'local' && esLocal"
+          [class.evento-visitante]="evento.equipo === 'visitante' && !esLocal">
+          
+          <div class="evento-minuto">{{ evento.minuto }}'</div>
+          
+          <div class="evento-icon">
+            <span *ngIf="evento.tipo === 'gol'">⚽</span>
+            <span *ngIf="evento.tipo === 'tarjeta_amarilla'">🟨</span>
+            <span *ngIf="evento.tipo === 'tarjeta_roja'">🟥</span>
+            <span *ngIf="evento.tipo === 'sustitucion' || evento.tipo === 'cambio'">🔄</span>
+          </div>
+          
+          <div class="evento-content">
+            <div class="evento-tipo">{{ getTipoEventoTexto(evento.tipo) }}</div>
+            <div class="evento-jugador" *ngIf="evento.jugador">
+              <strong>#{{ evento.jugador.dorsal }}</strong> 
+              {{ evento.jugador.nombre }} {{ evento.jugador.apellido }}
+            </div>
+            <div class="evento-asistidor" *ngIf="evento.asistidor">
+              Asistencia: #{{ evento.asistidor.dorsal }} {{ evento.asistidor.nombre }}
+            </div>
+            <div class="evento-equipo">
+              {{ evento.equipo === 'local' ? partido()!.equipo_local : partido()!.equipo_visitante }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CAMBIO -->
+  <div class="modal-overlay" *ngIf="showModalCambio()" (click)="cerrarModalCambio()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Realizar Cambio</h2>
+        <button class="modal-close" (click)="cerrarModalCambio()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="cambio-info">
+          <div class="jugador-sale">
+            <h4>Sale</h4>
+            <div class="jugador-selected" *ngIf="jugadorSale()">
+              <div class="jugador-dorsal">{{ jugadorSale()!.dorsal }}</div>
+              <div class="jugador-nombre">
+                {{ jugadorSale()!.nombre || jugadorSale()!.jugador_nombre }}
+                {{ jugadorSale()!.apellido }}
+              </div>
+            </div>
+          </div>
+
+          <div class="jugador-entra">
+            <h4>Entra</h4>
+            <div class="suplentes-select">
+              <div 
+                *ngFor="let jugador of suplentesDisponibles()" 
+                class="jugador-option"
+                [class.selected]="jugadorEntra()?.id_jugador === jugador.id_jugador"
+                (click)="seleccionarJugadorEntra(jugador)">
+                <div class="jugador-dorsal">{{ jugador.dorsal }}</div>
+                <div class="jugador-nombre">
+                  {{ jugador.nombre || jugador.jugador_nombre }}
+                  {{ jugador.apellido }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="minuto-input">
+            <label>Minuto del cambio:</label>
+            <input 
+              type="number" 
+              [(ngModel)]="minutoCambio" 
+              min="1" 
+              max="90"
+              placeholder="Ej: 45">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModalCambio()">Cancelar</button>
+        <button 
+          class="btn-primary" 
+          (click)="confirmarCambio()"
+          [disabled]="!jugadorEntra() || minutoCambio() <= 0">
+          Confirmar Cambio
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

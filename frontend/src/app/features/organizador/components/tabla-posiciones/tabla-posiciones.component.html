@@ -1,134 +1,844 @@
-<div class="tabla-container">
-    <div class="page-header">
-      <h1>Tabla de Posiciones</h1>
-      <div class="header-actions">
-        <button type="button" class="btn-action" (click)="descargarPDF()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          Descargar PDF
+<!-- TOAST -->
+<app-toast
+  [show]="showToast()"
+  [type]="toastType()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  (close)="cerrarToast()">
+</app-toast>
+
+<!-- CONTAINER PRINCIPAL -->
+<div class="min-h-screen bg-gray-50 dark:bg-[#102211]">
+  
+  <!-- HEADER -->
+  <div class="bg-white dark:bg-[#182c19] border-b-2 border-gray-200 dark:border-[#2a452b] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <span class="material-symbols-outlined text-[#2E7D32]">{{ getIconoVistaActual() }}</span>
+            {{ getNombreVistaActual() }}
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400 mt-1">
+            {{ vistaTabla() === 'posiciones' ? 'Análisis completo y seguimiento de posiciones' : 
+               vistaTabla() === 'goleadores' ? 'Ranking de máximos goleadores del campeonato' : 
+               'Ranking de mejores asistidores del campeonato' }}
+          </p>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Botón ROTAR VISTA -->
+          <button 
+            (click)="rotarTabla()"
+            [disabled]="isFlipping()"
+            class="px-4 py-2 rounded-xl bg-gradient-to-r from-[#2E7D32] to-[#1B5E20] text-white hover:from-[#1B5E20] hover:to-[#0d3f10] flex items-center gap-2 transition-all font-semibold shadow-md disabled:opacity-50">
+            <span class="material-symbols-outlined text-xl" [class.animate-spin]="isFlipping()">swap_horiz</span>
+            <span class="hidden sm:inline">Cambiar Vista</span>
+          </button>
+
+          <button 
+            (click)="cargarTodasLasTablas()"
+            class="px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2 transition-all font-semibold">
+            <span class="material-symbols-outlined text-xl">refresh</span>
+            <span class="hidden sm:inline">Actualizar</span>
+          </button>
+          
+          <button 
+            (click)="exportarExcel()"
+            class="px-4 py-2 rounded-xl border-2 border-green-300 text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20 flex items-center gap-2 transition-all font-semibold">
+            <span class="material-symbols-outlined text-xl">table_view</span>
+            <span class="hidden sm:inline">Excel</span>
+          </button>
+
+          <button 
+            (click)="exportarPDF()"
+            class="px-4 py-2 rounded-xl bg-[#2E7D32] text-white hover:bg-[#1B5E20] flex items-center gap-2 transition-all font-semibold shadow-md">
+            <span class="material-symbols-outlined text-xl">picture_as_pdf</span>
+            <span class="hidden sm:inline">PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Selector de vistas (Pills) -->
+      <div class="flex items-center gap-2 mb-6 p-2 bg-gray-100 dark:bg-gray-800 rounded-xl w-fit">
+        <button
+          (click)="cambiarVistaTabla('posiciones')"
+          [class]="vistaTabla() === 'posiciones' ? 
+                   'px-4 py-2 rounded-lg bg-white dark:bg-gray-700 text-[#2E7D32] font-bold shadow-md' : 
+                   'px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 font-semibold'">
+          <span class="material-symbols-outlined text-sm align-middle mr-1">emoji_events</span>
+          Posiciones
         </button>
-        <button type="button" class="btn-action" (click)="descargarExcel()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          </svg>
-          Descargar Excel
+        <button
+          (click)="cambiarVistaTabla('goleadores')"
+          [class]="vistaTabla() === 'goleadores' ? 
+                   'px-4 py-2 rounded-lg bg-white dark:bg-gray-700 text-[#2E7D32] font-bold shadow-md' : 
+                   'px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 font-semibold'">
+          <span class="material-symbols-outlined text-sm align-middle mr-1">sports_soccer</span>
+          Goleadores
         </button>
-        <button type="button" class="btn-share" (click)="compartirEnlace()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-            <polyline points="16 6 12 2 8 6"></polyline>
-            <line x1="12" y1="2" x2="12" y2="15"></line>
-          </svg>
-          Compartir Enlace
+        <button
+          (click)="cambiarVistaTabla('asistencias')"
+          [class]="vistaTabla() === 'asistencias' ? 
+                   'px-4 py-2 rounded-lg bg-white dark:bg-gray-700 text-[#2E7D32] font-bold shadow-md' : 
+                   'px-4 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 font-semibold'">
+          <span class="material-symbols-outlined text-sm align-middle mr-1">sports_handball</span>
+          Asistencias
         </button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Selector de campeonato -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">emoji_events</span>
+            Campeonato
+          </label>
+          <select 
+            [(ngModel)]="campeonatoSeleccionado"
+            (change)="cambiarCampeonato()"
+            class="w-full px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+            <option [value]="null" disabled>Selecciona un campeonato</option>
+            <option *ngFor="let campeonato of misCampeonatos()" [value]="campeonato.id_campeonato">
+              {{ campeonato.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Selector de jornada (solo en vista posiciones) -->
+        <div *ngIf="vistaTabla() === 'posiciones'">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">calendar_today</span>
+            Ver tabla hasta jornada
+          </label>
+          <div class="flex gap-2">
+            <select 
+              [(ngModel)]="jornadaSeleccionada"
+              (change)="cambiarJornada()"
+              class="flex-1 px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+              <option [value]="null">Todas las jornadas</option>
+              <option *ngFor="let jornada of getJornadas()" [value]="jornada">
+                Jornada {{ jornada }}
+              </option>
+            </select>
+            <button 
+              *ngIf="jornadaSeleccionada()"
+              (click)="verTodasLasJornadas()"
+              class="px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+              title="Ver todas las jornadas">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Buscador (solo en vista posiciones) -->
+        <div *ngIf="vistaTabla() === 'posiciones'">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <span class="material-symbols-outlined text-sm align-middle mr-1">search</span>
+            Buscar equipo
+          </label>
+          <input 
+            type="text"
+            [(ngModel)]="busquedaEquipo"
+            placeholder="Nombre del equipo..."
+            class="w-full px-4 py-2 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-4 focus:ring-[#2E7D32]/20 focus:border-[#2E7D32] transition-all">
+        </div>
       </div>
     </div>
-  
-    <div class="filters-card">
-      <div class="filter-group">
-        <label>Ver tabla al</label>
-        <input type="date" [(ngModel)]="selectedDate" class="date-input">
-      </div>
-      <div class="filter-group">
-        <label>Jornada</label>
-        <select [(ngModel)]="selectedJornada" class="select-input">
-          <option>Jornada 12</option>
-          <option>Jornada 11</option>
-          <option>Jornada 10</option>
-        </select>
-      </div>
-      <div class="ultima-actualizacion">
-        <span>Última actualización: 14 de Agosto, 2024 10:30 AM</span>
-      </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading() || loadingGoleadores() || loadingAsistencias()" class="flex items-center justify-center py-20">
+    <div class="text-center">
+      <div class="inline-block w-16 h-16 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400 font-medium">Cargando datos...</p>
     </div>
-  
-    @if (isLoading()) {
-      <div class="loading">
-        <div class="spinner"></div>
-        <p>Cargando tabla...</p>
-      </div>
-    } @else {
-      <div class="tabla-card">
-        <div class="tabla-wrapper">
-          <table class="tabla">
-            <thead>
-              <tr>
-                <th class="col-pos">#</th>
-                <th class="col-equipo">EQUIPO</th>
-                <th class="col-cambio">CAMBIO</th>
-                <th>PJ</th>
-                <th>PG</th>
-                <th>PE</th>
-                <th>PP</th>
-                <th>GF</th>
-                <th>GC</th>
-                <th>DG</th>
-                <th class="col-pts">PTS</th>
-                <th class="col-forma">FORMA</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (equipo of equipos(); track equipo.posicion) {
-                <tr [class]="getZonaClass(equipo.posicion)">
-                  <td class="col-pos">
-                    <span class="posicion">{{ equipo.posicion }}</span>
-                  </td>
-                  <td class="col-equipo">
-                    <div class="equipo-info">
-                      <div class="equipo-logo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                        </svg>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div *ngIf="!loading() && !loadingGoleadores() && !loadingAsistencias()" class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- ========================================== -->
+    <!-- VISTA: TABLA DE POSICIONES -->
+    <!-- ========================================== -->
+    <div *ngIf="vistaTabla() === 'posiciones'" [class.flip-animation]="isFlipping()">
+      <div *ngIf="equiposFiltrados().length > 0">
+        
+        <!-- Info de jornada (si aplica) -->
+        <div *ngIf="jornadaSeleccionada()" class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-xl p-4 mb-6">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-blue-600 dark:text-blue-400">info</span>
+            <p class="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              Viendo tabla hasta la <strong>Jornada {{ jornadaSeleccionada() }}</strong> de {{ jornadaMaxima() }}
+            </p>
+          </div>
+        </div>
+
+        <!-- TABLA PRINCIPAL -->
+        <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-lg overflow-hidden">
+          
+          <!-- Tabla Desktop -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gradient-to-r from-[#2E7D32] to-[#1B5E20] text-white">
+                <tr>
+                  <th class="px-4 py-4 text-left text-xs font-bold uppercase tracking-wider w-16">
+                    <span class="material-symbols-outlined text-sm">tag</span>
+                  </th>
+                  <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">
+                    Equipo
+                  </th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">PJ</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">G</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">E</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">P</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">GF</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">GC</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">DIF</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider">PTS</th>
+                  <th class="px-4 py-4 text-center text-xs font-bold uppercase tracking-wider w-32"></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <tr *ngFor="let equipo of equiposFiltrados(); let i = index"
+                    [class]="'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 border-l-4 ' + 
+                             (equipo.posicion === 1 ? 'border-l-yellow-400 bg-yellow-50/30 dark:bg-yellow-900/10' : 
+                              equipo.posicion <= 4 ? 'border-l-green-500 bg-green-50/30 dark:bg-green-900/10' : 
+                              equipo.posicion >= equiposFiltrados().length - 2 ? 'border-l-red-500 bg-red-50/30 dark:bg-red-900/10' : 
+                              'border-l-gray-300')">
+                  
+                  <!-- Posición -->
+                  <td class="px-4 py-4">
+                    <div class="flex items-center justify-center">
+                      <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ' +
+                                    (equipo.posicion === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : 
+                                     equipo.posicion <= 4 ? 'bg-gradient-to-br from-green-500 to-green-700 text-white' : 
+                                     equipo.posicion >= equiposFiltrados().length - 2 ? 'bg-gradient-to-br from-red-500 to-red-700 text-white' : 
+                                     'bg-gradient-to-br from-gray-200 to-gray-400 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300')">
+                        {{ equipo.posicion }}
                       </div>
-                      <span class="equipo-nombre">{{ equipo.nombre }}</span>
                     </div>
                   </td>
-                  <td class="col-cambio">
-                    <div class="cambio-indicator" [class]="'cambio-' + equipo.cambio" [innerHTML]="getCambioIcon(equipo.cambio)"></div>
+
+                  <!-- Equipo -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] flex items-center justify-center shadow-md flex-shrink-0">
+                        <span class="material-symbols-outlined text-white text-lg">shield</span>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-bold text-gray-900 dark:text-white truncate">{{ equipo.nombre }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ equipo.partidos_jugados }} partidos</p>
+                      </div>
+                    </div>
                   </td>
-                  <td>{{ equipo.pj }}</td>
-                  <td>{{ equipo.pg }}</td>
-                  <td>{{ equipo.pe }}</td>
-                  <td>{{ equipo.pp }}</td>
-                  <td>{{ equipo.gf }}</td>
-                  <td>{{ equipo.gc }}</td>
-                  <td>
-                    <span [class]="equipo.dif >= 0 ? 'dif-positive' : 'dif-negative'">
-                      {{ equipo.dif >= 0 ? '+' : '' }}{{ equipo.dif }}
+
+                  <!-- PJ -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ equipo.partidos_jugados }}</span>
+                  </td>
+
+                  <!-- G -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 text-sm font-bold text-green-700 dark:text-green-400">
+                      {{ equipo.ganados }}
                     </span>
                   </td>
-                  <td class="col-pts">
-                    <strong>{{ equipo.pts }}</strong>
+
+                  <!-- E -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-sm font-semibold text-gray-700 dark:text-gray-400">
+                      {{ equipo.empatados }}
+                    </span>
                   </td>
-                  <td class="col-forma">
-                    <div class="forma-list">
-                      @for (resultado of equipo.forma; track $index) {
-                        <span class="forma-badge" [class]="getFormaClass(resultado)">{{ resultado }}</span>
-                      }
-                    </div>
+
+                  <!-- P -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/30 text-sm font-bold text-red-700 dark:text-red-400">
+                      {{ equipo.perdidos }}
+                    </span>
+                  </td>
+
+                  <!-- GF -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ equipo.goles_favor }}</span>
+                  </td>
+
+                  <!-- GC -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ equipo.goles_contra }}</span>
+                  </td>
+
+                  <!-- DIF -->
+                  <td class="px-4 py-4 text-center">
+                    <span [class]="'text-sm font-bold px-2 py-1 rounded-lg ' + 
+                                  (equipo.diferencia_goles > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 
+                                   equipo.diferencia_goles < 0 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 
+                                   'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400')">
+                      {{ equipo.diferencia_goles > 0 ? '+' : '' }}{{ equipo.diferencia_goles }}
+                    </span>
+                  </td>
+
+                  <!-- PTS -->
+                  <td class="px-4 py-4 text-center">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] text-white text-lg font-bold shadow-lg">
+                      {{ equipo.puntos }}
+                    </span>
+                  </td>
+
+                  <!-- Acciones -->
+                  <td class="px-4 py-4 text-center">
+                    <button 
+                      (click)="verHistorialEquipo(equipo)"
+                      class="px-3 py-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 font-semibold text-xs transition-all flex items-center gap-1 mx-auto">
+                      <span class="material-symbols-outlined text-sm">visibility</span>
+                      Ver
+                    </button>
                   </td>
                 </tr>
-              }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tabla Mobile -->
+          <div class="md:hidden divide-y divide-gray-200 dark:divide-gray-700">
+            <div *ngFor="let equipo of equiposFiltrados(); let i = index"
+                 [class]="'p-4 border-l-4 ' + 
+                          (equipo.posicion === 1 ? 'border-l-yellow-400 bg-yellow-50/30 dark:bg-yellow-900/10' : 
+                           equipo.posicion <= 4 ? 'border-l-green-500 bg-green-50/30 dark:bg-green-900/10' : 
+                           equipo.posicion >= equiposFiltrados().length - 2 ? 'border-l-red-500 bg-red-50/30 dark:bg-red-900/10' : 
+                           'border-l-gray-300')">
+              
+              <!-- Header Mobile -->
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3">
+                  <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ' +
+                                (equipo.posicion === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : 
+                                 equipo.posicion <= 4 ? 'bg-gradient-to-br from-green-500 to-green-700 text-white' : 
+                                 equipo.posicion >= equiposFiltrados().length - 2 ? 'bg-gradient-to-br from-red-500 to-red-700 text-white' : 
+                                 'bg-gradient-to-br from-gray-200 to-gray-400 text-gray-700')">
+                    {{ equipo.posicion }}
+                  </div>
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] flex items-center justify-center shadow-md">
+                    <span class="material-symbols-outlined text-white text-sm">shield</span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-gray-900 dark:text-white">{{ equipo.nombre }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ equipo.partidos_jugados }} PJ</p>
+                  </div>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2E7D32] to-[#1B5E20] text-white flex items-center justify-center text-lg font-bold shadow-lg">
+                  {{ equipo.puntos }}
+                </div>
+              </div>
+
+              <!-- Stats Mobile -->
+              <div class="grid grid-cols-4 gap-2 mb-3">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">G</p>
+                  <p class="text-sm font-bold text-green-600 dark:text-green-400">{{ equipo.ganados }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">E</p>
+                  <p class="text-sm font-bold text-gray-600 dark:text-gray-400">{{ equipo.empatados }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">P</p>
+                  <p class="text-sm font-bold text-red-600 dark:text-red-400">{{ equipo.perdidos }}</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">DIF</p>
+                  <p [class]="'text-sm font-bold ' + 
+                             (equipo.diferencia_goles > 0 ? 'text-green-600' : 
+                              equipo.diferencia_goles < 0 ? 'text-red-600' : 'text-gray-600')">
+                    {{ equipo.diferencia_goles > 0 ? '+' : '' }}{{ equipo.diferencia_goles }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Goles Mobile -->
+              <div class="flex items-center justify-between mb-3 text-sm">
+                <div class="flex items-center gap-4">
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">GF:</span>
+                    <span class="font-bold text-gray-900 dark:text-white ml-1">{{ equipo.goles_favor }}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500 dark:text-gray-400">GC:</span>
+                    <span class="font-bold text-gray-900 dark:text-white ml-1">{{ equipo.goles_contra }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón Ver Mobile -->
+              <button 
+                (click)="verHistorialEquipo(equipo)"
+                class="w-full px-4 py-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50 font-semibold text-sm transition-all flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">visibility</span>
+                Ver Historial
+              </button>
+            </div>
+          </div>
+
+          <!-- Leyenda -->
+          <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 border-t-2 border-gray-200 dark:border-gray-700">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex flex-wrap gap-3 text-xs">
+                <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-yellow-200 dark:border-yellow-800">
+                  <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                  <span class="text-gray-700 dark:text-gray-300 font-medium">Campeón</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-green-200 dark:border-green-800">
+                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span class="text-gray-700 dark:text-gray-300 font-medium">Clasificación</span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-red-200 dark:border-red-800">
+                  <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span class="text-gray-700 dark:text-gray-300 font-medium">Descenso</span>
+                </div>
+              </div>
+              
+              <div class="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">lightbulb</span>
+                <span class="font-semibold">Tip:</span> Click en "Ver" para ver el historial del equipo
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="equiposFiltrados().length === 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-lg p-12 text-center">
+        <span class="material-symbols-outlined text-8xl text-gray-300 dark:text-gray-600 mb-4">sports_soccer</span>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          {{ busquedaEquipo() ? 'No se encontraron equipos' : 'No hay datos disponibles' }}
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ busquedaEquipo() ? 'Intenta con otro término de búsqueda' : 'Finaliza algunos partidos para ver las posiciones' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VISTA: TABLA DE GOLEADORES -->
+    <!-- ========================================== -->
+    <div *ngIf="vistaTabla() === 'goleadores'" [class.flip-animation]="isFlipping()">
+      <div *ngIf="goleadores().length > 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-lg overflow-hidden">
+        
+        <!-- Tabla Desktop Goleadores -->
+        <div class="hidden lg:block overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gradient-to-r from-[#2E7D32] to-[#1B5E20] text-white">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider w-20">Pos</th>
+                <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Jugador</th>
+                <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Equipo</th>
+                <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">PJ</th>
+                <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+                  <span class="material-symbols-outlined text-sm">sports_soccer</span>
+                  Goles
+                </th>
+                <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">Promedio</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr *ngFor="let goleador of goleadores(); let i = index"
+                  [class]="'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 ' +
+                           (i === 0 ? 'bg-yellow-50 dark:bg-yellow-900/20' : 
+                            i < 3 ? 'bg-green-50 dark:bg-green-900/20' : '')">
+                
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ' +
+                                  (i === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : 
+                                   i === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-700' :
+                                   i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                                   'bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700')">
+                      {{ goleador.posicion }}
+                    </div>
+                    <span *ngIf="i === 0" class="material-symbols-outlined text-yellow-500 text-2xl">emoji_events</span>
+                    <span *ngIf="i === 1" class="material-symbols-outlined text-gray-400 text-2xl">military_tech</span>
+                    <span *ngIf="i === 2" class="material-symbols-outlined text-orange-500 text-2xl">workspace_premium</span>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center shadow-md">
+                      <span class="material-symbols-outlined text-white text-xl">person</span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-900 dark:text-white">{{ goleador.jugador }}</p>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ goleador.equipo }}</p>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ goleador.partidos_jugados }}</span>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-700 text-white text-xl font-bold shadow-lg">
+                    {{ goleador.goles }}
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span class="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-bold text-gray-700 dark:text-gray-300">
+                    {{ goleador.promedio_goles }}
+                  </span>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
-  
-        <div class="leyenda">
-          <div class="leyenda-item">
-            <span class="leyenda-color zona-champions"></span>
-            <span>Champions League</span>
+
+        <!-- Tabla Mobile Goleadores -->
+        <div class="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
+          <div *ngFor="let goleador of goleadores(); let i = index"
+               [class]="'p-4 ' + 
+                        (i === 0 ? 'bg-yellow-50 dark:bg-yellow-900/20' : 
+                         i < 3 ? 'bg-green-50 dark:bg-green-900/20' : '')">
+            
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ' +
+                              (i === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : 
+                               i === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-700' :
+                               i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                               'bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700')">
+                  {{ goleador.posicion }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white">{{ goleador.jugador }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ goleador.equipo }}</p>
+                </div>
+              </div>
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-green-700 text-white flex items-center justify-center text-xl font-bold shadow-lg">
+                {{ goleador.goles }}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Partidos</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ goleador.partidos_jugados }}</p>
+              </div>
+              <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Promedio</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ goleador.promedio_goles }}</p>
+              </div>
+            </div>
           </div>
-          <div class="leyenda-item">
-            <span class="leyenda-color zona-europa"></span>
-            <span>Europa League</span>
+        </div>
+
+        <!-- Footer Goleadores -->
+        <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 border-t-2 border-gray-200 dark:border-gray-700">
+          <p class="text-xs text-gray-600 dark:text-gray-400 text-center flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-sm">info</span>
+            <strong>Nota:</strong> Datos simulados. Se actualizarán cuando el sistema de eventos esté disponible.
+          </p>
+        </div>
+      </div>
+
+      <!-- Empty State Goleadores -->
+      <div *ngIf="goleadores().length === 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-lg p-12">
+        <div class="text-center">
+          <span class="material-symbols-outlined text-8xl text-gray-400 mb-4">sports_soccer</span>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No hay goleadores registrados</h3>
+          <p class="text-gray-600 dark:text-gray-400">Finaliza algunos partidos para ver las estadísticas</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- VISTA: TABLA DE ASISTENCIAS -->
+    <!-- ========================================== -->
+    <div *ngIf="vistaTabla() === 'asistencias'" [class.flip-animation]="isFlipping()">
+      <div *ngIf="asistidores().length > 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-lg overflow-hidden">
+        
+        <!-- Tabla Desktop Asistencias -->
+        <div class="hidden lg:block overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gradient-to-r from-[#2E7D32] to-[#1B5E20] text-white">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider w-20">Pos</th>
+                <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Jugador</th>
+                <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider">Equipo</th>
+                <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">PJ</th>
+                <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+                  <span class="material-symbols-outlined text-sm">sports_handball</span>
+                  Asistencias
+                </th>
+                <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider">Promedio</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr *ngFor="let asistidor of asistidores(); let i = index"
+                  [class]="'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 ' +
+                           (i === 0 ? 'bg-yellow-50 dark:bg-yellow-900/20' : 
+                            i < 3 ? 'bg-blue-50 dark:bg-blue-900/20' : '')">
+                
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ' +
+                                  (i === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : 
+                                   i === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-700' :
+                                   i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                                   'bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700')">
+                      {{ asistidor.posicion }}
+                    </div>
+                    <span *ngIf="i === 0" class="material-symbols-outlined text-yellow-500 text-2xl">emoji_events</span>
+                    <span *ngIf="i === 1" class="material-symbols-outlined text-gray-400 text-2xl">military_tech</span>
+                    <span *ngIf="i === 2" class="material-symbols-outlined text-orange-500 text-2xl">workspace_premium</span>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-md">
+                      <span class="material-symbols-outlined text-white text-xl">person</span>
+                    </div>
+                    <p class="text-sm font-bold text-gray-900 dark:text-white">{{ asistidor.jugador }}</p>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ asistidor.equipo }}</p>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ asistidor.partidos_jugados }}</span>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span class="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white text-xl font-bold shadow-lg">
+                    {{ asistidor.asistencias }}
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                  <span class="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-bold text-gray-700 dark:text-gray-300">
+                    {{ asistidor.promedio_asistencias }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tabla Mobile Asistencias -->
+        <div class="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
+          <div *ngFor="let asistidor of asistidores(); let i = index"
+               [class]="'p-4 ' + 
+                        (i === 0 ? 'bg-yellow-50 dark:bg-yellow-900/20' : 
+                         i < 3 ? 'bg-blue-50 dark:bg-blue-900/20' : '')">
+            
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div [class]="'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shadow-md ' +
+                              (i === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-yellow-900' : 
+                               i === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400 text-gray-700' :
+                               i === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' :
+                               'bg-gradient-to-br from-gray-200 to-gray-300 text-gray-700')">
+                  {{ asistidor.posicion }}
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-gray-900 dark:text-white">{{ asistidor.jugador }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ asistidor.equipo }}</p>
+                </div>
+              </div>
+              <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-xl font-bold shadow-lg">
+                {{ asistidor.asistencias }}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Partidos</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ asistidor.partidos_jugados }}</p>
+              </div>
+              <div class="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Promedio</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ asistidor.promedio_asistencias }}</p>
+              </div>
+            </div>
           </div>
-          <div class="leyenda-item">
-            <span class="leyenda-color zona-descenso"></span>
-            <span>Descenso</span>
+        </div>
+
+        <!-- Footer Asistencias -->
+        <div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 border-t-2 border-gray-200 dark:border-gray-700">
+          <p class="text-xs text-gray-600 dark:text-gray-400 text-center flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-sm">info</span>
+            <strong>Nota:</strong> Datos simulados. Se actualizarán cuando el sistema de eventos esté disponible.
+          </p>
+        </div>
+      </div>
+
+      <!-- Empty State Asistencias -->
+      <div *ngIf="asistidores().length === 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-lg p-12">
+        <div class="text-center">
+          <span class="material-symbols-outlined text-8xl text-gray-400 mb-4">sports_handball</span>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No hay asistidores registrados</h3>
+          <p class="text-gray-600 dark:text-gray-400">Finaliza algunos partidos para ver las estadísticas</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: HISTORIAL DEL EQUIPO -->
+<!-- ========================================== -->
+<div *ngIf="showModalHistorial()" 
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+     (click)="cerrarModalHistorial()">
+  <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="sticky top-0 bg-gradient-to-r from-[#2E7D32] to-[#1B5E20] text-white px-6 py-4 flex items-center justify-between z-10">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+          <span class="material-symbols-outlined text-2xl">shield</span>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold">{{ equipoSeleccionado()?.nombre }}</h3>
+          <p class="text-sm text-green-100">Historial del campeonato</p>
+        </div>
+      </div>
+      <button 
+        (click)="cerrarModalHistorial()"
+        class="w-10 h-10 rounded-lg hover:bg-white/20 flex items-center justify-center transition-all">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Loading historial -->
+    <div *ngIf="loadingHistorial()" class="p-12 text-center">
+      <div class="inline-block w-12 h-12 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4"></div>
+      <p class="text-gray-600 dark:text-gray-400">Cargando historial...</p>
+    </div>
+
+    <!-- Contenido del historial -->
+    <div *ngIf="!loadingHistorial() && historialEquipo()" class="overflow-y-auto max-h-[calc(90vh-80px)]">
+      
+      <!-- Resumen de estadísticas -->
+      <div class="p-6 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-white dark:bg-gray-900 rounded-xl border-2 border-green-200 dark:border-green-800">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <span class="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
+            </div>
+            <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ historialEquipo()!.victorias.length }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400">Victorias</p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-gray-900 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">equal</span>
+            </div>
+            <p class="text-2xl font-bold text-gray-600 dark:text-gray-400">{{ historialEquipo()!.empates.length }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400">Empates</p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-gray-900 rounded-xl border-2 border-red-200 dark:border-red-800">
+            <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <span class="material-symbols-outlined text-red-600 dark:text-red-400">cancel</span>
+            </div>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ historialEquipo()!.derrotas.length }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400">Derrotas</p>
           </div>
         </div>
       </div>
-    }
+
+      <!-- Tabs de resultados -->
+      <div class="p-6 space-y-6">
+        
+        <!-- Victorias -->
+        <div *ngIf="historialEquipo()!.victorias.length > 0">
+          <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-green-600">check_circle</span>
+            Victorias ({{ historialEquipo()!.victorias.length }})
+          </h4>
+          <div class="space-y-3">
+            <div *ngFor="let partido of historialEquipo()!.victorias" 
+                 class="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 rounded-lg bg-green-600 text-white text-xs font-bold">J{{ partido.jornada }}</span>
+                  <span class="text-xs text-gray-600 dark:text-gray-400">{{ formatearFecha(partido.fecha) }}</span>
+                  <span *ngIf="partido.local" class="px-2 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold">LOCAL</span>
+                  <span *ngIf="!partido.local" class="px-2 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-semibold">VISITANTE</span>
+                </div>
+                <span class="text-sm font-bold text-green-700 dark:text-green-400">{{ partido.resultado }}</span>
+              </div>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                vs {{ partido.rival }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empates -->
+        <div *ngIf="historialEquipo()!.empates.length > 0">
+          <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-gray-600">equal</span>
+            Empates ({{ historialEquipo()!.empates.length }})
+          </h4>
+          <div class="space-y-3">
+            <div *ngFor="let partido of historialEquipo()!.empates" 
+                 class="p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 rounded-lg bg-gray-600 text-white text-xs font-bold">J{{ partido.jornada }}</span>
+                  <span class="text-xs text-gray-600 dark:text-gray-400">{{ formatearFecha(partido.fecha) }}</span>
+                  <span *ngIf="partido.local" class="px-2 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold">LOCAL</span>
+                  <span *ngIf="!partido.local" class="px-2 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-semibold">VISITANTE</span>
+                </div>
+                <span class="text-sm font-bold text-gray-700 dark:text-gray-400">{{ partido.resultado }}</span>
+              </div>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                vs {{ partido.rival }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Derrotas -->
+        <div *ngIf="historialEquipo()!.derrotas.length > 0">
+          <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-red-600">cancel</span>
+            Derrotas ({{ historialEquipo()!.derrotas.length }})
+          </h4>
+          <div class="space-y-3">
+            <div *ngFor="let partido of historialEquipo()!.derrotas" 
+                 class="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 rounded-lg bg-red-600 text-white text-xs font-bold">J{{ partido.jornada }}</span>
+                  <span class="text-xs text-gray-600 dark:text-gray-400">{{ formatearFecha(partido.fecha) }}</span>
+                  <span *ngIf="partido.local" class="px-2 py-1 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold">LOCAL</span>
+                  <span *ngIf="!partido.local" class="px-2 py-1 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-semibold">VISITANTE</span>
+                </div>
+                <span class="text-sm font-bold text-red-700 dark:text-red-400">{{ partido.resultado }}</span>
+              </div>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                vs {{ partido.rival }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="historialEquipo()!.victorias.length === 0 && historialEquipo()!.empates.length === 0 && historialEquipo()!.derrotas.length === 0"
+             class="text-center py-8">
+          <p class="text-gray-600 dark:text-gray-400">Este equipo aún no ha jugado partidos</p>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
