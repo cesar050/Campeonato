@@ -7,6 +7,8 @@ from app.models.gol import Gol
 from app.models.tarjeta import Tarjeta
 from app.models.solicitud_equipo import SolicitudEquipo
 from app.models.notificacion import Notificacion
+from app.models.historial_estado import HistorialEstado
+from app.models.campeonato_equipo import CampeonatoEquipo 
 
 # Seguridad
 from app.models.token_blacklist import TokenBlacklist
@@ -27,6 +29,8 @@ __all__ = [
     'Tarjeta',
     'SolicitudEquipo',
     'Notificacion',
+    'CampeonatoEquipo',
+    'HistorialEstado',
     # Modelos de seguridad
     'TokenBlacklist',
     'RefreshToken',

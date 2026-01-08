@@ -1,0 +1,172 @@
+<div class="accessibility-center" role="region" aria-labelledby="accessibility-title">
+  <h2 id="accessibility-title" class="accessibility-title">
+    <span class="material-symbols-outlined">accessibility_new</span>
+    Centro de Accesibilidad
+  </h2>
+  <p class="accessibility-description">
+    Personaliza la experiencia según tus necesidades de accesibilidad. Los cambios se aplican inmediatamente al activar cada opción.
+  </p>
+
+  <div class="accessibility-options">
+    <!-- Modo Oscuro -->
+    <div class="accessibility-option">
+      <div class="option-header">
+        <div class="option-info">
+          <span class="material-symbols-outlined option-icon">dark_mode</span>
+          <div class="option-text">
+            <h3>Modo Oscuro</h3>
+            <p>Interfaz con colores oscuros para reducir la fatiga visual</p>
+          </div>
+        </div>
+        <label class="toggle-switch" [attr.aria-label]="'Activar o desactivar modo oscuro. ' + (darkMode() ? 'Activo' : 'Inactivo')">
+          <input
+            type="checkbox"
+            [checked]="darkMode()"
+            (change)="toggleDarkMode()"
+            [attr.aria-checked]="darkMode()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Alto Contraste -->
+    <div class="accessibility-option">
+      <div class="option-header">
+        <div class="option-info">
+          <span class="material-symbols-outlined option-icon">contrast</span>
+          <div class="option-text">
+            <h3>Alto Contraste</h3>
+            <p>Mayor contraste entre texto y fondos para mejor legibilidad</p>
+          </div>
+        </div>
+        <label class="toggle-switch" [attr.aria-label]="'Activar o desactivar alto contraste. ' + (highContrast() ? 'Activo' : 'Inactivo')">
+          <input
+            type="checkbox"
+            [checked]="highContrast()"
+            (change)="toggleHighContrast()"
+            [attr.aria-checked]="highContrast()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Tamaño de Texto -->
+    <div class="accessibility-option">
+      <div class="option-header">
+        <div class="option-info">
+          <span class="material-symbols-outlined option-icon">text_increase</span>
+          <div class="option-text">
+            <h3>Tamaño de Texto</h3>
+            <p>Ajusta el tamaño de fuente según tu preferencia</p>
+          </div>
+        </div>
+        <div class="option-control">
+          <div class="font-size-buttons" role="radiogroup" aria-label="Seleccionar tamaño de texto">
+            <button
+              *ngFor="let option of fontSizeOptions"
+              type="button"
+              [class.active]="fontSize() === option.value"
+              (click)="setFontSize(option.value)"
+              [attr.aria-checked]="fontSize() === option.value"
+              [attr.aria-label]="'Tamaño de texto ' + option.label"
+              role="radio"
+              class="font-size-btn">
+              <span class="material-symbols-outlined" aria-hidden="true">{{ option.icon }}</span>
+              <span class="sr-only">{{ option.label }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Foco Mejorado -->
+    <div class="accessibility-option">
+      <div class="option-header">
+        <div class="option-info">
+          <span class="material-symbols-outlined option-icon">visibility</span>
+          <div class="option-text">
+            <h3>Resaltado Avanzado del Foco</h3>
+            <p>Indicadores de foco más visibles y destacados</p>
+          </div>
+        </div>
+        <label class="toggle-switch" [attr.aria-label]="'Activar o desactivar resaltado avanzado del foco. ' + (enhancedFocus() ? 'Activo' : 'Inactivo')">
+          <input
+            type="checkbox"
+            [checked]="enhancedFocus()"
+            (change)="toggleEnhancedFocus()"
+            [attr.aria-checked]="enhancedFocus()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Reducir Animaciones -->
+    <div class="accessibility-option">
+      <div class="option-header">
+        <div class="option-info">
+          <span class="material-symbols-outlined option-icon">slow_motion_video</span>
+          <div class="option-text">
+            <h3>Reducir Animaciones</h3>
+            <p>Minimiza animaciones y transiciones para reducir movimiento</p>
+          </div>
+        </div>
+        <label class="toggle-switch" [attr.aria-label]="'Activar o desactivar reducción de animaciones. ' + (reduceMotion() ? 'Activo' : 'Inactivo')">
+          <input
+            type="checkbox"
+            [checked]="reduceMotion()"
+            (change)="toggleReduceMotion()"
+            [attr.aria-checked]="reduceMotion()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Modo Daltónicos -->
+    <div class="accessibility-option">
+      <div class="option-header">
+        <div class="option-info">
+          <span class="material-symbols-outlined option-icon">palette</span>
+          <div class="option-text">
+            <h3>Modo Daltónicos</h3>
+            <p>Ajusta los colores para diferentes tipos de daltonismo</p>
+          </div>
+        </div>
+        <div class="option-control">
+          <select
+            [value]="colorblind()"
+            (change)="setColorblind($any($event.target).value)"
+            class="colorblind-select"
+            aria-label="Seleccionar modo para daltónicos">
+            <option *ngFor="let option of colorblindOptions" [value]="option.value">
+              {{ option.label }} - {{ option.description }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de Acción -->
+  <div class="accessibility-actions">
+    <button
+      type="button"
+      class="btn-reset"
+      (click)="resetPreferences()"
+      aria-label="Restablecer todas las preferencias de accesibilidad a los valores por defecto">
+      <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
+      Restablecer a Valores por Defecto
+    </button>
+  </div>
+</div>
+
+<!-- Dialog de confirmación para reset -->
+<app-confirm-dialog
+  [show]="showConfirmReset()"
+  title="Restablecer Preferencias"
+  message="¿Restablecer todas las preferencias de accesibilidad a los valores por defecto?"
+  type="warning"
+  (confirm)="confirmReset($event.confirmed)">
+</app-confirm-dialog>
+
+<span class="sr-only">Centro de accesibilidad cargado. Use las opciones para personalizar la experiencia.</span>
+

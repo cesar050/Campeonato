@@ -1,287 +1,353 @@
-$white: #FFFFFF;
-$bg-light: #F8F9FA;
-$text-dark: #1A1A1A;
-$text-gray: #666666;
+// ==================== VARIABLES ====================
 $green-primary: #2E7D32;
 $green-light: #4CAF50;
-$border-color: #E0E0E0;
+$green-dark: #1B5E20;
+$white: #FFFFFF;
+$bg-light: #F8F9FA;
+$bg-dark: #102211;
 
-.partidos-container {
-  padding: 2rem;
-  max-width: 1400px;
-  min-height: 100vh;
-  background: $bg-light;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: $text-dark;
-    margin: 0;
+// ==================== ANIMACIONES ====================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.btn-generate {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, $green-light, $green-primary);
-  color: $white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  svg {
-    color: $white;
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.views-tabs {
-  display: flex;
-  gap: 0.5rem;
-  background: $white;
-  padding: 0.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  background: transparent;
-  color: $text-gray;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    color: $text-dark;
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-
-  &.active {
-    background: $green-primary;
-    color: $white;
-    font-weight: 600;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4rem 2rem;
-
-  .spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid $border-color;
-    border-top-color: $green-primary;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 1rem;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
   }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.jornadas-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.jornada-section {
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: $text-dark;
-    margin: 0 0 1.5rem;
+  to {
+    transform: rotate(360deg);
   }
 }
 
+// ==================== PARTIDO CARDS ====================
 .partido-card {
-  background: $white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s;
-
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.4s ease-out;
+  
   &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(46, 125, 50, 0.15);
+    
+    .material-symbols-outlined {
+      &.arrow_forward {
+        transform: translateX(4px);
+      }
+    }
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// Animación de entrada escalonada
+.grid > .partido-card {
+  &:nth-child(1) { animation-delay: 0s; }
+  &:nth-child(2) { animation-delay: 0.05s; }
+  &:nth-child(3) { animation-delay: 0.1s; }
+  &:nth-child(4) { animation-delay: 0.15s; }
+  &:nth-child(5) { animation-delay: 0.2s; }
+  &:nth-child(6) { animation-delay: 0.25s; }
+}
+
+// ==================== EQUIPOS ====================
+.equipo-shield {
+  transition: transform 0.3s;
+  
+  &:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+// ==================== BUTTONS ====================
+button {
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 }
 
-.partido-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid $border-color;
-}
-
-.partido-fecha {
-  font-size: 0.875rem;
-  color: $text-gray;
-}
-
-.estado-badge {
-  padding: 0.375rem 0.875rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-
-  &.badge-warning {
-    background: #FFF3E0;
-    color: #F97316;
-  }
-
-  &.badge-info {
-    background: #E3F2FD;
-    color: #2196F3;
-  }
-
-  &.badge-danger {
-    background: #FFEBEE;
-    color: #DC2626;
-  }
-}
-
-.partido-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  gap: 2rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
-
-.equipo {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.equipo-logo {
-  width: 40px;
-  height: 40px;
-  background: $bg-light;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  svg {
-    color: $green-primary;
-  }
-}
-
-.equipo-nombre {
-  font-weight: 600;
-  color: $text-dark;
-}
-
-.resultado {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 100px;
-
-  .marcador {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: $text-dark;
-  }
-
-  .vs {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: $text-gray;
-  }
-}
-
-.partido-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.btn-action {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  background: $bg-light;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  color: $text-dark;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  svg {
-    color: $text-gray;
-  }
-
+// ==================== BADGES ====================
+span[class*="px-3"] {
+  transition: all 0.2s ease;
+  
   &:hover {
-    background: #EEEFF0;
-    border-color: $green-primary;
-    color: $green-primary;
+    transform: scale(1.05);
+  }
+}
 
-    svg {
-      color: $green-primary;
+// ==================== MODAL ====================
+.fixed.inset-0 {
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(4px);
+  
+  > div {
+    animation: scaleIn 0.3s ease-out;
+  }
+}
+
+// ==================== SCROLLBAR ====================
+.overflow-y-auto,
+.overflow-x-auto {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $bg-light;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $green-primary;
+    border-radius: 4px;
+    
+    &:hover {
+      background: $green-dark;
     }
   }
 }
 
-.empty-view {
-  text-align: center;
-  padding: 4rem 2rem;
-  background: $white;
-  border-radius: 12px;
+// ==================== LOADING ====================
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
 
-  svg {
-    color: #999999;
-    margin-bottom: 1.5rem;
+// ==================== STATS ====================
+.text-center {
+  animation: fadeIn 0.5s ease-out;
+  
+  .material-symbols-outlined {
+    animation: pulse 2s ease-in-out infinite;
   }
+}
 
-  h3 {
+// ==================== LINE CLAMP ====================
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+// ==================== FECHA SEPARATOR ====================
+.fecha-separator {
+  .flex-1 {
+    transition: background 0.3s;
+  }
+  
+  &:hover {
+    .flex-1 {
+      background: linear-gradient(to right, transparent, $green-primary, transparent);
+      height: 2px;
+    }
+  }
+}
+
+// ==================== MARCADORES ====================
+.marcador {
+  transition: all 0.3s;
+  
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// ==================== TABLA ====================
+table {
+  tbody tr {
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: rgba(46, 125, 50, 0.05);
+    }
+  }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 1024px) {
+  .partido-card {
+    .w-16 {
+      width: 3.5rem !important;
+      height: 3.5rem !important;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
     font-size: 1.5rem;
-    font-weight: 600;
-    color: $text-dark;
-    margin: 0 0 0.75rem;
   }
+  
+  .partido-card {
+    .w-16 {
+      width: 3rem !important;
+      height: 3rem !important;
+    }
+    
+    .text-2xl {
+      font-size: 1.25rem !important;
+    }
+  }
+}
 
-  p {
-    color: $text-gray;
-    margin: 0;
+@media (max-width: 640px) {
+  .partido-card {
+    .w-16 {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+    }
+    
+    .material-symbols-outlined {
+      font-size: 1.25rem !important;
+    }
+    
+    .w-12.h-12 {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+    }
   }
+}
+
+// ==================== DARK MODE ====================
+.dark {
+  .overflow-y-auto,
+  .overflow-x-auto {
+    &::-webkit-scrollbar-track {
+      background: $bg-dark;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #2a452b;
+      
+      &:hover {
+        background: #3d5e3e;
+      }
+    }
+  }
+  
+  .partido-card {
+    &:hover {
+      box-shadow: 0 12px 24px rgba(46, 125, 50, 0.25);
+    }
+  }
+  
+  table tbody tr:hover {
+    background-color: rgba(46, 125, 50, 0.1);
+  }
+}
+
+// ==================== ACCESIBILIDAD ====================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+*:focus-visible {
+  outline: 3px solid $green-primary;
+  outline-offset: 3px;
+  border-radius: 0.5rem;
+}
+
+// ==================== UTILITIES ====================
+.hover-lift {
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.hover-scale {
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// ==================== SELECTION ====================
+::selection {
+  background: rgba(46, 125, 50, 0.3);
+  color: #111;
+}
+
+::-moz-selection {
+  background: rgba(46, 125, 50, 0.3);
+  color: #111;
 }

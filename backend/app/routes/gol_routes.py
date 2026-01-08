@@ -1,4 +1,3 @@
-
 from flask import request
 from flask_restx import Namespace, fields, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -13,7 +12,7 @@ from datetime import datetime
 gol_ns = Namespace('goles', description='Gestión de goles en partidos de fútbol')
 
 # ============================================
-# MODELOS PARA DOCUMENTACIÓN SWAGGER
+# MODELOS SWAGGER
 # ============================================
 
 gol_input_model = gol_ns.model('GolInput', {
@@ -39,20 +38,16 @@ goleador_model = gol_ns.model('Goleador', {
     'posicion': fields.Integer(description='Posición en la tabla'),
     'id_jugador': fields.Integer(description='ID del jugador'),
     'nombre': fields.String(description='Nombre completo del jugador'),
+    'equipo': fields.String(description='Nombre del equipo'),
     'dorsal': fields.Integer(description='Número de dorsal'),
-    'goles': fields.Integer(description='Total de goles')
+    'goles': fields.Integer(description='Total de goles'),
+    'penales': fields.Integer(description='Total de penales'),
+    'tiros_libres': fields.Integer(description='Total de tiros libres')
 })
 
 message_response = gol_ns.model('MessageResponse', {
     'mensaje': fields.String(description='Mensaje de respuesta')
 })
-
-error_response = gol_ns.model('ErrorResponse', {
-    'error': fields.String(description='Mensaje de error'),
-    'mensaje': fields.String(description='Mensaje descriptivo adicional'),
-    'sugerencia': fields.String(description='Sugerencia adicional')
-})
-
 
 # ============================================
 # ENDPOINTS
@@ -60,17 +55,7 @@ error_response = gol_ns.model('ErrorResponse', {
 
 @gol_ns.route('')
 class GolList(Resource):
-    @gol_ns.doc(
-        description='Crear nuevo gol en un partido',
-        security='Bearer',
-        responses={
-            201: 'Gol creado exitosamente',
-            400: 'Datos inválidos o validaciones fallidas',
-            401: 'No autorizado',
-            403: 'Permisos insuficientes',
-            404: 'Partido o jugador no encontrado'
-        }
-    )
+    @gol_ns.doc(description='Crear nuevo gol en un partido', security='Bearer')
     @gol_ns.expect(gol_input_model, validate=True)
     @gol_ns.marshal_with(gol_output_model, code=201, envelope='gol')
     @jwt_required()
@@ -83,6 +68,10 @@ class GolList(Resource):
             partido = Partido.query.get(data['id_partido'])
             if not partido:
                 gol_ns.abort(404, error='Partido no encontrado')
+
+            # CRÍTICO: Verificar que el resultado NO esté registrado (inmutable)
+            if partido.resultado_registrado:
+                gol_ns.abort(400, error='No se pueden agregar goles a un partido con resultado registrado (inmutable)')
 
             # Buscar jugador por nombre
             nombre_completo = data['nombre_jugador'].strip()
@@ -118,7 +107,6 @@ class GolList(Resource):
 
             # Mapear string a Enum
             tipo_str = data.get('tipo', 'normal').lower()
-
             tipo_map = {
                 'normal': TipoGol.NORMAL,
                 'penal': TipoGol.PENAL,
@@ -127,11 +115,11 @@ class GolList(Resource):
             }
 
             if tipo_str not in tipo_map:
-                gol_ns.abort(400, error=f'Tipo no válido. Debe ser uno de: normal, penal, autogol, tiro_libre')
+                gol_ns.abort(400, error='Tipo no válido. Debe ser: normal, penal, autogol, tiro_libre')
 
             tipo_enum = tipo_map[tipo_str]
 
-            # Crear gol con ENUM
+            # Crear gol
             nuevo_gol = Gol(
                 id_partido=data['id_partido'],
                 id_jugador=jugador.id_jugador,
@@ -177,15 +165,14 @@ class GolList(Resource):
             gol_ns.abort(500, error=str(e))
 
     @gol_ns.doc(
-        description='Listar goles con filtros opcionales',
+        description='Listar goles con filtros',
         params={
             'id_partido': 'Filtrar por ID del partido',
             'id_jugador': 'Filtrar por ID del jugador',
-            'tipo': 'Filtrar por tipo de gol'
-        },
-        responses={
-            200: 'Lista de goles',
-            500: 'Error interno del servidor'
+            'id_equipo': 'Filtrar por ID del equipo',
+            'tipo': 'Filtrar por tipo de gol',
+            'ordenar_por': 'Ordenar por (minuto, fecha_creacion)',
+            'orden': 'Orden (asc, desc)'
         }
     )
     @gol_ns.marshal_list_with(gol_output_model, code=200, envelope='goles')
@@ -193,20 +180,29 @@ class GolList(Resource):
         try:
             id_partido = request.args.get('id_partido')
             id_jugador = request.args.get('id_jugador')
+            id_equipo = request.args.get('id_equipo')
             tipo = request.args.get('tipo')
+            ordenar_por = request.args.get('ordenar_por', 'minuto')
+            orden = request.args.get('orden', 'asc')
 
             query = Gol.query
 
             if id_partido:
                 query = query.filter_by(id_partido=int(id_partido))
-
             if id_jugador:
                 query = query.filter_by(id_jugador=int(id_jugador))
-
+            if id_equipo:
+                query = query.join(Jugador).filter(Jugador.id_equipo == int(id_equipo))
             if tipo:
                 query = query.filter_by(tipo=tipo)
 
-            goles = query.order_by(Gol.minuto.asc()).all()
+            # Ordenar
+            if ordenar_por == 'fecha_creacion':
+                query = query.order_by(Gol.fecha_registro.desc() if orden == 'desc' else Gol.fecha_registro.asc())
+            else:
+                query = query.order_by(Gol.minuto.desc() if orden == 'desc' else Gol.minuto.asc())
+
+            goles = query.all()
             return [g.to_dict() for g in goles], 200
 
         except Exception as e:
@@ -216,51 +212,36 @@ class GolList(Resource):
 @gol_ns.route('/<int:id_gol>')
 @gol_ns.param('id_gol', 'ID del gol')
 class GolDetail(Resource):
-    @gol_ns.doc(
-        description='Obtener detalles de un gol específico',
-        responses={
-            200: 'Gol encontrado',
-            404: 'Gol no encontrado',
-            500: 'Error interno del servidor'
-        }
-    )
+    @gol_ns.doc(description='Obtener detalles de un gol específico')
     @gol_ns.marshal_with(gol_output_model, code=200, envelope='gol')
     def get(self, id_gol):
         try:
             gol = Gol.query.get(id_gol)
-
             if not gol:
                 gol_ns.abort(404, error='Gol no encontrado')
-
             return gol.to_dict(), 200
-
         except Exception as e:
             gol_ns.abort(500, error=str(e))
 
-    @gol_ns.doc(
-        description='Eliminar un gol (solo admin)',
-        security='Bearer',
-        responses={
-            200: 'Gol eliminado exitosamente',
-            401: 'No autorizado',
-            403: 'Permisos insuficientes - solo admin',
-            404: 'Gol no encontrado',
-            500: 'Error interno del servidor'
-        }
-    )
+    @gol_ns.doc(description='Eliminar un gol (solo admin, solo si resultado NO registrado)', security='Bearer')
     @gol_ns.marshal_with(message_response, code=200)
     @jwt_required()
     @role_required(['admin'])
     def delete(self, id_gol):
         try:
             gol = Gol.query.get(id_gol)
-
             if not gol:
                 gol_ns.abort(404, error='Gol no encontrado')
 
             partido = Partido.query.get(gol.id_partido)
+            
+            # CRÍTICO: No se puede eliminar si el resultado está registrado
+            if partido.resultado_registrado:
+                gol_ns.abort(400, error='No se pueden eliminar goles de un partido con resultado registrado (inmutable)')
+
             jugador = Jugador.query.get(gol.id_jugador)
 
+            # Actualizar marcador
             if gol.tipo != TipoGol.AUTOGOL:
                 if jugador.id_equipo == partido.id_equipo_local:
                     partido.goles_local = max(0, partido.goles_local - 1)
@@ -289,10 +270,6 @@ class Goleadores(Resource):
         params={
             'id_campeonato': 'Filtrar por ID del campeonato',
             'limit': 'Número máximo de resultados (default: 10)'
-        },
-        responses={
-            200: 'Lista de goleadores',
-            500: 'Error interno del servidor'
         }
     )
     @gol_ns.marshal_list_with(goleador_model, code=200, envelope='goleadores')
@@ -306,9 +283,14 @@ class Goleadores(Resource):
                 Jugador.nombre,
                 Jugador.apellido,
                 Jugador.dorsal,
-                db.func.count(Gol.id_gol).label('total_goles')
+                Equipo.nombre.label('equipo_nombre'),
+                db.func.count(Gol.id_gol).label('total_goles'),
+                db.func.sum(db.case((Gol.tipo == TipoGol.PENAL, 1), else_=0)).label('penales'),
+                db.func.sum(db.case((Gol.tipo == TipoGol.TIRO_LIBRE, 1), else_=0)).label('tiros_libres')
             ).join(
                 Gol, Gol.id_jugador == Jugador.id_jugador
+            ).join(
+                Equipo, Equipo.id_equipo == Jugador.id_equipo
             ).filter(
                 Gol.tipo != TipoGol.AUTOGOL
             )
@@ -321,7 +303,7 @@ class Goleadores(Resource):
                 )
 
             goleadores = query.group_by(
-                Jugador.id_jugador
+                Jugador.id_jugador, Equipo.nombre
             ).order_by(
                 db.desc('total_goles')
             ).limit(int(limit)).all()
@@ -332,11 +314,37 @@ class Goleadores(Resource):
                     'posicion': pos,
                     'id_jugador': goleador.id_jugador,
                     'nombre': f"{goleador.nombre} {goleador.apellido}",
+                    'equipo': goleador.equipo_nombre,
                     'dorsal': goleador.dorsal,
-                    'goles': goleador.total_goles
+                    'goles': goleador.total_goles,
+                    'penales': goleador.penales or 0,
+                    'tiros_libres': goleador.tiros_libres or 0
                 })
 
             return resultado, 200
+
+        except Exception as e:
+            gol_ns.abort(500, error=str(e))
+
+
+@gol_ns.route('/partido/<int:id_partido>')
+@gol_ns.param('id_partido', 'ID del partido')
+class GolesPorPartido(Resource):
+    @gol_ns.doc(description='Obtener todos los goles de un partido específico')
+    def get(self, id_partido):
+        try:
+            partido = Partido.query.get(id_partido)
+            if not partido:
+                gol_ns.abort(404, error='Partido no encontrado')
+
+            goles = Gol.query.filter_by(id_partido=id_partido).order_by(Gol.minuto.asc()).all()
+
+            return {
+                'partido': f"{partido.equipo_local.nombre} vs {partido.equipo_visitante.nombre}",
+                'marcador': f"{partido.goles_local} - {partido.goles_visitante}",
+                'total_goles': len(goles),
+                'goles': [g.to_dict() for g in goles]
+            }, 200
 
         except Exception as e:
             gol_ns.abort(500, error=str(e))

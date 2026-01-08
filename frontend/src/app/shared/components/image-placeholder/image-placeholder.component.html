@@ -1,0 +1,27 @@
+<div 
+  class="image-placeholder" 
+  [class]="'image-placeholder--' + size + ' image-placeholder--' + type"
+  [attr.aria-label]="alt">
+  
+  @if (src && !imageError) {
+    <img
+      [src]="src"
+      [alt]="alt"
+      (error)="onImageError()"
+      class="image-placeholder__img"
+      loading="lazy">
+  } @else {
+    <div class="image-placeholder__fallback">
+      @if (type === 'avatar' || type === 'player') {
+        <span class="image-placeholder__text" [attr.aria-label]="alt">
+          {{ getPlaceholderText() }}
+        </span>
+      } @else {
+        <span class="material-symbols-outlined image-placeholder__icon" aria-hidden="true">
+          {{ getPlaceholderIcon() }}
+        </span>
+      }
+    </div>
+  }
+</div>
+

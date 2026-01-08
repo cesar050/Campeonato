@@ -1,0 +1,278 @@
+<div class="mis-equipos-container">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="material-symbols-outlined">shield</span>
+        Mis Equipos
+      </h1>
+      <p class="page-subtitle">Gestiona todos tus equipos y sus inscripciones</p>
+    </div>
+    <button 
+      (click)="abrirModal()"
+      class="btn-primary btn-create">
+      <span class="material-symbols-outlined">add</span>
+      Crear Equipo
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando equipos...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="errorMessage() && !loading()" class="error-state">
+    <span class="material-symbols-outlined">error</span>
+    <p>{{ errorMessage() }}</p>
+    <button class="btn-retry" (click)="cargarEquipos()">Reintentar</button>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="!loading() && !errorMessage() && equipos().length === 0" class="empty-state">
+    <div class="empty-icon">
+      <span class="material-symbols-outlined">shield</span>
+    </div>
+    <h2>No tienes equipos registrados</h2>
+    <p>Crea tu primer equipo para empezar a gestionar jugadores y participar en campeonatos</p>
+    <div class="empty-actions">
+      <button 
+        (click)="abrirModal()"
+        class="btn-primary">
+        <span class="material-symbols-outlined">add</span>
+        Crear Equipo
+      </button>
+      <button 
+        [routerLink]="['/lider-equipo/campeonatos-disponibles']"
+        class="btn-secondary">
+        <span class="material-symbols-outlined">search</span>
+        Buscar Campeonatos
+      </button>
+    </div>
+  </div>
+
+  <!-- EQUIPOS GRID -->
+  <div *ngIf="!loading() && equipos().length > 0" class="equipos-grid">
+    <div *ngFor="let equipo of equipos()" class="equipo-card">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="equipo-logo">
+          <img 
+            *ngIf="equipo.logo_url" 
+            [src]="equipo.logo_url" 
+            [alt]="'Logo de ' + equipo.nombre">
+          <span *ngIf="!equipo.logo_url" class="material-symbols-outlined">shield</span>
+        </div>
+        <span class="estado-badge" [class]="getEstadoBadgeClass(equipo.estado)">
+          {{ getEstadoTexto(equipo.estado) }}
+        </span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+        <h3 class="equipo-nombre">{{ equipo.nombre }}</h3>
+        
+        <div class="equipo-info">
+          <div class="info-item">
+            <span class="material-symbols-outlined">stadium</span>
+            <span>{{ equipo.estadio || 'Sin estadio' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="material-symbols-outlined">sports</span>
+            <span>{{ getTipoDeporteTexto(equipo.tipo_deporte) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="material-symbols-outlined">group</span>
+            <span>{{ equipo.total_jugadores || 0 }} / {{ equipo.max_jugadores }} jugadores</span>
+          </div>
+        </div>
+
+        <!-- Campeonatos -->
+        <div class="campeonatos-section" *ngIf="equipo.campeonatos && equipo.campeonatos.length > 0">
+          <h4 class="section-title">Campeonatos</h4>
+          <div class="campeonatos-list">
+            <div 
+              *ngFor="let camp of equipo.campeonatos" 
+              class="campeonato-item"
+              [class]="'estado-' + camp.estado_inscripcion">
+              <span class="campeonato-nombre">{{ camp.nombre_campeonato }}</span>
+              <span class="campeonato-estado">{{ getEstadoTexto(camp.estado_inscripcion) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!equipo.campeonatos || equipo.campeonatos.length === 0" class="no-campeonatos">
+          <span class="material-symbols-outlined">info</span>
+          <span>No inscrito en campeonatos</span>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <button 
+          [routerLink]="['/lider-equipo/jugadores']" 
+          [queryParams]="{equipo: equipo.id_equipo}"
+          class="btn-action btn-secondary">
+          <span class="material-symbols-outlined">group</span>
+          <span>Jugadores</span>
+        </button>
+        <button 
+          [routerLink]="['/lider-equipo/campeonatos-disponibles']"
+          class="btn-action btn-primary">
+          <span class="material-symbols-outlined">search</span>
+          <span>Campeonatos</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL CREAR EQUIPO -->
+<!-- ============================================ -->
+<div *ngIf="showModal()" class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <span class="material-symbols-outlined">shield</span>
+        Crear Nuevo Equipo
+      </h3>
+      <button class="btn-close" (click)="cerrarModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form [formGroup]="equipoForm" (ngSubmit)="crearEquipo()" class="modal-body">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-symbols-outlined">shield</span>
+          Nombre del Equipo *
+        </label>
+        <input 
+          type="text" 
+          formControlName="nombre"
+          class="form-control"
+          placeholder="Ej: Los Tigres FC"
+          [class.is-invalid]="equipoForm.get('nombre')?.invalid && equipoForm.get('nombre')?.touched">
+        <div class="invalid-feedback" *ngIf="equipoForm.get('nombre')?.invalid && equipoForm.get('nombre')?.touched">
+          El nombre debe tener al menos 3 caracteres
+        </div>
+      </div>
+
+      <!-- Estadio -->
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-symbols-outlined">stadium</span>
+          Estadio / Cancha *
+        </label>
+        <input 
+          type="text" 
+          formControlName="estadio"
+          class="form-control"
+          placeholder="Ej: Estadio Municipal"
+          [class.is-invalid]="equipoForm.get('estadio')?.invalid && equipoForm.get('estadio')?.touched">
+        <div class="invalid-feedback" *ngIf="equipoForm.get('estadio')?.invalid && equipoForm.get('estadio')?.touched">
+          El estadio es requerido
+        </div>
+      </div>
+
+      <!-- Tipo de Deporte -->
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-symbols-outlined">sports</span>
+          Tipo de Deporte *
+        </label>
+        <select 
+          formControlName="tipo_deporte"
+          class="form-control">
+          <option value="indoor">Indoor / Fútbol 5 (Máx. 12 jugadores)</option>
+          <option value="futbol">Fútbol 11 (Máx. 22 jugadores)</option>
+        </select>
+        <div class="form-hint">
+          <span class="material-symbols-outlined">info</span>
+          El número máximo de jugadores se asignará automáticamente
+        </div>
+      </div>
+
+      <!-- Logo del Equipo -->
+      <div class="form-group">
+        <label class="form-label">
+          <span class="material-symbols-outlined">image</span>
+          Logo del Equipo (Opcional)
+        </label>
+        
+        <!-- Preview del logo -->
+        <div *ngIf="logoPreview" class="logo-preview">
+          <img [src]="logoPreview" alt="Preview del logo">
+          <button 
+            type="button" 
+            class="btn-remove-preview"
+            (click)="removeLogoPreview()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Input de archivo -->
+        <div class="file-input-wrapper">
+          <input 
+            type="file" 
+            id="logo-input"
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none;">
+          
+          <label 
+            for="logo-input" 
+            class="file-input-label"
+            *ngIf="!logoPreview">
+            <span class="material-symbols-outlined">upload</span>
+            <span>Seleccionar imagen</span>
+          </label>
+        </div>
+
+        <div class="form-hint">
+          <span class="material-symbols-outlined">info</span>
+          Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="modal-footer">
+        <button 
+          type="button"
+          (click)="cerrarModal()"
+          class="btn-secondary">
+          <span class="material-symbols-outlined">close</span>
+          Cancelar
+        </button>
+        <button 
+          type="submit"
+          [disabled]="equipoForm.invalid"
+          class="btn-primary">
+          <span class="material-symbols-outlined">check</span>
+          Crear Equipo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirmación: crear equipo sin logo -->
+<app-confirm-dialog
+  [show]="showConfirmCrearSinLogo()"
+  title="Crear equipo sin logo"
+  message="No se pudo subir el logo. ¿Deseas crear el equipo sin logo?"
+  type="warning"
+  (confirm)="confirmCrearSinLogo($event.confirmed)">
+</app-confirm-dialog>
+
+<!-- Toast -->
+<app-toast
+  [show]="showToast()"
+  [type]="toastType()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  (close)="showToast.set(false)">
+</app-toast>

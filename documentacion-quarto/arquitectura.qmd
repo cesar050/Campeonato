@@ -1,0 +1,46 @@
+---
+title: "Arquitectura del sistema"
+format: html
+---
+
+## Arquitectura general
+
+El sistema sigue una arquitectura cliente-servidor con separación clara entre frontend y backend. El backend es una aplicación monolítica en Python que expone una API REST (Flask + Flask-RESTx). El frontend es una aplicación Angular que consume dicha API.
+
+Componentes principales identificados en el repositorio:
+
+- Backend (ruta: `backend/`):
+  - Flask + Flask-RESTx para rutas y documentación Swagger.
+  - SQLAlchemy para persistencia (modelos definidos en `backend/app/models`).
+  - JWT para autenticación y control de sesiones.
+  - Blueprints y namespaces para organizar endpoints (por ejemplo `partido_routes.py`, `gol_routes.py`, `eventos_routes.py`, `alineaciones_proxy_routes.py`).
+  - Servicio de correo configurado (variables en entorno) y manejo de archivos subidos (`/uploads`).
+
+- Frontend (ruta: `frontend/`):
+  - Proyecto Angular (package.json revela dependencias como `@angular/material`, `@angular/cdk`).
+
+- Microservicio de alineaciones: El backend actúa como proxy hacia un microservicio externo (constante `MICROSERVICIO_URL = "http://localhost:5001"` en `alineaciones_proxy_routes.py`). Este microservicio no forma parte del repositorio y por tanto debe proveerse externamente si se desea la funcionalidad completa de alineaciones.
+
+## Separación frontend / backend
+
+La UI (Angular) se comunica con la API REST del backend (Flask). El backend valida permisos y reglas de negocio, y además actúa como intermediario (proxy) hacia un servicio especializado en alineaciones. Las rutas del backend están agrupadas por dominio (auth, equipos, jugadores, partidos, goles, tarjetas, notificaciones, upload, etc.).
+
+## Flujo de datos (alto nivel)
+
+1. El usuario (cliente Angular) realiza una llamada HTTP al backend (por ejemplo, crear partido o registrar un gol).
+2. El backend valida autenticación (JWT) y autorización (roles) y aplica reglas de negocio.
+3. Las operaciones de escritura se traducen en transacciones SQLAlchemy persistidas en la base de datos.
+4. Para alineaciones, el backend delega a un microservicio (proxy HTTP). Para archivos, el backend sirve contenidos desde `/uploads`.
+
+## Tecnologías utilizadas (evidencia en el repositorio)
+
+- Python 3.x, Flask, Flask-RESTx, Flask-JWT-Extended, SQLAlchemy, Flask-Migrate.
+- Angular (v21 aproximada), Angular Material, ngx-daterangepicker-material.
+- Dependencias documentadas: `requirements.txt` en `backend/` y `package.json` en `frontend/`.
+
+## Estructura del proyecto (resumen relevante)
+
+- `backend/` — código servidor, modelos en `backend/app/models`, rutas en `backend/app/routes`. Punto de arranque: `backend/run.py`.
+- `frontend/` — aplicación Angular con `package.json` y código en `src/`.
+- `database/` — backups SQL incluidos.
+- `uploads/` — directorios preparados para documentos, fotos y logos que el backend sirve.

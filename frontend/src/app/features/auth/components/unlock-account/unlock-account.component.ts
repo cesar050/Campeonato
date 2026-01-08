@@ -8,7 +8,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-unlock-account',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './unlock-account.component.html',
   styleUrls: ['./unlock-account.component.scss']
 })

@@ -1,0 +1,411 @@
+<div class="min-h-screen bg-gray-50 dark:bg-[#102211]">
+  
+  <!-- HEADER -->
+  <div class="bg-white dark:bg-[#182c19] border-b-2 border-gray-200 dark:border-[#2a452b] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      
+      <!-- Título -->
+      <div class="mb-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E7D32]">sports_soccer</span>
+          Partidos
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">Calendario y resultados de tus partidos</p>
+      </div>
+
+      <!-- Selector de Campeonato + Vista Toggle -->
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <!-- Selector campeonato -->
+        <div class="flex-1 max-w-md">
+          <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <span class="material-symbols-outlined text-[#2E7D32] align-middle">emoji_events</span>
+            Campeonato:
+          </label>
+          <select 
+            *ngIf="campeonatosDisponibles().length > 0"
+            [(ngModel)]="campeonatoSeleccionado" 
+            (change)="cambiarCampeonato()"
+            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-left hover:border-[#2E7D32] transition-all font-semibold text-gray-900 dark:text-white">
+            <option [value]="null" disabled>Selecciona un campeonato</option>
+            <option 
+              *ngFor="let camp of campeonatosDisponibles()" 
+              [ngValue]="camp">
+              {{ camp.nombre_campeonato }} ({{ camp.nombre_equipo }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Vista Toggle -->
+        <div class="flex bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+          <button 
+            (click)="cambiarVista('lista')"
+            [class]="vistaActual() === 'lista' 
+              ? 'px-6 py-2 rounded-lg bg-white dark:bg-gray-700 text-[#2E7D32] font-bold shadow-md' 
+              : 'px-6 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-[#2E7D32]'"
+            class="transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl">view_list</span>
+            <span>Lista</span>
+          </button>
+          <button 
+            (click)="cambiarVista('calendario')"
+            [class]="vistaActual() === 'calendario' 
+              ? 'px-6 py-2 rounded-lg bg-white dark:bg-gray-700 text-[#2E7D32] font-bold shadow-md' 
+              : 'px-6 py-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-[#2E7D32]'"
+            class="transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl">calendar_month</span>
+            <span>Calendario</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    
+    <!-- ESTADÍSTICAS -->
+    <div *ngIf="!loading() && campeonatoSeleccionado()" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Total Partidos</p>
+          <span class="material-symbols-outlined text-[#2E7D32] text-2xl">sports_soccer</span>
+        </div>
+        <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ estadisticas().total }}</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Programados</p>
+          <span class="material-symbols-outlined text-blue-500 text-2xl">schedule</span>
+        </div>
+        <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ estadisticas().programados }}</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Victorias</p>
+          <span class="material-symbols-outlined text-green-500 text-2xl">emoji_events</span>
+        </div>
+        <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ estadisticas().ganados }}</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Empates</p>
+          <span class="material-symbols-outlined text-yellow-500 text-2xl">handshake</span>
+        </div>
+        <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ estadisticas().empatados }}</p>
+      </div>
+
+      <div class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 hover:shadow-md transition-all">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">Derrotas</p>
+          <span class="material-symbols-outlined text-red-500 text-2xl">cancel</span>
+        </div>
+        <p class="text-4xl font-bold text-gray-900 dark:text-white">{{ estadisticas().perdidos }}</p>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center">
+        <div class="inline-block w-16 h-16 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-600 dark:text-gray-400 font-medium">Cargando partidos...</p>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE - SIN CAMPEONATOS -->
+    <div *ngIf="!loading() && campeonatosDisponibles().length === 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-12 text-center">
+      <span class="material-symbols-outlined text-8xl text-gray-300 dark:text-gray-600 mb-4">emoji_events</span>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No estás inscrito en ningún campeonato</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">Primero debes inscribir un equipo en un campeonato</p>
+      <button 
+        [routerLink]="['/lider-equipo/campeonatos-disponibles']"
+        class="px-8 py-4 rounded-xl bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] transition-all shadow-lg inline-flex items-center gap-2">
+        <span class="material-symbols-outlined">search</span>
+        Buscar Campeonatos
+      </button>
+    </div>
+
+    <!-- VISTA LISTA -->
+    <div *ngIf="!loading() && vistaActual() === 'lista' && campeonatoSeleccionado()">
+      
+      <!-- Sin partidos -->
+      <div *ngIf="todosLosPartidos().length === 0" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-12 text-center">
+        <span class="material-symbols-outlined text-8xl text-gray-300 dark:text-gray-600 mb-4">calendar_month</span>
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Calendario de Partidos</h3>
+        <p class="text-gray-600 dark:text-gray-400">Aún no hay partidos programados</p>
+      </div>
+
+      <!-- Con partidos -->
+      <div *ngIf="todosLosPartidos().length > 0 && fechaActual() !== null" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 sm:p-8">
+        
+        <!-- Header con navegación -->
+        <div class="bg-gradient-to-r from-white to-gray-50/50 dark:from-[#182c19] dark:to-[#1a2f1b] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-xl p-6 mb-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            
+            <!-- Título -->
+            <div class="flex-1">
+              <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#2E7D32]">calendar_month</span>
+                Calendario de Partidos
+              </h3>
+              <div class="flex flex-wrap items-center gap-3 text-sm">
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-base">sports_soccer</span>
+                  <span class="text-gray-700 dark:text-gray-300 font-semibold">
+                    <strong class="text-blue-600 dark:text-blue-400">{{ todosLosPartidos().length }}</strong> partidos totales
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-base">check_circle</span>
+                  <span class="text-gray-700 dark:text-gray-300 font-semibold">
+                    <strong class="text-green-600 dark:text-green-400">{{ estadisticas().finalizados }}</strong> finalizados
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selector de fecha y navegación -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <!-- Selector de fecha mejorado -->
+              <div class="relative flex-1 sm:flex-initial sm:min-w-[280px]">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-[#2E7D32] dark:text-green-400 text-xl pointer-events-none z-10">calendar_today</span>
+                <select 
+                  [value]="fechaActual()!"
+                  (change)="seleccionarFecha($any($event.target).value)"
+                  class="w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#182c19] text-gray-900 dark:text-white font-bold appearance-none cursor-pointer hover:border-[#2E7D32] dark:hover:border-green-500 focus:outline-none focus:border-[#2E7D32] dark:focus:border-green-500 focus:ring-4 focus:ring-[#2E7D32]/20 dark:focus:ring-green-500/20 transition-all shadow-sm hover:shadow-md">
+                  <option *ngFor="let fecha of fechasDisponibles()" [value]="fecha">
+                    {{ formatearFechaCorta(fecha) }}
+                  </option>
+                </select>
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 dark:text-gray-400 pointer-events-none text-xl">
+                  expand_more
+                </span>
+              </div>
+
+              <!-- Botones navegación mejorados -->
+              <div class="flex items-center gap-2.5">
+                <button 
+                  (click)="irAFechaAnterior()"
+                  [disabled]="fechasDisponibles().indexOf(fechaActual()!) === 0"
+                  [class]="fechasDisponibles().indexOf(fechaActual()!) === 0
+                    ? 'w-12 h-12 flex items-center justify-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'w-12 h-12 flex items-center justify-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#182c19] text-gray-700 dark:text-gray-300 hover:border-[#2E7D32] dark:hover:border-green-500 hover:bg-[#2E7D32] dark:hover:bg-green-600 hover:text-white transition-all shadow-sm hover:shadow-lg hover:scale-105 active:scale-95'"
+                  aria-label="Fecha anterior">
+                  <span class="material-symbols-outlined text-xl">chevron_left</span>
+                </button>
+                <button 
+                  (click)="irAFechaSiguiente()"
+                  [disabled]="fechasDisponibles().indexOf(fechaActual()!) === fechasDisponibles().length - 1"
+                  [class]="fechasDisponibles().indexOf(fechaActual()!) === fechasDisponibles().length - 1
+                    ? 'w-12 h-12 flex items-center justify-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                    : 'w-12 h-12 flex items-center justify-center rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-[#182c19] text-gray-700 dark:text-gray-300 hover:border-[#2E7D32] dark:hover:border-green-500 hover:bg-[#2E7D32] dark:hover:bg-green-600 hover:text-white transition-all shadow-sm hover:shadow-lg hover:scale-105 active:scale-95'"
+                  aria-label="Fecha siguiente">
+                  <span class="material-symbols-outlined text-xl">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fecha seleccionada mejorada -->
+          <div class="mt-6 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#2E7D32]/10 to-green-50/50 dark:from-[#2E7D32]/20 dark:to-green-900/10 rounded-xl border border-[#2E7D32]/20 dark:border-green-500/30">
+                <span class="material-symbols-outlined text-[#2E7D32] dark:text-green-400 text-xl">event</span>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <span class="font-bold text-gray-900 dark:text-white text-base">{{ formatearFechaCorta(fechaActual()!) }}</span>
+                  <span class="hidden sm:inline text-gray-400 dark:text-gray-500">•</span>
+                  <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    {{ partidosFechaActual().length }} partido{{ partidosFechaActual().length !== 1 ? 's' : '' }}
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <span class="text-xs font-bold text-gray-600 dark:text-gray-400">
+                  {{ fechasDisponibles().indexOf(fechaActual()!) + 1 }} / {{ fechasDisponibles().length }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="flex items-center gap-2 mb-6">
+          <button 
+            (click)="estadoFilter.set(''); aplicarFiltros();"
+            [class]="estadoFilter() === '' 
+              ? 'px-4 py-2 rounded-lg bg-[#2E7D32] text-white font-semibold' 
+              : 'px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-[#2E7D32]'">
+            Todos
+          </button>
+          <button 
+            (click)="estadoFilter.set('programado'); aplicarFiltros();"
+            [class]="estadoFilter() === 'programado' 
+              ? 'px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold' 
+              : 'px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-600'">
+            Por jugar
+          </button>
+          <button 
+            (click)="estadoFilter.set('finalizado'); aplicarFiltros();"
+            [class]="estadoFilter() === 'finalizado' 
+              ? 'px-4 py-2 rounded-lg bg-green-600 text-white font-semibold' 
+              : 'px-4 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-green-600'">
+            Finalizados
+          </button>
+        </div>
+
+        <!-- Grid de partidos (2 columnas como organizador) -->
+        <div *ngIf="partidosFechaActual().length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div 
+            *ngFor="let partido of partidosFechaActual()"
+            (click)="verDetallePartido(partido.id_partido)"
+            class="partido-card group relative bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-[#2E7D32] hover:shadow-lg transition-all cursor-pointer overflow-hidden"
+            [class.victoria-border]="getResultadoClase(partido) === 'victoria'"
+            [class.derrota-border]="getResultadoClase(partido) === 'derrota'"
+            [class.empate-border]="getResultadoClase(partido) === 'empate'">
+            
+            <!-- Estado badge -->
+            <div class="absolute top-3 right-3 z-10">
+              <span [class]="getEstadoPartidoClasses(partido.estado)">
+                {{ getEstadoPartidoLabel(partido.estado) }}
+              </span>
+            </div>
+
+            <!-- Contenido -->
+            <div class="p-6">
+              <!-- Hora -->
+              <div class="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
+                <span class="material-symbols-outlined text-lg">schedule</span>
+                <span class="font-semibold">{{ formatearHora(partido.fecha_partido) }}</span>
+              </div>
+
+              <!-- Equipos VS -->
+              <div class="flex items-center justify-between gap-4">
+                <!-- Equipo Local -->
+                <div class="flex-1 flex flex-col items-center text-center">
+                  <app-image-placeholder
+                    [src]="obtenerLogoEquipo(partido.id_equipo_local)"
+                    [type]="'team'"
+                    [size]="'lg'"
+                    [alt]="'Logo de ' + partido.equipo_local"
+                    class="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700 flex-shrink-0 mb-2">
+                  </app-image-placeholder>
+                  <p class="font-bold text-gray-900 dark:text-white line-clamp-2" 
+                     [class.text-[#2E7D32]]="partido.es_local">
+                    {{ partido.equipo_local }}
+                  </p>
+                  <span *ngIf="partido.es_local" class="mt-1 px-2 py-0.5 rounded-full bg-[#2E7D32] text-white text-xs font-bold">
+                    TU EQUIPO
+                  </span>
+                  
+                  <!-- Marcador -->
+                  <div *ngIf="partido.estado === 'finalizado'" 
+                       class="mt-2 w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <span class="text-2xl font-bold text-gray-900 dark:text-white">
+                      {{ partido.goles_local }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- VS -->
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400">VS</span>
+                  </div>
+                </div>
+
+                <!-- Equipo Visitante -->
+                <div class="flex-1 flex flex-col items-center text-center">
+                  <app-image-placeholder
+                    [src]="obtenerLogoEquipo(partido.id_equipo_visitante)"
+                    [type]="'team'"
+                    [size]="'lg'"
+                    [alt]="'Logo de ' + partido.equipo_visitante"
+                    class="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700 flex-shrink-0 mb-2">
+                  </app-image-placeholder>
+                  <p class="font-bold text-gray-900 dark:text-white line-clamp-2"
+                     [class.text-[#2E7D32]]="!partido.es_local">
+                    {{ partido.equipo_visitante }}
+                  </p>
+                  <span *ngIf="!partido.es_local" class="mt-1 px-2 py-0.5 rounded-full bg-[#2E7D32] text-white text-xs font-bold">
+                    TU EQUIPO
+                  </span>
+                  
+                  <!-- Marcador -->
+                  <div *ngIf="partido.estado === 'finalizado'" 
+                       class="mt-2 w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <span class="text-2xl font-bold text-gray-900 dark:text-white">
+                      {{ partido.goles_visitante }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer con lugar -->
+              <div *ngIf="partido.lugar" class="mt-4 pt-4 border-t-2 border-gray-100 dark:border-gray-700 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <span class="material-symbols-outlined text-lg">stadium</span>
+                <span>{{ partido.lugar }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sin partidos en fecha -->
+        <div *ngIf="partidosFechaActual().length === 0" class="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700">
+          <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">sports_soccer</span>
+          <p class="text-lg font-semibold text-gray-600 dark:text-gray-400">
+            No hay partidos en esta fecha con el filtro seleccionado
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA CALENDARIO -->
+    <div *ngIf="!loading() && vistaActual() === 'calendario' && campeonatoSeleccionado()" class="bg-white dark:bg-[#182c19] rounded-2xl border-2 border-gray-200 dark:border-[#2a452b] shadow-sm p-6 sm:p-8">
+      <!-- Navegación del calendario -->
+      <div class="flex items-center justify-between mb-6">
+        <button (click)="mesAnterior()" class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-[#2E7D32] hover:bg-[#2E7D32] hover:text-white transition-all">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white capitalize">{{ getNombreMes() }}</h2>
+        <button (click)="mesSiguiente()" class="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center hover:border-[#2E7D32] hover:bg-[#2E7D32] hover:text-white transition-all">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+
+      <!-- Días de la semana -->
+      <div class="grid grid-cols-7 gap-2 mb-2">
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Dom</div>
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Lun</div>
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Mar</div>
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Mié</div>
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Jue</div>
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Vie</div>
+        <div class="text-center font-bold text-sm text-gray-600 dark:text-gray-400 py-2">Sáb</div>
+      </div>
+
+      <!-- Grid calendario -->
+      <div class="grid grid-cols-7 gap-2">
+        <div *ngFor="let dia of getDiasDelMes()" 
+             [class.opacity-0]="dia.getTime() === 0"
+             [class.border-[#2E7D32]]="esHoy(dia)"
+             [class.bg-green-50]="esHoy(dia)"
+             class="min-h-[100px] border-2 border-gray-200 dark:border-gray-700 rounded-lg p-2">
+          <div *ngIf="dia.getTime() !== 0" class="text-sm font-bold mb-1" [class.text-[#2E7D32]]="esHoy(dia)">
+            {{ dia.getDate() }}
+          </div>
+          <div *ngFor="let partido of getPartidosDelDia(dia)" 
+               class="text-xs p-1 rounded mb-1 cursor-pointer hover:opacity-80"
+               [class.bg-green-100]="getResultadoClase(partido) === 'victoria'"
+               [class.bg-red-100]="getResultadoClase(partido) === 'derrota'"
+               [class.bg-yellow-100]="getResultadoClase(partido) === 'empate'"
+               [class.bg-blue-100]="partido.estado === 'programado'"
+               (click)="verDetallePartido(partido.id_partido)">
+            {{ formatearHora(partido.fecha_partido) }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

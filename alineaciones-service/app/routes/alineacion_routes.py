@@ -20,22 +20,30 @@ alineacion_input_model = alineacion_ns.model('AlineacionInput', {
     'minuto_salida': fields.Integer(description='Minuto de salida')
 })
 
-jugador_nombre_model = alineacion_ns.model('JugadorNombre', {
-    'nombre': fields.String(description='Nombre del jugador')
+# NUEVO: Modelo con posiciones para drag & drop
+jugador_posicion_model = alineacion_ns.model('JugadorPosicion', {
+    'id_jugador': fields.Integer(description='ID del jugador (preferido)'),
+    'nombre': fields.String(description='Nombre del jugador (alternativo)'),
+    'posicion_x': fields.Float(description='Posición X en cancha (0-100)'),
+    'posicion_y': fields.Float(description='Posición Y en cancha (0-100)')
 })
 
 alineacion_definir_model = alineacion_ns.model('AlineacionDefinir', {
     'id_partido': fields.Integer(required=True, description='ID del partido'),
     'id_equipo': fields.Integer(required=True, description='ID del equipo'),
-    'titulares': fields.List(fields.Nested(jugador_nombre_model), required=True, description='Lista de titulares'),
-    'suplentes': fields.List(fields.Nested(jugador_nombre_model), description='Lista de suplentes')
+    'formacion': fields.String(description='Formación (4-4-2, 4-3-3, 1-2-1, etc)'),
+    'titulares': fields.List(fields.Nested(jugador_posicion_model), description='Lista de titulares con posiciones'),
+    'suplentes': fields.List(fields.Nested(jugador_posicion_model), description='Lista de suplentes'),
+    'jugadores': fields.List(fields.Nested(jugador_posicion_model), description='Lista de jugadores (alternativo, incluye titulares y suplentes)')
 })
 
 cambio_model = alineacion_ns.model('Cambio', {
     'id_partido': fields.Integer(required=True, description='ID del partido'),
     'id_equipo': fields.Integer(required=True, description='ID del equipo'),
-    'sale': fields.String(required=True, description='Nombre del jugador que sale'),
-    'entra': fields.String(required=True, description='Nombre del jugador que entra'),
+    'id_jugador_sale': fields.Integer(description='ID del jugador que sale (preferido)'),
+    'id_jugador_entra': fields.Integer(description='ID del jugador que entra (preferido)'),
+    'sale': fields.String(description='Nombre del jugador que sale (alternativo)'),
+    'entra': fields.String(description='Nombre del jugador que entra (alternativo)'),
     'minuto': fields.Integer(required=True, description='Minuto del cambio')
 })
 
@@ -58,6 +66,9 @@ alineacion_output_model = alineacion_ns.model('AlineacionOutput', {
     'titular': fields.Boolean(description='Si es titular'),
     'minuto_entrada': fields.Integer(description='Minuto de entrada'),
     'minuto_salida': fields.Integer(description='Minuto de salida'),
+    'posicion_x': fields.Float(description='Posición X en cancha (0-100)'),
+    'posicion_y': fields.Float(description='Posición Y en cancha (0-100)'),
+    'formacion': fields.String(description='Formación del equipo'),
     'jugador_nombre': fields.String(description='Nombre completo del jugador'),
     'dorsal': fields.Integer(description='Número de dorsal'),
     'posicion': fields.String(description='Posición del jugador'),
@@ -98,22 +109,17 @@ class AlineacionList(Resource):
         try:
             data = alineacion_ns.payload
 
-            # Cliente para consultar backend principal
             api_client = BackendAPIClient()
 
-            # Validar que el partido existe
             partido = api_client.get_partido(data['id_partido'])
             if not partido:
                 alineacion_ns.abort(404, error='Partido no encontrado')
 
-            # Validar que el equipo participa en el partido
             if not api_client.validar_equipo_en_partido(data['id_equipo'], data['id_partido']):
                 alineacion_ns.abort(400, error='El equipo no participa en este partido')
 
-            # Buscar jugador por nombre
             nombre_jugador = data['nombre_jugador'].strip()
 
-            # Obtener todos los jugadores del equipo
             try:
                 import requests
                 response = requests.get(
@@ -123,7 +129,6 @@ class AlineacionList(Resource):
                 if response.status_code == 200:
                     jugadores = response.json().get('jugadores', [])
 
-                    # Buscar por nombre completo
                     jugador = None
                     for j in jugadores:
                         nombre_completo = f"{j['nombre']} {j['apellido']}"
@@ -140,7 +145,6 @@ class AlineacionList(Resource):
             except Exception as e:
                 alineacion_ns.abort(500, error=f'Error al buscar jugador: {str(e)}')
 
-            # Validar que el jugador no esté ya en la alineación
             alineacion_existente = Alineacion.query.filter_by(
                 id_partido=data['id_partido'],
                 id_jugador=id_jugador
@@ -149,7 +153,6 @@ class AlineacionList(Resource):
             if alineacion_existente:
                 alineacion_ns.abort(400, error=f'{nombre_jugador} ya está en la alineación')
 
-            # Crear alineación
             nueva_alineacion = Alineacion(
                 id_partido=data['id_partido'],
                 id_equipo=data['id_equipo'],
@@ -162,7 +165,6 @@ class AlineacionList(Resource):
             db.session.add(nueva_alineacion)
             db.session.commit()
 
-            # Enriquecer respuesta
             response = nueva_alineacion.to_dict()
             response['jugador_nombre'] = f"{jugador['nombre']} {jugador['apellido']}"
             response['dorsal'] = jugador['dorsal']
@@ -207,21 +209,18 @@ class AlineacionList(Resource):
 
             alineaciones = query.all()
 
-            # Enriquecer con datos del backend principal
             api_client = BackendAPIClient()
             resultado = []
 
             for alineacion in alineaciones:
                 data = alineacion.to_dict()
 
-                # Obtener datos del jugador
                 jugador = api_client.get_jugador(alineacion.id_jugador)
                 if jugador:
                     data['jugador_nombre'] = f"{jugador.get('nombre')} {jugador.get('apellido')}"
                     data['dorsal'] = jugador.get('dorsal')
                     data['posicion'] = jugador.get('posicion')
 
-                # Obtener datos del equipo
                 equipo = api_client.get_equipo(alineacion.id_equipo)
                 if equipo:
                     data['equipo_nombre'] = equipo.get('nombre')
@@ -268,12 +267,12 @@ class AlineacionDetail(Resource):
 
 
 # ============================================
-# NUEVO: DEFINIR ALINEACIÓN COMPLETA
+# DEFINIR ALINEACIÓN COMPLETA CON DRAG & DROP
 # ============================================
 @alineacion_ns.route('/definir-alineacion')
 class DefinirAlineacion(Resource):
     @alineacion_ns.doc(
-        description='Definir alineación completa para un equipo en un partido',
+        description='Definir alineación completa para un equipo en un partido CON posiciones drag & drop',
         security='Bearer',
         responses={
             201: 'Alineación definida exitosamente',
@@ -290,24 +289,20 @@ class DefinirAlineacion(Resource):
         try:
             data = alineacion_ns.payload
 
-            # Validaciones ya manejadas por el modelo
-
             api_client = BackendAPIClient()
 
-            # Validar partido
             partido = api_client.get_partido(data['id_partido'])
             if not partido:
                 alineacion_ns.abort(404, error='Partido no encontrado')
 
-            # Validar que el partido esté en estado 'programado'
-            if partido.get('estado') != 'programado':
-                alineacion_ns.abort(400, error='Solo se puede definir alineación en partidos programados')
+            # Permitir subir alineación siempre, incluso si el partido ya inició o está tarde
+            # Las penalizaciones se calcularán en el proxy
+            if partido.get('estado') not in ['programado', 'en_juego']:
+                alineacion_ns.abort(400, error='Solo se puede definir alineación en partidos programados o en juego')
 
-            # Validar equipo en partido
             if not api_client.validar_equipo_en_partido(data['id_equipo'], data['id_partido']):
                 alineacion_ns.abort(400, error='El equipo no participa en este partido')
 
-            # Obtener jugadores del equipo
             import requests
             response = requests.get(
                 f"{api_client.base_url}/jugadores?id_equipo={data['id_equipo']}",
@@ -319,7 +314,7 @@ class DefinirAlineacion(Resource):
 
             jugadores_equipo = response.json().get('jugadores', [])
 
-            # Limpiar alineaciones previas de este equipo en este partido
+            # Limpiar alineaciones previas
             Alineacion.query.filter_by(
                 id_partido=data['id_partido'],
                 id_equipo=data['id_equipo']
@@ -328,76 +323,146 @@ class DefinirAlineacion(Resource):
             alineaciones_creadas = []
             errores = []
 
-            # Procesar titulares
-            for idx, titular in enumerate(data.get('titulares', [])):
-                nombre_titular = titular.get('nombre', '').strip()
+            # Determinar formato de datos recibidos
+            # Formato nuevo: jugadores con id_jugador y titular flag
+            # Formato antiguo: titulares y suplentes separados con nombre
+            jugadores_data = data.get('jugadores', [])
+            titulares_data = data.get('titulares', [])
+            suplentes_data = data.get('suplentes', [])
 
-                if not nombre_titular:
-                    errores.append(f"Titular #{idx+1} sin nombre")
-                    continue
+            # Si viene en formato nuevo (jugadores)
+            if jugadores_data:
+                for idx, jugador_data in enumerate(jugadores_data):
+                    id_jugador = jugador_data.get('id_jugador')
+                    es_titular = jugador_data.get('titular', False)
+                    
+                    if not id_jugador:
+                        errores.append(f"Jugador #{idx+1} sin id_jugador")
+                        continue
 
-                # Buscar jugador
-                jugador = None
-                for j in jugadores_equipo:
-                    nombre_completo = f"{j['nombre']} {j['apellido']}"
-                    if nombre_titular.lower() in nombre_completo.lower():
-                        jugador = j
-                        break
+                    # Buscar jugador por ID
+                    jugador = None
+                    for j in jugadores_equipo:
+                        if j['id_jugador'] == id_jugador:
+                            jugador = j
+                            break
 
-                if not jugador:
-                    errores.append(f"Titular '{nombre_titular}' no encontrado")
-                    continue
+                    if not jugador:
+                        errores.append(f"Jugador con ID {id_jugador} no encontrado")
+                        continue
 
-                nueva_alineacion = Alineacion(
-                    id_partido=data['id_partido'],
-                    id_equipo=data['id_equipo'],
-                    id_jugador=jugador['id_jugador'],
-                    titular=True,
-                    minuto_entrada=0
-                )
+                    nueva_alineacion = Alineacion(
+                        id_partido=data['id_partido'],
+                        id_equipo=data['id_equipo'],
+                        id_jugador=jugador['id_jugador'],
+                        titular=es_titular,
+                        minuto_entrada=0 if es_titular else None,
+                        posicion_x=jugador_data.get('posicion_x'),
+                        posicion_y=jugador_data.get('posicion_y'),
+                        formacion=data.get('formacion')
+                    )
 
-                db.session.add(nueva_alineacion)
-                alineaciones_creadas.append({
-                    'nombre': f"{jugador['nombre']} {jugador['apellido']}",
-                    'dorsal': jugador['dorsal'],
-                    'posicion': jugador['posicion'],
-                    'titular': True,
-                    'minuto_entrada': 0
-                })
+                    db.session.add(nueva_alineacion)
+                    alineaciones_creadas.append({
+                        'nombre': f"{jugador['nombre']} {jugador['apellido']}",
+                        'dorsal': jugador['dorsal'],
+                        'posicion': jugador['posicion'],
+                        'titular': es_titular,
+                        'minuto_entrada': 0 if es_titular else None,
+                        'posicion_x': jugador_data.get('posicion_x'),
+                        'posicion_y': jugador_data.get('posicion_y')
+                    })
+            else:
+                # Formato antiguo: titulares y suplentes separados
+                # Procesar titulares CON POSICIONES
+                for idx, titular in enumerate(titulares_data):
+                    id_jugador = titular.get('id_jugador')
+                    nombre_titular = titular.get('nombre', '').strip()
 
-            # Procesar suplentes
-            for suplente in data.get('suplentes', []):
-                nombre_suplente = suplente.get('nombre', '').strip()
+                    jugador = None
+                    if id_jugador:
+                        # Buscar por ID
+                        for j in jugadores_equipo:
+                            if j['id_jugador'] == id_jugador:
+                                jugador = j
+                                break
+                    elif nombre_titular:
+                        # Buscar por nombre (compatibilidad)
+                        for j in jugadores_equipo:
+                            nombre_completo = f"{j['nombre']} {j['apellido']}"
+                            if nombre_titular.lower() in nombre_completo.lower():
+                                jugador = j
+                                break
 
-                if not nombre_suplente:
-                    continue
+                    if not jugador:
+                        errores.append(f"Titular #{idx+1} no encontrado")
+                        continue
 
-                jugador = None
-                for j in jugadores_equipo:
-                    nombre_completo = f"{j['nombre']} {j['apellido']}"
-                    if nombre_suplente.lower() in nombre_completo.lower():
-                        jugador = j
-                        break
+                    nueva_alineacion = Alineacion(
+                        id_partido=data['id_partido'],
+                        id_equipo=data['id_equipo'],
+                        id_jugador=jugador['id_jugador'],
+                        titular=True,
+                        minuto_entrada=0,
+                        posicion_x=titular.get('posicion_x'),
+                        posicion_y=titular.get('posicion_y'),
+                        formacion=data.get('formacion')
+                    )
 
-                if not jugador:
-                    errores.append(f"Suplente '{nombre_suplente}' no encontrado")
-                    continue
+                    db.session.add(nueva_alineacion)
+                    alineaciones_creadas.append({
+                        'nombre': f"{jugador['nombre']} {jugador['apellido']}",
+                        'dorsal': jugador['dorsal'],
+                        'posicion': jugador['posicion'],
+                        'titular': True,
+                        'minuto_entrada': 0,
+                        'posicion_x': titular.get('posicion_x'),
+                        'posicion_y': titular.get('posicion_y')
+                    })
 
-                nueva_alineacion = Alineacion(
-                    id_partido=data['id_partido'],
-                    id_equipo=data['id_equipo'],
-                    id_jugador=jugador['id_jugador'],
-                    titular=False,
-                    minuto_entrada=None
-                )
+                # Procesar suplentes
+                for suplente in suplentes_data:
+                    id_jugador = suplente.get('id_jugador')
+                    nombre_suplente = suplente.get('nombre', '').strip()
 
-                db.session.add(nueva_alineacion)
-                alineaciones_creadas.append({
-                    'nombre': f"{jugador['nombre']} {jugador['apellido']}",
-                    'dorsal': jugador['dorsal'],
-                    'posicion': jugador['posicion'],
-                    'titular': False
-                })
+                    if not id_jugador and not nombre_suplente:
+                        continue
+
+                    jugador = None
+                    if id_jugador:
+                        # Buscar por ID
+                        for j in jugadores_equipo:
+                            if j['id_jugador'] == id_jugador:
+                                jugador = j
+                                break
+                    elif nombre_suplente:
+                        # Buscar por nombre (compatibilidad)
+                        for j in jugadores_equipo:
+                            nombre_completo = f"{j['nombre']} {j['apellido']}"
+                            if nombre_suplente.lower() in nombre_completo.lower():
+                                jugador = j
+                                break
+
+                    if not jugador:
+                        errores.append(f"Suplente no encontrado")
+                        continue
+
+                    nueva_alineacion = Alineacion(
+                        id_partido=data['id_partido'],
+                        id_equipo=data['id_equipo'],
+                        id_jugador=jugador['id_jugador'],
+                        titular=False,
+                        minuto_entrada=None,
+                        formacion=data.get('formacion')
+                    )
+
+                    db.session.add(nueva_alineacion)
+                    alineaciones_creadas.append({
+                        'nombre': f"{jugador['nombre']} {jugador['apellido']}",
+                        'dorsal': jugador['dorsal'],
+                        'posicion': jugador['posicion'],
+                        'titular': False
+                    })
 
             db.session.commit()
 
@@ -417,7 +482,7 @@ class DefinirAlineacion(Resource):
 
 
 # ============================================
-# NUEVO: HACER CAMBIO DURANTE EL PARTIDO
+# HACER CAMBIO DURANTE EL PARTIDO
 # ============================================
 @alineacion_ns.route('/cambio')
 class HacerCambio(Resource):
@@ -436,24 +501,18 @@ class HacerCambio(Resource):
     @alineacion_ns.marshal_with(message_response, code=200)
     @jwt_required()
     def post(self):
-        """
-        Hace un cambio durante el partido: saca un titular, entra un suplente
-        """
+        """Hace un cambio durante el partido"""
         try:
             data = alineacion_ns.payload
-
             api_client = BackendAPIClient()
 
-            # Validar partido
             partido = api_client.get_partido(data['id_partido'])
             if not partido:
                 alineacion_ns.abort(404, error='Partido no encontrado')
 
-            # Validar que el partido esté en estado 'en_juego'
             if partido.get('estado') != 'en_juego':
                 alineacion_ns.abort(400, error='Solo se pueden hacer cambios en partidos en juego')
 
-            # Obtener jugadores del equipo
             import requests
             response = requests.get(
                 f"{api_client.base_url}/jugadores?id_equipo={data['id_equipo']}",
@@ -465,29 +524,40 @@ class HacerCambio(Resource):
 
             jugadores_equipo = response.json().get('jugadores', [])
 
-            # Buscar jugador que SALE
+            # Buscar jugador que sale
             jugador_sale = None
-            for j in jugadores_equipo:
-                nombre_completo = f"{j['nombre']} {j['apellido']}"
-                if data['sale'].lower() in nombre_completo.lower():
-                    jugador_sale = j
-                    break
+            if data.get('id_jugador_sale'):
+                for j in jugadores_equipo:
+                    if j['id_jugador'] == data['id_jugador_sale']:
+                        jugador_sale = j
+                        break
+            elif data.get('sale'):
+                for j in jugadores_equipo:
+                    nombre_completo = f"{j['nombre']} {j['apellido']}"
+                    if data['sale'].lower() in nombre_completo.lower():
+                        jugador_sale = j
+                        break
 
             if not jugador_sale:
-                alineacion_ns.abort(404, error=f'Jugador "{data["sale"]}" no encontrado')
+                alineacion_ns.abort(404, error=f'Jugador que sale no encontrado')
 
-            # Buscar jugador que ENTRA
+            # Buscar jugador que entra
             jugador_entra = None
-            for j in jugadores_equipo:
-                nombre_completo = f"{j['nombre']} {j['apellido']}"
-                if data['entra'].lower() in nombre_completo.lower():
-                    jugador_entra = j
-                    break
+            if data.get('id_jugador_entra'):
+                for j in jugadores_equipo:
+                    if j['id_jugador'] == data['id_jugador_entra']:
+                        jugador_entra = j
+                        break
+            elif data.get('entra'):
+                for j in jugadores_equipo:
+                    nombre_completo = f"{j['nombre']} {j['apellido']}"
+                    if data['entra'].lower() in nombre_completo.lower():
+                        jugador_entra = j
+                        break
 
             if not jugador_entra:
-                alineacion_ns.abort(404, error=f'Jugador "{data["entra"]}" no encontrado')
+                alineacion_ns.abort(404, error=f'Jugador que entra no encontrado')
 
-            # Buscar alineación del que SALE
             alineacion_sale = Alineacion.query.filter_by(
                 id_partido=data['id_partido'],
                 id_equipo=data['id_equipo'],
@@ -500,11 +570,9 @@ class HacerCambio(Resource):
             if alineacion_sale.minuto_salida is not None:
                 alineacion_ns.abort(400, error=f'{data["sale"]} ya fue sustituido anteriormente')
 
-            # Verificar que el minuto de salida sea mayor que el de entrada
             if alineacion_sale.minuto_entrada is not None and data['minuto'] <= alineacion_sale.minuto_entrada:
                 alineacion_ns.abort(400, error='El minuto de salida debe ser mayor al de entrada')
 
-            # Buscar alineación del que ENTRA
             alineacion_entra = Alineacion.query.filter_by(
                 id_partido=data['id_partido'],
                 id_equipo=data['id_equipo'],
@@ -517,7 +585,6 @@ class HacerCambio(Resource):
             if alineacion_entra.minuto_entrada is not None:
                 alineacion_ns.abort(400, error=f'{data["entra"]} ya está en la cancha')
 
-            # Realizar el cambio
             alineacion_sale.minuto_salida = data['minuto']
             alineacion_entra.minuto_entrada = data['minuto']
 
@@ -545,39 +612,26 @@ class HacerCambio(Resource):
 
 
 # ============================================
-# NUEVO: AUTO-GENERAR ALINEACIONES (SOLO PARA PRUEBAS RÁPIDAS)
+# AUTO-GENERAR (SOLO PRUEBAS)
 # ============================================
 @alineacion_ns.route('/auto-generar')
 class AutoGenerarAlineaciones(Resource):
     @alineacion_ns.doc(
         description='Generar automáticamente alineaciones para todos los partidos de un campeonato (SOLO PARA PRUEBAS)',
-        security='Bearer',
-        responses={
-            201: 'Alineaciones generadas exitosamente',
-            400: 'Campeonato requerido',
-            401: 'No autorizado',
-            404: 'Campeonato sin partidos',
-            500: 'Error interno del servidor'
-        }
+        security='Bearer'
     )
     @alineacion_ns.expect(auto_generar_model, validate=True)
     @alineacion_ns.marshal_with(message_response, code=201)
     @jwt_required()
     def post(self):
-        """
-        Genera automáticamente alineaciones para todos los partidos de un campeonato
-        SOLO PARA PRUEBAS - En producción el líder debe definir manualmente
-        """
+        """Genera automáticamente alineaciones (SOLO PRUEBAS)"""
         try:
             import requests
             data = alineacion_ns.payload
-
-            id_campeonato = data['id_campeonato']
             api_client = BackendAPIClient()
 
-            # Obtener todos los partidos del campeonato
             response = requests.get(
-                f"{api_client.base_url}/partido?id_campeonato={id_campeonato}",
+                f"{api_client.base_url}/partido?id_campeonato={data['id_campeonato']}",
                 timeout=10
             )
 
@@ -591,229 +645,46 @@ class AutoGenerarAlineaciones(Resource):
 
             alineaciones_creadas = 0
             partidos_procesados = 0
-            errores = []
 
             for partido in partidos:
-                try:
-                    id_partido = partido['id_partido']
-                    id_equipo_local = partido['id_equipo_local']
-                    id_equipo_visitante = partido['id_equipo_visitante']
+                id_partido = partido['id_partido']
+                id_equipo_local = partido['id_equipo_local']
+                id_equipo_visitante = partido['id_equipo_visitante']
 
-                    # Procesar equipo local
-                    try:
-                        response_local = requests.get(
-                            f"{api_client.base_url}/jugadores?id_equipo={id_equipo_local}",
-                            timeout=5
-                        )
+                for id_equipo in [id_equipo_local, id_equipo_visitante]:
+                    response_jug = requests.get(
+                        f"{api_client.base_url}/jugadores?id_equipo={id_equipo}",
+                        timeout=5
+                    )
 
-                        if response_local.status_code == 200:
-                            jugadores_local = response_local.json().get('jugadores', [])
+                    if response_jug.status_code == 200:
+                        jugadores = response_jug.json().get('jugadores', [])
 
-                            # Primeros 5 titulares, resto suplentes
-                            for idx, jugador in enumerate(jugadores_local):
-                                existe = Alineacion.query.filter_by(
+                        for idx, jugador in enumerate(jugadores[:11]):
+                            existe = Alineacion.query.filter_by(
+                                id_partido=id_partido,
+                                id_jugador=jugador['id_jugador']
+                            ).first()
+
+                            if not existe:
+                                nueva_alineacion = Alineacion(
                                     id_partido=id_partido,
-                                    id_jugador=jugador['id_jugador']
-                                ).first()
+                                    id_equipo=id_equipo,
+                                    id_jugador=jugador['id_jugador'],
+                                    titular=(idx < 11),
+                                    minuto_entrada=0 if idx < 11 else None
+                                )
+                                db.session.add(nueva_alineacion)
+                                alineaciones_creadas += 1
 
-                                if not existe:
-                                    nueva_alineacion = Alineacion(
-                                        id_partido=id_partido,
-                                        id_equipo=id_equipo_local,
-                                        id_jugador=jugador['id_jugador'],
-                                        titular=(idx < 5),
-                                        minuto_entrada=0 if idx < 5 else None
-                                    )
-
-                                    db.session.add(nueva_alineacion)
-                                    alineaciones_creadas += 1
-                    except Exception as e:
-                        errores.append(f"Partido {id_partido} - Local: {str(e)}")
-
-                    # Procesar equipo visitante
-                    try:
-                        response_visitante = requests.get(
-                            f"{api_client.base_url}/jugadores?id_equipo={id_equipo_visitante}",
-                            timeout=5
-                        )
-
-                        if response_visitante.status_code == 200:
-                            jugadores_visitante = response_visitante.json().get('jugadores', [])
-
-                            for idx, jugador in enumerate(jugadores_visitante):
-                                existe = Alineacion.query.filter_by(
-                                    id_partido=id_partido,
-                                    id_jugador=jugador['id_jugador']
-                                ).first()
-
-                                if not existe:
-                                    nueva_alineacion = Alineacion(
-                                        id_partido=id_partido,
-                                        id_equipo=id_equipo_visitante,
-                                        id_jugador=jugador['id_jugador'],
-                                        titular=(idx < 5),
-                                        minuto_entrada=0 if idx < 5 else None
-                                    )
-
-                                    db.session.add(nueva_alineacion)
-                                    alineaciones_creadas += 1
-                    except Exception as e:
-                        errores.append(f"Partido {id_partido} - Visitante: {str(e)}")
-
-                    partidos_procesados += 1
-
-                except Exception as e:
-                    errores.append(f"Partido {partido.get('id_partido', '?')}: {str(e)}")
+                partidos_procesados += 1
 
             db.session.commit()
 
             return {
                 'mensaje': 'Alineaciones generadas automáticamente',
                 'partidos_procesados': partidos_procesados,
-                'alineaciones_creadas': alineaciones_creadas,
-                'errores': errores if errores else None
-            }, 201
-
-        except Exception as e:
-            db.session.rollback()
-            alineacion_ns.abort(500, error=str(e))
-
-
-# ============================================
-# BATCH (MANTENER PARA COMPATIBILIDAD)
-# ============================================
-@alineacion_ns.route('/batch')
-class CrearAlineacionBatch(Resource):
-    @alineacion_ns.doc(
-        description='Crear múltiples alineaciones de golpe (DEPRECADO - Usar /definir-alineacion)',
-        security='Bearer',
-        responses={
-            201: 'Alineaciones creadas exitosamente',
-            400: 'Datos inválidos',
-            401: 'No autorizado',
-            404: 'Partido o equipo no encontrado',
-            500: 'Error interno del servidor'
-        }
-    )
-    @alineacion_ns.expect(batch_model, validate=True)
-    @alineacion_ns.marshal_with(message_response, code=201)
-    @jwt_required()
-    def post(self):
-        """
-        Crea múltiples alineaciones de golpe (DEPRECADO - Usar /definir-alineacion)
-        """
-        try:
-            data = alineacion_ns.payload
-
-            api_client = BackendAPIClient()
-
-            # Validar partido
-            partido = api_client.get_partido(data['id_partido'])
-            if not partido:
-                alineacion_ns.abort(404, error='Partido no encontrado')
-
-            # Validar equipo en partido
-            if not api_client.validar_equipo_en_partido(data['id_equipo'], data['id_partido']):
-                alineacion_ns.abort(400, error='El equipo no participa en este partido')
-
-            # Obtener jugadores del equipo
-            import requests
-            response = requests.get(
-                f"{api_client.base_url}/jugadores?id_equipo={data['id_equipo']}",
-                timeout=5
-            )
-
-            if response.status_code != 200:
-                alineacion_ns.abort(500, error='No se pudieron obtener los jugadores')
-
-            jugadores_equipo = response.json().get('jugadores', [])
-
-            alineaciones_creadas = []
-            errores = []
-
-            # Procesar titulares
-            for nombre_titular in data.get('titulares', []):
-                jugador = None
-                for j in jugadores_equipo:
-                    nombre_completo = f"{j['nombre']} {j['apellido']}"
-                    if nombre_titular.lower() in nombre_completo.lower():
-                        jugador = j
-                        break
-
-                if not jugador:
-                    errores.append(f"Titular '{nombre_titular}' no encontrado")
-                    continue
-
-                # Verificar si ya existe
-                existe = Alineacion.query.filter_by(
-                    id_partido=data['id_partido'],
-                    id_jugador=jugador['id_jugador']
-                ).first()
-
-                if existe:
-                    errores.append(f"{nombre_titular} ya está en la alineación")
-                    continue
-
-                nueva_alineacion = Alineacion(
-                    id_partido=data['id_partido'],
-                    id_equipo=data['id_equipo'],
-                    id_jugador=jugador['id_jugador'],
-                    titular=True,
-                    minuto_entrada=0
-                )
-
-                db.session.add(nueva_alineacion)
-                alineaciones_creadas.append({
-                    'nombre': f"{jugador['nombre']} {jugador['apellido']}",
-                    'dorsal': jugador['dorsal'],
-                    'posicion': jugador['posicion'],
-                    'titular': True
-                })
-
-            # Procesar suplentes
-            for nombre_suplente in data.get('suplentes', []):
-                jugador = None
-                for j in jugadores_equipo:
-                    nombre_completo = f"{j['nombre']} {j['apellido']}"
-                    if nombre_suplente.lower() in nombre_completo.lower():
-                        jugador = j
-                        break
-
-                if not jugador:
-                    errores.append(f"Suplente '{nombre_suplente}' no encontrado")
-                    continue
-
-                existe = Alineacion.query.filter_by(
-                    id_partido=data['id_partido'],
-                    id_jugador=jugador['id_jugador']
-                ).first()
-
-                if existe:
-                    errores.append(f"{nombre_suplente} ya está en la alineación")
-                    continue
-
-                nueva_alineacion = Alineacion(
-                    id_partido=data['id_partido'],
-                    id_equipo=data['id_equipo'],
-                    id_jugador=jugador['id_jugador'],
-                    titular=False,
-                    minuto_entrada=None
-                )
-
-                db.session.add(nueva_alineacion)
-                alineaciones_creadas.append({
-                    'nombre': f"{jugador['nombre']} {jugador['apellido']}",
-                    'dorsal': jugador['dorsal'],
-                    'posicion': jugador['posicion'],
-                    'titular': False
-                })
-
-            db.session.commit()
-
-            return {
-                'mensaje': f'{len(alineaciones_creadas)} alineaciones creadas',
-                'alineaciones': alineaciones_creadas,
-                'errores': errores if errores else None
+                'alineaciones_creadas': alineaciones_creadas
             }, 201
 
         except Exception as e:

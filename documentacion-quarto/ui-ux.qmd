@@ -1,0 +1,34 @@
+---
+title: "UI / UX"
+format: html
+---
+
+## Enfoque de diseño
+
+El repositorio contiene un frontend Angular que depende de Angular Material. La decisión de usar Angular Material sugiere un enfoque orientado a componentes, consistencia visual y accesibilidad básica proporcionada por la librería.
+
+## Usabilidad
+
+- Estructura de navegación tradicional (barra lateral o superior) es compatible con la organización por módulos del backend (auth, equipos, campeonatos, partidos, estadísticas).
+- Las rutas del backend están diseñadas para soportar paginación, búsqueda y filtros (por ejemplo `GET /partidos` permite filtros varios), lo que facilita crear vistas con tablas filtrables y paginadas en el frontend.
+
+## Accesibilidad
+
+Se adopta Angular Material, que proporciona componentes con soporte básico de accesibilidad (etiquetas ARIA, enfoque de teclado). No obstante, el repositorio no contiene un documento DCP/Checklist de accesibilidad explícito.
+
+## Decisiones tomadas en la vista Detalle del Partido
+
+Basado en los modelos y las respuestas de la API (`Partido.to_dict()`), la vista Detalle del Partido debe mostrar al menos:
+
+- Información básica: equipos, fecha, lugar, jornada.
+- Estado del partido y controles para cambiarlo (según permisos).
+- Marcador actual y lista de eventos ordenada por minuto (goles, tarjetas, sustituciones).
+- Alineaciones (obtenidas vía proxy) con logos y bandera de disponibilidad (`tiene_alineacion_local` / `tiene_alineacion_visitante`).
+
+Justificación del rediseño
+
+Se recomienda un diseño que priorice la visibilidad del marcador y la cronología de eventos: el usuario organizador necesita registrar y corregir eventos con rapidez. El diseño propuesto favorecería:
+
+- Panel principal con marcador y control de estados (programado, en_juego, finalizado).
+- Cronología de eventos en panel lateral con filtros por tipo (goles, tarjetas) y opción de reversión controlada por permisos (solo administradores).
+- Sección de alineaciones con posibilidad de invocar validación (proxy) y visualizar penalizaciones o faltantes.

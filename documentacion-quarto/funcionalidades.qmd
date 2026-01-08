@@ -1,0 +1,53 @@
+---
+title: "Funcionalidades"
+format: html
+---
+
+En esta sección se enumeran las funcionalidades que se han implementado o que están presentes en el código del repositorio. La lista se ha extraído de los módulos de rutas expuestos en `backend/app/routes`.
+
+1) Gestión de campeonatos
+
+- Creación, consulta, actualización y listado de campeonatos. Campos relevantes: nombre, fechas, tipo_deporte (`futbol` o `indoor`), tipo_competicion.
+- Control de inscripciones y conteo de equipos inscritos (campo `equipos_inscritos`).
+
+2) Gestión de equipos
+
+- CRUD de equipos; además, manejo de líder de equipo y estados de aprobación (el backend valida que equipos estén `aprobado` antes de ciertas acciones, p.ej. creación de partidos).
+
+3) Gestión de jugadores
+
+- Registro y consulta de jugadores; relación con equipo y atributos como dorsal.
+
+4) Gestión de partidos
+
+- Creación de partidos (validación: equipos distintos — check constraint en modelo `Partido`).
+- Listado con filtros (por campeonato, estado, jornada, equipo y rango de fechas), ordenación y paginación (implementada en `partido_routes.py`).
+- Cambio de estado de partido con registro de historial (`HistorialEstado`) y control de permisos (admin / creador del campeonato / superadmin).
+- Registro de resultado final como operación inmutable (`resultado_registrado = True`) que impide posteriores modificaciones o eliminación de goles.
+
+5) Alineaciones
+
+- El backend expone endpoints proxy para consultar, validar y definir alineaciones. Internamente realiza peticiones HTTP a un microservicio externo localizado por defecto en `http://localhost:5001` (constante `MICROSERVICIO_URL`). El microservicio de alineaciones no está incluido en este repositorio.
+
+6) Registro de eventos (goles, tarjetas, sustituciones)
+
+- Existe un blueprint `eventos` que crea una tabla temporal `eventos_partido` para registrar tipos: `gol`, `tarjeta_amarilla`, `tarjeta_roja`, `sustitucion`.
+- Registrar un evento actualiza el estado del partido (p.ej. un `gol` incrementa el marcador correspondiente).
+- El backend expone endpoints para obtener eventos, eliminar eventos (con reversión del marcador en caso de gol) y estadísticas básicas del partido (goleadores y tarjetas por equipo).
+
+7) Registro y gestión de goles (módulo `gol_routes.py`)
+
+- Permite crear goles, listarlos por filtros y eliminar goles (solo si el resultado final no ha sido registrado).
+- Búsqueda de jugador por nombre (con heurística de `concat(nombre, ' ', apellido)` y búsquedas parciales si no hay coincidencia exacta).
+- Lógica para goles de autogol: actualiza marcador a favor del equipo contrario.
+
+8) Notificaciones, autenticación y seguridad
+
+- Autenticación JWT con configuración de expiración para access/refresh tokens y lista negra de tokens.
+- Roles y middlewares para autorizar según rol (`admin`, `lider`, `superadmin`).
+
+9) Uploads y archivos estáticos
+
+- El backend sirve archivos mediante la ruta `/uploads/<path:filename>` y crea directorios estándar (`documentos_jugadores`, `fotos_jugadores`, `logos`).
+
+Observación: No se han incluido en esta documentación funcionalidades que no estén representadas por rutas o modelos en el repositorio. Por ejemplo, la UI completa de cada vista del frontend existe en `frontend/` pero algunos componentes específicos pueden no estar presentes o estar incompletos; el apartado "Estado del proyecto" detalla dichas limitaciones.

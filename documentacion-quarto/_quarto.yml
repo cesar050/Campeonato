@@ -1,0 +1,33 @@
+project:
+  type: website
+
+website:
+  title: "Sistema de Gestión de Campeonatos Deportivos"
+  navbar:
+    left:
+      - text: "Inicio"
+        href: index.qmd
+      - text: "Introducción"
+        href: introduccion.qmd
+      - text: "Arquitectura"
+        href: arquitectura.qmd
+      - text: "Funcionalidades"
+        href: funcionalidades.qmd
+      - text: "Reglas de negocio"
+        href: reglas-negocio.qmd
+      - text: "UI / UX"
+        href: ui-ux.qmd
+      - text: "Estado del proyecto"
+        href: estado-proyecto.qmd
+      - text: "Mejoras futuras"
+        href: mejoras-futuras.qmd
+
+format:
+  html:
+    theme: flatly
+    toc: true
+    toc-depth: 2
+    number-sections: false
+
+title: "Sistema de Gestión de Campeonatos Deportivos"
+author: "Proyecto Campeonato"

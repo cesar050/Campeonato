@@ -1,0 +1,113 @@
+<!-- Skip Link para accesibilidad -->
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+<!-- Overlay para móvil -->
+<div class="sidebar-overlay" [class.active]="!isCollapsed()" (click)="toggleSidebar()"></div>
+
+<aside class="sidebar" [class.collapsed]="isCollapsed()" role="navigation" aria-label="Navegación principal">
+  <!-- Botón hamburguesa -->
+  <button
+    type="button"
+    class="sidebar-toggle"
+    (click)="toggleSidebar()"
+    [attr.aria-expanded]="!isCollapsed()"
+    [attr.aria-label]="isCollapsed() ? 'Expandir menú lateral' : 'Colapsar menú lateral'"
+    aria-controls="sidebar-nav">
+    <span class="material-symbols-outlined">{{ isCollapsed() ? 'menu' : 'menu_open' }}</span>
+  </button>
+
+  <div class="user-section" role="region" aria-label="Información de usuario">
+    <div class="user-avatar" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </div>
+    <div class="user-details" *ngIf="!isCollapsed()">
+      <div class="user-name" aria-label="Usuario actual">{{ currentUser()?.nombre || 'Líder' }}</div>
+      <div class="user-role">Campeonato Libre</div>
+    </div>
+  </div>
+
+  <nav id="sidebar-nav" class="sidebar-nav" aria-label="Menú de navegación">
+    @for (item of menuItems; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [attr.aria-current]="item.route === router.url.split('?')[0] ? 'page' : null"
+        class="nav-item"
+        [attr.aria-label]="item.label + (item.route === router.url.split('?')[0] ? ' - página actual' : '')"
+        (click)="onNavigate()">
+        <span class="material-symbols-outlined nav-icon" aria-hidden="true">{{ item.icon }}</span>
+        <span class="nav-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-bottom" role="region" aria-label="Acciones de usuario">
+    <button
+      type="button"
+      class="nav-item"
+      (click)="toggleAccessibilityCenter()"
+      aria-label="Abrir centro de accesibilidad"
+      aria-expanded="showAccessibilityCenter()"
+      aria-controls="accessibility-modal">
+      <span class="material-symbols-outlined nav-icon" aria-hidden="true">accessibility_new</span>
+      <span class="nav-label" *ngIf="!isCollapsed()">Accesibilidad</span>
+    </button>
+
+    <button
+      type="button"
+      class="nav-item logout-btn"
+      (click)="logout()"
+      aria-label="Cerrar sesión">
+      <span class="material-symbols-outlined nav-icon" aria-hidden="true">logout</span>
+      <span class="nav-label" *ngIf="!isCollapsed()">Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main id="main-content" class="main-content" role="main" [class.sidebar-collapsed]="isCollapsed()">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Modal de Centro de Accesibilidad -->
+@if (showAccessibilityCenter()) {
+  <div
+    class="modal-overlay"
+    (click)="closeAccessibilityCenter()"
+    (keydown)="onKeyDown($event)"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="accessibility-modal-title"
+    id="accessibility-modal">
+    <div
+      class="modal-content"
+      (click)="$event.stopPropagation()"
+      role="document">
+      <div class="modal-header">
+        <h2 id="accessibility-modal-title">Centro de Accesibilidad</h2>
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeAccessibilityCenter()"
+          aria-label="Cerrar centro de accesibilidad">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-accessibility-center></app-accessibility-center>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Dialog de confirmación de logout -->
+<app-confirm-dialog
+  [show]="showConfirmLogout()"
+  title="Cerrar Sesión"
+  message="¿Estás seguro de que deseas cerrar sesión?"
+  type="warning"
+  (confirm)="confirmLogout($event.confirmed)">
+</app-confirm-dialog>

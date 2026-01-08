@@ -1,0 +1,323 @@
+// ==================== VARIABLES ====================
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$green-dark: #1B5E20;
+
+// ==================== CONTAINER ====================
+.datepicker-container {
+  position: relative;
+  width: 100%;
+}
+
+// ==================== INPUT ====================
+.datepicker-input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.75rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $green-primary;
+    background: #f0fdf4;
+  }
+
+  .calendar-icon {
+    color: $green-primary;
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .datepicker-input-field {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: #1f2937;
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+}
+
+// ==================== DROPDOWN ====================
+.datepicker-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 1000;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 1rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 1rem;
+  width: 320px;
+  max-width: 95vw;
+  animation: slideDown 0.2s ease-out;
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// ==================== HEADER ====================
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f3f4f6;
+
+  .month-year {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #1f2937;
+    flex: 1;
+    text-align: center;
+  }
+
+  .nav-button {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #6b7280;
+    flex-shrink: 0;
+
+    &:hover {
+      background: #f3f4f6;
+      color: $green-primary;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    .material-symbols-outlined {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+// ==================== DÍAS DE LA SEMANA ====================
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+
+  .weekday {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: center;
+    padding: 0.375rem 0;
+    text-transform: uppercase;
+  }
+}
+
+// ==================== DÍAS DEL MES ====================
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+
+  .day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.15s ease;
+    min-height: 2rem;
+
+    &:hover:not(.disabled):not(.selected) {
+      background: #f3f4f6;
+      color: $green-primary;
+    }
+
+    &.disabled {
+      color: #d1d5db;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    &.today {
+      background: #e8f5e9;
+      color: $green-dark;
+      font-weight: 700;
+    }
+
+    &.selected {
+      background: $green-primary;
+      color: white;
+      font-weight: 700;
+    }
+
+    &:active:not(.disabled) {
+      transform: scale(0.9);
+    }
+  }
+}
+
+// ==================== FOOTER ====================
+.calendar-footer {
+  padding-top: 0.75rem;
+  border-top: 2px solid #f3f4f6;
+  display: flex;
+  justify-content: flex-end;
+
+  .btn-close {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f3f4f6;
+      border-color: $green-primary;
+      color: $green-primary;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// ==================== DARK MODE ====================
+.dark {
+  .datepicker-input {
+    background: #1f2937;
+    border-color: #4b5563;
+
+    .datepicker-input-field {
+      color: white;
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+
+    &:hover {
+      border-color: $green-light;
+      background: #374151;
+    }
+  }
+
+  .datepicker-dropdown {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .calendar-header {
+    border-color: #374151;
+
+    .month-year {
+      color: white;
+    }
+
+    .nav-button {
+      color: #9ca3af;
+
+      &:hover {
+        background: #374151;
+        color: $green-light;
+      }
+    }
+  }
+
+  .calendar-weekdays .weekday {
+    color: #9ca3af;
+  }
+
+  .calendar-days .day {
+    color: #d1d5db;
+
+    &:hover:not(.disabled):not(.selected) {
+      background: #374151;
+      color: $green-light;
+    }
+
+    &.today {
+      background: #2a452b;
+      color: $green-light;
+    }
+
+    &.selected {
+      background: $green-light;
+      color: white;
+    }
+  }
+
+  .calendar-footer {
+    border-color: #374151;
+
+    .btn-close {
+      background: #374151;
+      border-color: #4b5563;
+      color: #d1d5db;
+
+      &:hover {
+        background: #4b5563;
+        border-color: $green-light;
+        color: $green-light;
+      }
+    }
+  }
+}
+
+// ==================== RESPONSIVE ====================
+@media (max-width: 640px) {
+  .datepicker-dropdown {
+    width: 280px;
+    padding: 0.75rem;
+  }
+
+  .calendar-header .month-year {
+    font-size: 0.875rem;
+  }
+
+  .calendar-weekdays .weekday {
+    font-size: 0.625rem;
+  }
+
+  .calendar-days .day {
+    font-size: 0.75rem;
+    min-height: 1.75rem;
+  }
+}

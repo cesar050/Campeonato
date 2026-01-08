@@ -15,7 +15,6 @@ $orange: #FF9800;
   max-width: 1400px;
 }
 
-// PAGE HEADER
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -61,7 +60,6 @@ $orange: #FF9800;
   }
 }
 
-// FILTERS
 .filters-bar {
   display: flex;
   gap: 1rem;
@@ -134,7 +132,6 @@ $orange: #FF9800;
   }
 }
 
-// LOADING STATE
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -163,7 +160,6 @@ $orange: #FF9800;
   to { transform: rotate(360deg); }
 }
 
-// EMPTY STATE
 .empty-state {
   background: $white;
   border-radius: 12px;
@@ -208,7 +204,6 @@ $orange: #FF9800;
   }
 }
 
-// TABLE
 .table-container {
   background: $white;
   border-radius: 12px;
@@ -396,7 +391,6 @@ $orange: #FF9800;
   }
 }
 
-// TABLE FOOTER
 .table-footer {
   padding: 1rem 1.25rem;
   display: flex;
@@ -441,7 +435,6 @@ $orange: #FF9800;
   }
 }
 
-// MODAL
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -546,7 +539,6 @@ $orange: #FF9800;
   }
 }
 
-// ALERTS
 .alert {
   padding: 1rem;
   border-radius: 8px;
@@ -575,7 +567,6 @@ $orange: #FF9800;
   }
 }
 
-// MODAL BODY
 .modal-body {
   padding: 1.5rem 2rem;
 }
@@ -665,7 +656,6 @@ $orange: #FF9800;
   }
 }
 
-// MODAL FOOTER
 .modal-footer {
   padding: 1.5rem 2rem;
   border-top: 1px solid $border-color;

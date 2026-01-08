@@ -1,126 +1,188 @@
 <div class="estadisticas-container">
-    <div class="page-header">
-      <div>
-        <h1>Estadísticas de Disciplina</h1>
-        <p class="subtitle">Analiza el comportamiento disciplinario de jugadores y equipos a lo largo del torneo.</p>
-      </div>
-      <button type="button" class="btn-export">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        Exportar
-      </button>
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Estadísticas de Disciplina</h1>
+      <p class="subtitle">Analiza el comportamiento disciplinario de jugadores y equipos a lo largo del torneo.</p>
     </div>
-  
+    <button type="button" class="btn-export" (click)="exportar()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Exportar
+    </button>
+  </div>
+
+  <!-- SELECTOR DE CAMPEONATO -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+        Campeonato
+      </label>
+      <select [(ngModel)]="campeonatoSeleccionado" (change)="cambiarCampeonato()" class="select-campeonato">
+        <option [value]="null" disabled>Selecciona un campeonato</option>
+        @for (campeonato of misCampeonatos(); track campeonato.id_campeonato) {
+          <option [value]="campeonato.id_campeonato">{{ campeonato.nombre }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  @if (loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+  }
+
+  <!-- SIN DATOS -->
+  @if (!loading() && !hayDatos()) {
+    <div class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <h3>No hay datos de disciplina</h3>
+      <p>Cuando se registren tarjetas en los partidos, las estadísticas aparecerán aquí.</p>
+    </div>
+  }
+
+  <!-- CONTENIDO CON DATOS -->
+  @if (!loading() && hayDatos()) {
     <div class="content-grid">
       <!-- MÁS TARJETAS AMARILLAS -->
       <div class="card">
         <h3>Más Tarjetas Amarillas</h3>
-        <div class="players-list">
-          @for (jugador of masAmarillas(); track $index) {
-            <div class="player-item">
-              <div class="player-rank">{{ $index + 1 }}</div>
-              <div class="player-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
+        @if (masAmarillas().length > 0) {
+          <div class="players-list">
+            @for (jugador of masAmarillas(); track jugador.id_jugador) {
+              <div class="player-item">
+                <div class="player-rank">{{ $index + 1 }}</div>
+                <div class="player-avatar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div class="player-details">
+                  <div class="player-name">{{ jugador.nombre }}</div>
+                  <div class="player-team">{{ jugador.equipo }}</div>
+                </div>
+                <div class="player-stat yellow">{{ jugador.amarillas }}</div>
               </div>
-              <div class="player-details">
-                <div class="player-name">{{ jugador.nombre }}</div>
-                <div class="player-team">{{ jugador.equipo }}</div>
-              </div>
-              <div class="player-stat yellow">{{ jugador.amarillas }}</div>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        } @else {
+          <p class="no-data-text">Sin tarjetas amarillas registradas</p>
+        }
       </div>
-  
+
       <!-- MÁS TARJETAS ROJAS -->
       <div class="card">
         <h3>Más Tarjetas Rojas</h3>
-        <div class="players-list">
-          @for (jugador of masRojas(); track $index) {
-            <div class="player-item">
-              <div class="player-rank">{{ $index + 1 }}</div>
-              <div class="player-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
+        @if (masRojas().length > 0) {
+          <div class="players-list">
+            @for (jugador of masRojas(); track jugador.id_jugador) {
+              <div class="player-item">
+                <div class="player-rank">{{ $index + 1 }}</div>
+                <div class="player-avatar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div class="player-details">
+                  <div class="player-name">{{ jugador.nombre }}</div>
+                  <div class="player-team">{{ jugador.equipo }}</div>
+                </div>
+                <div class="player-stat red">{{ jugador.rojas }}</div>
               </div>
-              <div class="player-details">
-                <div class="player-name">{{ jugador.nombre }}</div>
-                <div class="player-team">{{ jugador.equipo }}</div>
-              </div>
-              <div class="player-stat red">{{ jugador.rojas }}</div>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-  
-    <!-- DISCIPLINA POR EQUIPO -->
-    <div class="card-full">
-      <h3>Disciplina por Equipo (Juego Limpio)</h3>
-      <div class="table-wrapper">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>Equipo</th>
-              <th>Amarillas</th>
-              <th>Rojas</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (equipo of disciplinaPorEquipo(); track $index) {
-              <tr>
-                <td>
-                  <div class="equipo-cell">
-                    <span class="equipo-nombre">{{ equipo.equipo }}</span>
-                    @if (equipo.badge) {
-                      <span class="badge-limpio">{{ equipo.badge }}</span>
-                    }
-                  </div>
-                </td>
-                <td><span class="tarjeta-count yellow">{{ equipo.amarillas }}</span></td>
-                <td><span class="tarjeta-count red">{{ equipo.rojas }}</span></td>
-                <td><strong>{{ equipo.total }}</strong></td>
-              </tr>
             }
-          </tbody>
-        </table>
+          </div>
+        } @else {
+          <p class="no-data-text">Sin tarjetas rojas registradas</p>
+        }
       </div>
     </div>
-  
+
+    <!-- DISCIPLINA POR EQUIPO -->
+    @if (disciplinaPorEquipo().length > 0) {
+      <div class="card-full">
+        <h3>Disciplina por Equipo (Juego Limpio)</h3>
+        <div class="table-wrapper">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Equipo</th>
+                <th>Amarillas</th>
+                <th>Rojas</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (equipo of disciplinaPorEquipo(); track equipo.id_equipo) {
+                <tr>
+                  <td>
+                    <div class="equipo-cell">
+                      <span class="equipo-nombre">{{ equipo.equipo }}</span>
+                      @if (equipo.badge) {
+                        <span class="badge-limpio">{{ equipo.badge }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td><span class="tarjeta-count yellow">{{ equipo.amarillas }}</span></td>
+                  <td><span class="tarjeta-count red">{{ equipo.rojas }}</span></td>
+                  <td><strong>{{ equipo.total }}</strong></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
     <!-- TARJETAS POR JORNADA -->
-    <div class="card-full">
-      <h3>Tarjetas por Jornada</h3>
-      <div class="chart-container">
-        <div class="chart-bars">
-          @for (jornada of tarjetasPorJornada(); track jornada.jornada) {
-            <div class="chart-group">
-              <div class="bars-wrapper">
-                <div class="bar yellow" [style.height.%]="getBarHeight(jornada.amarillas, getMaxValue(tarjetasPorJornada()))" [title]="jornada.amarillas + ' amarillas'"></div>
-                <div class="bar red" [style.height.%]="getBarHeight(jornada.rojas, getMaxValue(tarjetasPorJornada()))" [title]="jornada.rojas + ' rojas'"></div>
+    @if (tarjetasPorJornada().length > 0) {
+      <div class="card-full">
+        <h3>Tarjetas por Jornada</h3>
+        <div class="chart-container">
+          <div class="chart-bars">
+            @for (jornada of tarjetasPorJornada(); track jornada.jornada) {
+              <div class="chart-group">
+                <div class="bars-wrapper">
+                  <div class="bar yellow" 
+                       [style.height.%]="getBarHeight(jornada.amarillas, getMaxValue(tarjetasPorJornada()))" 
+                       [title]="jornada.amarillas + ' amarillas'">
+                  </div>
+                  <div class="bar red" 
+                       [style.height.%]="getBarHeight(jornada.rojas, getMaxValue(tarjetasPorJornada()))" 
+                       [title]="jornada.rojas + ' rojas'">
+                  </div>
+                </div>
+                <div class="chart-label">J{{ jornada.jornada }}</div>
               </div>
-              <div class="chart-label">Jornada {{ jornada.jornada }}</div>
-            </div>
-          }
-        </div>
-        <div class="chart-legend">
-          <div class="legend-item">
-            <span class="legend-color yellow"></span>
-            <span>Amarillas</span>
+            }
           </div>
-          <div class="legend-item">
-            <span class="legend-color red"></span>
-            <span>Rojas</span>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <span class="legend-color yellow"></span>
+              <span>Amarillas ({{ totales().amarillas }})</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color red"></span>
+              <span>Rojas ({{ totales().rojas }})</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    }
+  }
+</div>

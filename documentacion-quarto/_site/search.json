@@ -1,0 +1,177 @@
+[
+  {
+    "objectID": "ui-ux.html",
+    "href": "ui-ux.html",
+    "title": "UI / UX",
+    "section": "",
+    "text": "El repositorio contiene un frontend Angular que depende de Angular Material. La decisión de usar Angular Material sugiere un enfoque orientado a componentes, consistencia visual y accesibilidad básica proporcionada por la librería."
+  },
+  {
+    "objectID": "ui-ux.html#enfoque-de-diseño",
+    "href": "ui-ux.html#enfoque-de-diseño",
+    "title": "UI / UX",
+    "section": "",
+    "text": "El repositorio contiene un frontend Angular que depende de Angular Material. La decisión de usar Angular Material sugiere un enfoque orientado a componentes, consistencia visual y accesibilidad básica proporcionada por la librería."
+  },
+  {
+    "objectID": "ui-ux.html#usabilidad",
+    "href": "ui-ux.html#usabilidad",
+    "title": "UI / UX",
+    "section": "Usabilidad",
+    "text": "Usabilidad\n\nEstructura de navegación tradicional (barra lateral o superior) es compatible con la organización por módulos del backend (auth, equipos, campeonatos, partidos, estadísticas).\nLas rutas del backend están diseñadas para soportar paginación, búsqueda y filtros (por ejemplo GET /partidos permite filtros varios), lo que facilita crear vistas con tablas filtrables y paginadas en el frontend."
+  },
+  {
+    "objectID": "ui-ux.html#accesibilidad",
+    "href": "ui-ux.html#accesibilidad",
+    "title": "UI / UX",
+    "section": "Accesibilidad",
+    "text": "Accesibilidad\nSe adopta Angular Material, que proporciona componentes con soporte básico de accesibilidad (etiquetas ARIA, enfoque de teclado). No obstante, el repositorio no contiene un documento DCP/Checklist de accesibilidad explícito."
+  },
+  {
+    "objectID": "ui-ux.html#decisiones-tomadas-en-la-vista-detalle-del-partido",
+    "href": "ui-ux.html#decisiones-tomadas-en-la-vista-detalle-del-partido",
+    "title": "UI / UX",
+    "section": "Decisiones tomadas en la vista Detalle del Partido",
+    "text": "Decisiones tomadas en la vista Detalle del Partido\nBasado en los modelos y las respuestas de la API (Partido.to_dict()), la vista Detalle del Partido debe mostrar al menos:\n\nInformación básica: equipos, fecha, lugar, jornada.\nEstado del partido y controles para cambiarlo (según permisos).\nMarcador actual y lista de eventos ordenada por minuto (goles, tarjetas, sustituciones).\nAlineaciones (obtenidas vía proxy) con logos y bandera de disponibilidad (tiene_alineacion_local / tiene_alineacion_visitante).\n\nJustificación del rediseño\nSe recomienda un diseño que priorice la visibilidad del marcador y la cronología de eventos: el usuario organizador necesita registrar y corregir eventos con rapidez. El diseño propuesto favorecería:\n\nPanel principal con marcador y control de estados (programado, en_juego, finalizado).\nCronología de eventos en panel lateral con filtros por tipo (goles, tarjetas) y opción de reversión controlada por permisos (solo administradores).\nSección de alineaciones con posibilidad de invocar validación (proxy) y visualizar penalizaciones o faltantes."
+  },
+  {
+    "objectID": "introduccion.html",
+    "href": "introduccion.html",
+    "title": "Introducción",
+    "section": "",
+    "text": "El repositorio “Campeonato” implementa un sistema orientado a la gestión de campeonatos deportivos, con énfasis en fútbol. El proyecto contiene un backend desarrollado con Flask y Flask-RESTx que expone una API REST para la gestión de campeonatos, equipos, jugadores, partidos y eventos (goles, tarjetas, sustituciones). El frontend está desarrollado con Angular (proyecto presente en la carpeta frontend) y emplea Angular Material."
+  },
+  {
+    "objectID": "introduccion.html#visión-general-del-sistema",
+    "href": "introduccion.html#visión-general-del-sistema",
+    "title": "Introducción",
+    "section": "",
+    "text": "El repositorio “Campeonato” implementa un sistema orientado a la gestión de campeonatos deportivos, con énfasis en fútbol. El proyecto contiene un backend desarrollado con Flask y Flask-RESTx que expone una API REST para la gestión de campeonatos, equipos, jugadores, partidos y eventos (goles, tarjetas, sustituciones). El frontend está desarrollado con Angular (proyecto presente en la carpeta frontend) y emplea Angular Material."
+  },
+  {
+    "objectID": "introduccion.html#problema-que-resuelve",
+    "href": "introduccion.html#problema-que-resuelve",
+    "title": "Introducción",
+    "section": "Problema que resuelve",
+    "text": "Problema que resuelve\nEl sistema facilita la organización y el registro de campeonatos deportivos en contextos donde se requiere un control centralizado de inscripciones, programación de partidos, registro de eventos en tiempo real y publicación de alineaciones. Permite que roles con diferentes privilegios (administradores, líderes de equipo, superadministradores) realicen acciones acordes a su responsabilidad."
+  },
+  {
+    "objectID": "introduccion.html#objetivos-del-proyecto",
+    "href": "introduccion.html#objetivos-del-proyecto",
+    "title": "Introducción",
+    "section": "Objetivos del proyecto",
+    "text": "Objetivos del proyecto\n\nProporcionar una API REST segura y documentada para operaciones administrativas y deportivas.\nPermitir la inscripción y gestión de equipos y jugadores en campeonatos.\nRegistrar partidos y eventos en tiempo real (goles, tarjetas, sustituciones) conservando inmutabilidad de resultados finales cuando procede.\nIntegrar (por proxy) un microservicio externo encargado de la gestión de alineaciones."
+  },
+  {
+    "objectID": "introduccion.html#beneficiarios",
+    "href": "introduccion.html#beneficiarios",
+    "title": "Introducción",
+    "section": "Beneficiarios",
+    "text": "Beneficiarios\nLos principales beneficiarios son: organizadores de campeonatos (administradores), líderes de equipo que gestionan alineaciones y eventos en los partidos, y audiencias (usuarios) que consumen estadísticas y resultados a través del frontend."
+  },
+  {
+    "objectID": "funcionalidades.html",
+    "href": "funcionalidades.html",
+    "title": "Funcionalidades",
+    "section": "",
+    "text": "En esta sección se enumeran las funcionalidades que se han implementado o que están presentes en el código del repositorio. La lista se ha extraído de los módulos de rutas expuestos en backend/app/routes.\n\nGestión de campeonatos\n\n\nCreación, consulta, actualización y listado de campeonatos. Campos relevantes: nombre, fechas, tipo_deporte (futbol o indoor), tipo_competicion.\nControl de inscripciones y conteo de equipos inscritos (campo equipos_inscritos).\n\n\nGestión de equipos\n\n\nCRUD de equipos; además, manejo de líder de equipo y estados de aprobación (el backend valida que equipos estén aprobado antes de ciertas acciones, p.ej. creación de partidos).\n\n\nGestión de jugadores\n\n\nRegistro y consulta de jugadores; relación con equipo y atributos como dorsal.\n\n\nGestión de partidos\n\n\nCreación de partidos (validación: equipos distintos — check constraint en modelo Partido).\nListado con filtros (por campeonato, estado, jornada, equipo y rango de fechas), ordenación y paginación (implementada en partido_routes.py).\nCambio de estado de partido con registro de historial (HistorialEstado) y control de permisos (admin / creador del campeonato / superadmin).\nRegistro de resultado final como operación inmutable (resultado_registrado = True) que impide posteriores modificaciones o eliminación de goles.\n\n\nAlineaciones\n\n\nEl backend expone endpoints proxy para consultar, validar y definir alineaciones. Internamente realiza peticiones HTTP a un microservicio externo localizado por defecto en http://localhost:5001 (constante MICROSERVICIO_URL). El microservicio de alineaciones no está incluido en este repositorio.\n\n\nRegistro de eventos (goles, tarjetas, sustituciones)\n\n\nExiste un blueprint eventos que crea una tabla temporal eventos_partido para registrar tipos: gol, tarjeta_amarilla, tarjeta_roja, sustitucion.\nRegistrar un evento actualiza el estado del partido (p.ej. un gol incrementa el marcador correspondiente).\nEl backend expone endpoints para obtener eventos, eliminar eventos (con reversión del marcador en caso de gol) y estadísticas básicas del partido (goleadores y tarjetas por equipo).\n\n\nRegistro y gestión de goles (módulo gol_routes.py)\n\n\nPermite crear goles, listarlos por filtros y eliminar goles (solo si el resultado final no ha sido registrado).\nBúsqueda de jugador por nombre (con heurística de concat(nombre, ' ', apellido) y búsquedas parciales si no hay coincidencia exacta).\nLógica para goles de autogol: actualiza marcador a favor del equipo contrario.\n\n\nNotificaciones, autenticación y seguridad\n\n\nAutenticación JWT con configuración de expiración para access/refresh tokens y lista negra de tokens.\nRoles y middlewares para autorizar según rol (admin, lider, superadmin).\n\n\nUploads y archivos estáticos\n\n\nEl backend sirve archivos mediante la ruta /uploads/&lt;path:filename&gt; y crea directorios estándar (documentos_jugadores, fotos_jugadores, logos).\n\nObservación: No se han incluido en esta documentación funcionalidades que no estén representadas por rutas o modelos en el repositorio. Por ejemplo, la UI completa de cada vista del frontend existe en frontend/ pero algunos componentes específicos pueden no estar presentes o estar incompletos; el apartado “Estado del proyecto” detalla dichas limitaciones."
+  },
+  {
+    "objectID": "mejoras-futuras.html",
+    "href": "mejoras-futuras.html",
+    "title": "Mejoras futuras",
+    "section": "",
+    "text": "Esta sección propone mejoras técnicas, funcionales y de experiencia de usuario que se derivan directamente del análisis del código y las limitaciones detectadas.\n\nMejoras técnicas\n\n\nExtraer e implementar el microservicio de alineaciones dentro del repositorio o proveer un contenedor Docker con su imagen de referencia para facilitar despliegues replicables.\nAñadir reglas automáticas de negocio (p. ej. convertir dos tarjetas amarillas en una roja) en el backend y registrar el impacto en sanciones mediante una tabla de suspensiones.\nCompletar y ampliar la suite de pruebas (unitarias e integración) para endpoints críticos: partidos, registro de resultados, eventos y proxy de alineaciones. Integrar CI que ejecute las pruebas.\n\n\nMejoras funcionales\n\n\nRegistrar y auditar modificaciones: actualmente existe historial de cambios de estado (HistorialEstado) pero se podría extender a auditoría completa de cambios en entidades críticas.\nImplementar permisos más finos (p. ej. delegación temporal a líderes para administrar alineaciones durante el partido).\nAñadir un mecanismo robusto de gestión de sanciones y calendario automático para suspensiones por tarjetas rojas o acumulación.\n\n\nMejoras de UX\n\n\nDiseñar una vista de partido en tiempo real con actualización mediante WebSockets o Server-Sent Events para mostrar eventos a espectadores sin refrescar la página.\nMejorar accesibilidad con pruebas automatizadas (axe-core) y checklist de cumplimiento de WCAG 2.1.\nCrear componentes reutilizables para cronologías y tarjetas de evento que permitan desplegar rápidamente resúmenes y acciones (por ejemplo, revertir un evento con control de permisos y registro de auditoría).\n\n\nOperacional / DevOps\n\n\nAñadir Dockerfiles para backend y frontend y un docker-compose que incluya la base de datos y, opcionalmente, el microservicio de alineaciones.\nAutomatizar despliegue y gestión de secretos (variables de correo, JWT, credenciales de base de datos) mediante un gestor de secretos en los entornos académicos.\n\nPrioridades sugeridas (ordenadas):\n\nIntegrar/añadir el microservicio de alineaciones y proveer una imagen Docker.\nImplementar reglas automáticas de tarjetas y registrar suspensiones.\nAmpliar tests e integrar CI.\nAñadir soporte en frontend para actualización en tiempo real."
+  },
+  {
+    "objectID": "estado-proyecto.html",
+    "href": "estado-proyecto.html",
+    "title": "Estado del proyecto",
+    "section": "",
+    "text": "API REST completa para gestión de usuarios y autenticación JWT.\nEndpoints para gestión de campeonatos, equipos, jugadores, partidos, goles y tarjetas; namespaces y blueprints organizan las rutas.\nProxy para integración con microservicio de alineaciones (peticiones a http://localhost:5001).\nMecanismos de seguridad: roles, comprobaciones de permisos, lista negra de tokens, límites de login y rate limiting configurables en create_app.\nPersistencia mediante SQLAlchemy y migraciones (Flask-Migrate); creación automática de tablas al inicializar la app."
+  },
+  {
+    "objectID": "estado-proyecto.html#funcionalidades-implementadas-verificadas-en-el-código",
+    "href": "estado-proyecto.html#funcionalidades-implementadas-verificadas-en-el-código",
+    "title": "Estado del proyecto",
+    "section": "",
+    "text": "API REST completa para gestión de usuarios y autenticación JWT.\nEndpoints para gestión de campeonatos, equipos, jugadores, partidos, goles y tarjetas; namespaces y blueprints organizan las rutas.\nProxy para integración con microservicio de alineaciones (peticiones a http://localhost:5001).\nMecanismos de seguridad: roles, comprobaciones de permisos, lista negra de tokens, límites de login y rate limiting configurables en create_app.\nPersistencia mediante SQLAlchemy y migraciones (Flask-Migrate); creación automática de tablas al inicializar la app."
+  },
+  {
+    "objectID": "estado-proyecto.html#funcionalidades-parciales-o-dependientes-de-componentes-externos",
+    "href": "estado-proyecto.html#funcionalidades-parciales-o-dependientes-de-componentes-externos",
+    "title": "Estado del proyecto",
+    "section": "Funcionalidades parciales o dependientes de componentes externos",
+    "text": "Funcionalidades parciales o dependientes de componentes externos\n\nAlineaciones: el backend actúa como proxy hacia un microservicio externo; la lógica de validación (mínimo 6 titulares) está implementada en el proxy, pero el microservicio no está incluido en el repositorio.\nFrontend: el proyecto Angular está presente y preparado para servir la aplicación; la implementación completa de todas las vistas puede requerir revisar componentes concretos en frontend/src/app (no todos los componentes se han auditado en detalle para esta documentación)."
+  },
+  {
+    "objectID": "estado-proyecto.html#limitaciones-actuales",
+    "href": "estado-proyecto.html#limitaciones-actuales",
+    "title": "Estado del proyecto",
+    "section": "Limitaciones actuales",
+    "text": "Limitaciones actuales\n\nAusencia del microservicio de alineaciones en el repositorio: para disponer de la funcionalidad de definición y obtención de alineaciones es necesario desplegar el servicio externo o adaptar el MICROSERVICIO_URL a un servicio disponible.\nNo existe en el código una regla automática de conversión de dos tarjetas amarillas a una roja; tal regla no está implementada y, si se requiere, debe añadirse.\nLas pruebas unitarias y de integración son limitadas; se observan archivos de prueba (test_routes.py, test_email.py) pero no hay una suite de cobertura amplia documentada."
+  },
+  {
+    "objectID": "estado-proyecto.html#notas-de-despliegue-y-ejecución-mínima",
+    "href": "estado-proyecto.html#notas-de-despliegue-y-ejecución-mínima",
+    "title": "Estado del proyecto",
+    "section": "Notas de despliegue y ejecución mínima",
+    "text": "Notas de despliegue y ejecución mínima\n\nBackend: python run.py arranca la aplicación en http://0.0.0.0:5000 por defecto. Variables sensibles (correo, credenciales JWT) se deben configurar mediante .env.\nFrontend: npm install y npx ng serve para desarrollo — el package.json indica Angular CLI y Material."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Portada",
+    "section": "",
+    "text": "Sistema de Gestión de Campeonatos Deportivos\nProyecto: Sistema de Gestión de Campeonatos Deportivos\nBreve descripción\nEste documento reúne la documentación oficial y académica del proyecto “Campeonato”. Contiene la visión general, la arquitectura del sistema, las funcionalidades implementadas, las reglas de negocio extraídas del código, consideraciones de UI/UX, el estado actual del proyecto y una lista ordenada de mejoras futuras recomendadas.\nContexto académico\nLa documentación está preparada para presentación en un entorno académico. Se basa exclusivamente en el código y artefactos reales presentes en el repositorio: un backend implementado en Python/Flask con API REST (Flask-RESTx), y un frontend en Angular (versión aproximada 21) con Angular Material. Donde el sistema delega responsabilidades a servicios externos (por ejemplo, un microservicio de alineaciones) se indica explícitamente.\nEnlaces rápidos\n\nIntroducción: introduccion.qmd\nArquitectura: arquitectura.qmd\nFuncionalidades: funcionalidades.qmd"
+  },
+  {
+    "objectID": "reglas-negocio.html",
+    "href": "reglas-negocio.html",
+    "title": "Reglas de negocio",
+    "section": "",
+    "text": "Las reglas de negocio que siguen se han extraído directamente de los modelos y de la lógica de las rutas del backend. Se citan los puntos concretos que el código impone.\n\nTipos de campeonatos\n\n\nEl modelo Campeonato define tipo_deporte con valores futbol e indoor.\n\n\nEstados y duración de partidos\n\n\nEl modelo Partido define el campo estado con valores manejados por la API: programado, en_juego, finalizado, cancelado. El cambio de estado queda registrado en HistorialEstado.\nLa duración numérica de un partido no está codificada como constante en el backend; sin embargo, validaciones relacionadas con minutos de eventos permiten rangos hasta 120 (p. ej. en gol_routes.py el minuto debe estar entre 1 y 120). Esto implica soporte para prórrogas.\n\n\nReglas sobre tarjetas\n\n\nEl modelo Tarjeta distingue entre amarilla y roja. Las tarjetas se registran con minuto y motivo. No se han hallado reglas automáticas de acumulación (p.ej. dos amarillas → roja) en el código; por tanto, la conversión automática no está implementada y debe realizarse manualmente por el operador o mediante una futura regla de negocio.\n\n\nExpulsiones\n\n\nLas expulsiones son representadas por tarjetas de tipo roja. No se detecta en el código una lógica adicional (por ejemplo suspensión automática de partidos) fuera del registro de la tarjeta.\n\n\nConsideraciones especiales y restricciones observadas\n\n\nInmutabilidad de resultado: una vez que en Partido se establece resultado_registrado = True (operación PATCH /partidos/&lt;id&gt;/resultado), el sistema impide modificaciones de partidos o eliminación/agregado de goles asociados.\nRestricción de equipos distintos: el modelo Partido aplica una CheckConstraint que impide crear un partido con el mismo equipo local y visitante.\nRestricción sobre eliminación de partido: no se permite eliminar un partido que tenga goles registrados (comprobación en partido_routes.py).\nValidaciones de alineaciones: la comprobación de que ambos equipos tienen alineaciones utiliza como criterio mínimo 6 titulares (esta regla está codificada en el proxy de alineaciones). Si alguno no cumple, el partido no puede iniciar según la respuesta del proxy.\nControl de permisos: operaciones críticas (crear/editar/eliminar partidos, registrar resultado final, eliminar eventos) requieren roles con privilegios (admin, superadmin) o que el usuario sea el creador del campeonato en cuestión.\n\n\nReglas específicas de eventos\n\n\nLos eventos de tipo gol actualizan el marcador directamente al insertarse y se refleja en la entidad Partido.\nLa API registra asistidor opcionalmente para goles; cuando se proporciona id_asistidor se valida que exista y que pertenezca al mismo equipo.\n\n\nObservaciones de integridad\n\n\nEl sistema depende de la consistencia entre tablas (partidos, jugadores, equipos). Muchas operaciones consultan y validan relaciones antes de persistir; en caso de error se realiza rollback de la sesión."
+  },
+  {
+    "objectID": "arquitectura.html",
+    "href": "arquitectura.html",
+    "title": "Arquitectura del sistema",
+    "section": "",
+    "text": "El sistema sigue una arquitectura cliente-servidor con separación clara entre frontend y backend. El backend es una aplicación monolítica en Python que expone una API REST (Flask + Flask-RESTx). El frontend es una aplicación Angular que consume dicha API.\nComponentes principales identificados en el repositorio:\n\nBackend (ruta: backend/):\n\nFlask + Flask-RESTx para rutas y documentación Swagger.\nSQLAlchemy para persistencia (modelos definidos en backend/app/models).\nJWT para autenticación y control de sesiones.\nBlueprints y namespaces para organizar endpoints (por ejemplo partido_routes.py, gol_routes.py, eventos_routes.py, alineaciones_proxy_routes.py).\nServicio de correo configurado (variables en entorno) y manejo de archivos subidos (/uploads).\n\nFrontend (ruta: frontend/):\n\nProyecto Angular (package.json revela dependencias como @angular/material, @angular/cdk).\n\nMicroservicio de alineaciones: El backend actúa como proxy hacia un microservicio externo (constante MICROSERVICIO_URL = \"http://localhost:5001\" en alineaciones_proxy_routes.py). Este microservicio no forma parte del repositorio y por tanto debe proveerse externamente si se desea la funcionalidad completa de alineaciones."
+  },
+  {
+    "objectID": "arquitectura.html#arquitectura-general",
+    "href": "arquitectura.html#arquitectura-general",
+    "title": "Arquitectura del sistema",
+    "section": "",
+    "text": "El sistema sigue una arquitectura cliente-servidor con separación clara entre frontend y backend. El backend es una aplicación monolítica en Python que expone una API REST (Flask + Flask-RESTx). El frontend es una aplicación Angular que consume dicha API.\nComponentes principales identificados en el repositorio:\n\nBackend (ruta: backend/):\n\nFlask + Flask-RESTx para rutas y documentación Swagger.\nSQLAlchemy para persistencia (modelos definidos en backend/app/models).\nJWT para autenticación y control de sesiones.\nBlueprints y namespaces para organizar endpoints (por ejemplo partido_routes.py, gol_routes.py, eventos_routes.py, alineaciones_proxy_routes.py).\nServicio de correo configurado (variables en entorno) y manejo de archivos subidos (/uploads).\n\nFrontend (ruta: frontend/):\n\nProyecto Angular (package.json revela dependencias como @angular/material, @angular/cdk).\n\nMicroservicio de alineaciones: El backend actúa como proxy hacia un microservicio externo (constante MICROSERVICIO_URL = \"http://localhost:5001\" en alineaciones_proxy_routes.py). Este microservicio no forma parte del repositorio y por tanto debe proveerse externamente si se desea la funcionalidad completa de alineaciones."
+  },
+  {
+    "objectID": "arquitectura.html#separación-frontend-backend",
+    "href": "arquitectura.html#separación-frontend-backend",
+    "title": "Arquitectura del sistema",
+    "section": "Separación frontend / backend",
+    "text": "Separación frontend / backend\nLa UI (Angular) se comunica con la API REST del backend (Flask). El backend valida permisos y reglas de negocio, y además actúa como intermediario (proxy) hacia un servicio especializado en alineaciones. Las rutas del backend están agrupadas por dominio (auth, equipos, jugadores, partidos, goles, tarjetas, notificaciones, upload, etc.)."
+  },
+  {
+    "objectID": "arquitectura.html#flujo-de-datos-alto-nivel",
+    "href": "arquitectura.html#flujo-de-datos-alto-nivel",
+    "title": "Arquitectura del sistema",
+    "section": "Flujo de datos (alto nivel)",
+    "text": "Flujo de datos (alto nivel)\n\nEl usuario (cliente Angular) realiza una llamada HTTP al backend (por ejemplo, crear partido o registrar un gol).\nEl backend valida autenticación (JWT) y autorización (roles) y aplica reglas de negocio.\nLas operaciones de escritura se traducen en transacciones SQLAlchemy persistidas en la base de datos.\nPara alineaciones, el backend delega a un microservicio (proxy HTTP). Para archivos, el backend sirve contenidos desde /uploads."
+  },
+  {
+    "objectID": "arquitectura.html#tecnologías-utilizadas-evidencia-en-el-repositorio",
+    "href": "arquitectura.html#tecnologías-utilizadas-evidencia-en-el-repositorio",
+    "title": "Arquitectura del sistema",
+    "section": "Tecnologías utilizadas (evidencia en el repositorio)",
+    "text": "Tecnologías utilizadas (evidencia en el repositorio)\n\nPython 3.x, Flask, Flask-RESTx, Flask-JWT-Extended, SQLAlchemy, Flask-Migrate.\nAngular (v21 aproximada), Angular Material, ngx-daterangepicker-material.\nDependencias documentadas: requirements.txt en backend/ y package.json en frontend/."
+  },
+  {
+    "objectID": "arquitectura.html#estructura-del-proyecto-resumen-relevante",
+    "href": "arquitectura.html#estructura-del-proyecto-resumen-relevante",
+    "title": "Arquitectura del sistema",
+    "section": "Estructura del proyecto (resumen relevante)",
+    "text": "Estructura del proyecto (resumen relevante)\n\nbackend/ — código servidor, modelos en backend/app/models, rutas en backend/app/routes. Punto de arranque: backend/run.py.\nfrontend/ — aplicación Angular con package.json y código en src/.\ndatabase/ — backups SQL incluidos.\nuploads/ — directorios preparados para documentos, fotos y logos que el backend sirve."
+  }
+]

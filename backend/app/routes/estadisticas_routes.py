@@ -222,3 +222,231 @@ class Goleadores(Resource):
 
         except Exception as e:
             estadisticas_ns.abort(500, error=str(e))
+# ============================================
+# ESTADÍSTICAS DE DISCIPLINA
+# ============================================
+
+disciplina_jugador_model = estadisticas_ns.model('DisciplinaJugador', {
+    'id_jugador': fields.Integer(description='ID del jugador'),
+    'nombre': fields.String(description='Nombre completo'),
+    'equipo': fields.String(description='Nombre del equipo'),
+    'amarillas': fields.Integer(description='Total amarillas'),
+    'rojas': fields.Integer(description='Total rojas')
+})
+
+disciplina_equipo_model = estadisticas_ns.model('DisciplinaEquipo', {
+    'id_equipo': fields.Integer(description='ID del equipo'),
+    'equipo': fields.String(description='Nombre del equipo'),
+    'amarillas': fields.Integer(description='Total amarillas'),
+    'rojas': fields.Integer(description='Total rojas'),
+    'total': fields.Integer(description='Total tarjetas'),
+    'badge': fields.String(description='Badge especial')
+})
+
+tarjetas_jornada_model = estadisticas_ns.model('TarjetasJornada', {
+    'jornada': fields.Integer(description='Número de jornada'),
+    'amarillas': fields.Integer(description='Amarillas en la jornada'),
+    'rojas': fields.Integer(description='Rojas en la jornada')
+})
+
+
+@estadisticas_ns.route('/disciplina')
+class EstadisticasDisciplina(Resource):
+    @estadisticas_ns.doc(
+        description='Obtiene estadísticas de disciplina (tarjetas amarillas y rojas)',
+        params={
+            'id_campeonato': 'ID del campeonato (opcional)'
+        }
+    )
+    def get(self):
+        """
+        Obtiene estadísticas completas de disciplina:
+        - Top jugadores con más amarillas
+        - Top jugadores con más rojas  
+        - Disciplina por equipo
+        - Tarjetas por jornada
+        """
+        try:
+            id_campeonato = request.args.get('id_campeonato', type=int)
+            
+            # ========================================
+            # 1. TOP JUGADORES CON MÁS AMARILLAS
+            # ========================================
+            query_amarillas = """
+                SELECT 
+                    j.id_jugador,
+                    CONCAT(j.nombre, ' ', j.apellido) as nombre_completo,
+                    e.nombre as equipo,
+                    COUNT(t.id_tarjeta) as amarillas
+                FROM jugadores j
+                INNER JOIN equipos e ON j.id_equipo = e.id_equipo
+                INNER JOIN tarjetas t ON j.id_jugador = t.id_jugador
+                INNER JOIN partidos p ON t.id_partido = p.id_partido
+                WHERE t.tipo = 'amarilla'
+            """
+            
+            if id_campeonato:
+                query_amarillas += f" AND p.id_campeonato = {id_campeonato}"
+            
+            query_amarillas += """
+                GROUP BY j.id_jugador, e.nombre
+                ORDER BY amarillas DESC
+                LIMIT 10
+            """
+            
+            result_amarillas = db.session.execute(text(query_amarillas))
+            top_amarillas = [
+                {
+                    'id_jugador': row[0],
+                    'nombre': row[1],
+                    'equipo': row[2],
+                    'amarillas': row[3]
+                }
+                for row in result_amarillas
+            ]
+            
+            # ========================================
+            # 2. TOP JUGADORES CON MÁS ROJAS
+            # ========================================
+            query_rojas = """
+                SELECT 
+                    j.id_jugador,
+                    CONCAT(j.nombre, ' ', j.apellido) as nombre_completo,
+                    e.nombre as equipo,
+                    COUNT(t.id_tarjeta) as rojas
+                FROM jugadores j
+                INNER JOIN equipos e ON j.id_equipo = e.id_equipo
+                INNER JOIN tarjetas t ON j.id_jugador = t.id_jugador
+                INNER JOIN partidos p ON t.id_partido = p.id_partido
+                WHERE t.tipo = 'roja'
+            """
+            
+            if id_campeonato:
+                query_rojas += f" AND p.id_campeonato = {id_campeonato}"
+            
+            query_rojas += """
+                GROUP BY j.id_jugador, e.nombre
+                ORDER BY rojas DESC
+                LIMIT 10
+            """
+            
+            result_rojas = db.session.execute(text(query_rojas))
+            top_rojas = [
+                {
+                    'id_jugador': row[0],
+                    'nombre': row[1],
+                    'equipo': row[2],
+                    'rojas': row[3]
+                }
+                for row in result_rojas
+            ]
+            
+            # ========================================
+            # 3. DISCIPLINA POR EQUIPO
+            # ========================================
+            query_equipos = """
+                SELECT 
+                    e.id_equipo,
+                    e.nombre as equipo,
+                    SUM(CASE WHEN t.tipo = 'amarilla' THEN 1 ELSE 0 END) as amarillas,
+                    SUM(CASE WHEN t.tipo = 'roja' THEN 1 ELSE 0 END) as rojas,
+                    COUNT(t.id_tarjeta) as total
+                FROM equipos e
+                INNER JOIN jugadores j ON e.id_equipo = j.id_equipo
+                INNER JOIN tarjetas t ON j.id_jugador = t.id_jugador
+                INNER JOIN partidos p ON t.id_partido = p.id_partido
+            """
+            
+            if id_campeonato:
+                query_equipos += f" WHERE p.id_campeonato = {id_campeonato}"
+            
+            query_equipos += """
+                GROUP BY e.id_equipo, e.nombre
+                ORDER BY total ASC
+            """
+            
+            result_equipos = db.session.execute(text(query_equipos))
+            disciplina_equipos = []
+            for idx, row in enumerate(result_equipos):
+                disciplina_equipos.append({
+                    'id_equipo': row[0],
+                    'equipo': row[1],
+                    'amarillas': int(row[2]),
+                    'rojas': int(row[3]),
+                    'total': row[4],
+                    'badge': 'Equipo Más Limpio' if idx == 0 else None
+                })
+            
+            # ========================================
+            # 4. TARJETAS POR JORNADA
+            # ========================================
+            query_jornadas = """
+                SELECT 
+                    p.jornada,
+                    SUM(CASE WHEN t.tipo = 'amarilla' THEN 1 ELSE 0 END) as amarillas,
+                    SUM(CASE WHEN t.tipo = 'roja' THEN 1 ELSE 0 END) as rojas
+                FROM partidos p
+                INNER JOIN tarjetas t ON p.id_partido = t.id_partido
+            """
+            
+            if id_campeonato:
+                query_jornadas += f" WHERE p.id_campeonato = {id_campeonato}"
+            
+            query_jornadas += """
+                GROUP BY p.jornada
+                ORDER BY p.jornada
+            """
+            
+            result_jornadas = db.session.execute(text(query_jornadas))
+            tarjetas_jornada = [
+                {
+                    'jornada': row[0],
+                    'amarillas': int(row[1]),
+                    'rojas': int(row[2])
+                }
+                for row in result_jornadas
+            ]
+            
+            # ========================================
+            # INFORMACIÓN DEL CAMPEONATO
+            # ========================================
+            campeonato_info = None
+            if id_campeonato:
+                query_campeonato = """
+                    SELECT id_campeonato, nombre 
+                    FROM campeonatos 
+                    WHERE id_campeonato = :id_campeonato
+                """
+                result = db.session.execute(
+                    text(query_campeonato), 
+                    {'id_campeonato': id_campeonato}
+                ).fetchone()
+                
+                if result:
+                    campeonato_info = {
+                        'id_campeonato': result[0],
+                        'nombre': result[1]
+                    }
+            
+            # Calcular totales
+            total_amarillas = sum(j['amarillas'] for j in tarjetas_jornada)
+            total_rojas = sum(j['rojas'] for j in tarjetas_jornada)
+            
+            return {
+                'campeonato': campeonato_info,
+                'top_amarillas': top_amarillas,
+                'top_rojas': top_rojas,
+                'disciplina_equipos': disciplina_equipos,
+                'tarjetas_jornada': tarjetas_jornada,
+                'totales': {
+                    'amarillas': total_amarillas,
+                    'rojas': total_rojas,
+                    'total': total_amarillas + total_rojas
+                }
+            }, 200
+            
+        except Exception as e:
+            print(f"❌ Error en estadísticas de disciplina: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            estadisticas_ns.abort(500, error=str(e))

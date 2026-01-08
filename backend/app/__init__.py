@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_restx import Api
 from app.config import config_by_name
 from app.extensions import db, migrate, jwt, cors, mail
@@ -8,6 +8,10 @@ from datetime import timedelta
 
 def create_app(config_name='development'):
     app = Flask(__name__)
+
+    app.config['PROPAGATE_EXCEPTIONS'] = True
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
     app.config.from_object(config_by_name[config_name])
 
     api = Api(app, title='Campeonato API', version='1.0', description='API para gestión de campeonatos de fútbol')
@@ -27,13 +31,41 @@ def create_app(config_name='development'):
     app.config['RATE_LIMIT_BAN_DURATION_MINUTES'] = 30
     app.config['SECURITY_LOG_RETENTION_DAYS'] = 90
     app.config['SEND_LOCKOUT_EMAIL'] = True
+
+    # ============================================
+    # RUTA PARA SERVIR ARCHIVOS SUBIDOS
+    # ============================================
+    @app.route('/uploads/<path:filename>')
+    def uploaded_file(filename):
+        """Servir archivos subidos (logos, documentos, fotos)"""
+        # Construir la ruta absoluta al directorio uploads
+        uploads_base = os.path.join(os.path.dirname(app.root_path), 'uploads')
+        # El filename puede incluir subdirectorios (ej: logos/archivo.png)
+        file_path = os.path.join(uploads_base, filename)
+        
+        if not os.path.exists(file_path):
+            from flask import abort
+            app.logger.error(f"Archivo no encontrado: {file_path}")
+            abort(404)
+        
+        # Para send_from_directory, necesitamos el directorio y el nombre del archivo
+        directory = os.path.dirname(file_path)
+        file_name = os.path.basename(file_path)
+        
+        return send_from_directory(directory, file_name)
     
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'documentos'), exist_ok=True)
-    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'logos'), exist_ok=True)
+    # ============================================
+    # CREAR DIRECTORIOS DE UPLOADS
+    # ============================================
+    uploads_base = os.path.join(os.path.dirname(app.root_path), 'uploads')
+    os.makedirs(os.path.join(uploads_base, 'documentos_jugadores'), exist_ok=True)
+    os.makedirs(os.path.join(uploads_base, 'fotos_jugadores'), exist_ok=True)
+    os.makedirs(os.path.join(uploads_base, 'logos'), exist_ok=True)
     
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+
     cors.init_app(app, resources={
         r"/*": {
             "origins": ["http://localhost:4200", "http://localhost:3000"],
@@ -98,41 +130,58 @@ def create_app(config_name='development'):
         from app.models.equipo import Equipo
         from app.models.jugador import Jugador
         from app.models.campeonato import Campeonato
+        from app.models.campeonato_equipo import CampeonatoEquipo
         from app.models.partido import Partido
         from app.models.gol import Gol
         from app.models.tarjeta import Tarjeta
         from app.models.notificacion import Notificacion
         from app.models.solicitud_equipo import SolicitudEquipo
+        from app.models.historial_estado import HistorialEstado
         from app.models.token_blacklist import TokenBlacklist
         from app.models.refresh_token import RefreshToken
         from app.models.login_attempt import LoginAttempt
         from app.models.account_lockout import AccountLockout
         from app.models.security_log import SecurityLog
+        
         db.create_all()
     
+    # Importar namespaces
     from app.routes.auth_routes import auth_ns
     from app.routes.equipo_routes import equipo_ns
     from app.routes.jugador_routes import jugador_ns
     from app.routes.campeonato_routes import campeonato_ns
+    from app.routes.campeonato_equipo_routes import inscripcion_ns
     from app.routes.partido_routes import partidos_ns
     from app.routes.gol_routes import gol_ns
     from app.routes.tarjeta_routes import tarjeta_ns
     from app.routes.solicitud_equipo_routes import solicitud_ns
+    from app.routes.historial_estado_routes import historial_ns
     from app.routes.notificacion_routes import notificacion_ns
     from app.routes.estadisticas_routes import estadisticas_ns
     from app.routes.superadmin_routes import superadmin_ns
+    from app.routes.lider_routes import lider_ns
+    from app.routes.upload_routes import upload_ns
+    from app.routes.alineaciones_proxy_routes import alineaciones_proxy_bp
+    from app.routes.eventos_routes import eventos_bp
 
+    # Registrar namespaces
     api.add_namespace(auth_ns, path='/auth')
     api.add_namespace(equipo_ns, path='/equipos')
     api.add_namespace(jugador_ns, path='/jugadores')
     api.add_namespace(campeonato_ns, path='/campeonatos')
+    api.add_namespace(inscripcion_ns, path='/inscripciones')
     api.add_namespace(partidos_ns, path='/partidos')
     api.add_namespace(gol_ns, path='/gol')
     api.add_namespace(tarjeta_ns, path='/tarjetas')
     api.add_namespace(solicitud_ns, path='/solicitudes')
+    api.add_namespace(historial_ns, path='/historial')
     api.add_namespace(notificacion_ns, path='/notificaciones')
     api.add_namespace(estadisticas_ns, path='/estadisticas')
     api.add_namespace(superadmin_ns, path='/superadmin')
+    api.add_namespace(lider_ns, path='/lider')
+    api.add_namespace(upload_ns, path='/upload')
+    app.register_blueprint(alineaciones_proxy_bp)
+    app.register_blueprint(eventos_bp)
 
     @app.route('/health')
     def health_check():

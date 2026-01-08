@@ -1,0 +1,23 @@
+---
+title: "Introducción"
+format: html
+---
+
+## Visión general del sistema
+
+El repositorio "Campeonato" implementa un sistema orientado a la gestión de campeonatos deportivos, con énfasis en fútbol. El proyecto contiene un backend desarrollado con Flask y Flask-RESTx que expone una API REST para la gestión de campeonatos, equipos, jugadores, partidos y eventos (goles, tarjetas, sustituciones). El frontend está desarrollado con Angular (proyecto presente en la carpeta `frontend`) y emplea Angular Material.
+
+## Problema que resuelve
+
+El sistema facilita la organización y el registro de campeonatos deportivos en contextos donde se requiere un control centralizado de inscripciones, programación de partidos, registro de eventos en tiempo real y publicación de alineaciones. Permite que roles con diferentes privilegios (administradores, líderes de equipo, superadministradores) realicen acciones acordes a su responsabilidad.
+
+## Objetivos del proyecto
+
+- Proporcionar una API REST segura y documentada para operaciones administrativas y deportivas.
+- Permitir la inscripción y gestión de equipos y jugadores en campeonatos.
+- Registrar partidos y eventos en tiempo real (goles, tarjetas, sustituciones) conservando inmutabilidad de resultados finales cuando procede.
+- Integrar (por proxy) un microservicio externo encargado de la gestión de alineaciones.
+
+## Beneficiarios
+
+Los principales beneficiarios son: organizadores de campeonatos (administradores), líderes de equipo que gestionan alineaciones y eventos en los partidos, y audiencias (usuarios) que consumen estadísticas y resultados a través del frontend.

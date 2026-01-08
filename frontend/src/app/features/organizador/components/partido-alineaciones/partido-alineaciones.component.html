@@ -1,0 +1,346 @@
+<div class="live-match-container" role="main" aria-label="Partido en vivo - Panel de control">
+  
+  <!-- LOADING STATE -->
+  <div *ngIf="loading()" class="loading-overlay" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Cargando datos del partido...</p>
+  </div>
+  
+  <!-- MAIN CONTENT -->
+  <div *ngIf="!loading()" class="content-wrapper">
+    
+    <!-- HEADER -->
+    <header class="match-header">
+      <button 
+        class="btn-back" 
+        (click)="volver()"
+        aria-label="Volver al detalle del partido"
+        type="button">
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+        <span>Volver</span>
+      </button>
+      
+      <div class="header-info">
+        <div class="match-type-badge">
+          <span class="material-symbols-outlined" aria-hidden="true">sports_soccer</span>
+          <span>{{ partido()?.tipo_deporte === 'futbol_indoor' ? 'Indoor 6 vs 6' : 'Fútbol 11' }}</span>
+        </div>
+        <div class="minute-badge">
+          <span class="material-symbols-outlined" aria-hidden="true">timer</span>
+          <span>MIN {{ minutoActual() }}'</span>
+        </div>
+      </div>
+    </header>
+    
+    <!-- SCOREBOARD -->
+    <div class="scoreboard" role="region" aria-label="Marcador">
+      <div class="team team-local">
+        <div class="team-shield" aria-hidden="true">
+          <span class="material-symbols-outlined">shield</span>
+        </div>
+        <div class="team-details">
+          <h2 class="team-name">{{ partido()?.equipo_local || 'Equipo Local' }}</h2>
+          <span class="team-label">Local</span>
+        </div>
+      </div>
+      
+      <div class="score" aria-label="Marcador">
+        <span class="score-value">{{ golesLocal() }}</span>
+        <span class="score-separator">-</span>
+        <span class="score-value">{{ golesVisitante() }}</span>
+      </div>
+      
+      <div class="team team-visitor">
+        <div class="team-details">
+          <h2 class="team-name">{{ partido()?.equipo_visitante || 'Equipo Visitante' }}</h2>
+          <span class="team-label">Visitante</span>
+        </div>
+        <div class="team-shield" aria-hidden="true">
+          <span class="material-symbols-outlined">shield</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- MAIN LAYOUT: FIELD + CONTROL PANEL -->
+    <div class="main-layout">
+      
+      <!-- FIELD SECTION -->
+      <section class="field-section" aria-label="Cancha de fútbol">
+        <div class="field-container">
+          <div class="field" 
+               (click)="cerrarMenuContextual()"
+               role="img"
+               [attr.aria-label]="'Cancha con ' + alineacionLocal().length + ' jugadores locales y ' + alineacionVisitante().length + ' visitantes'">
+            
+            <!-- FIELD LINES -->
+            <div class="field-lines" aria-hidden="true">
+              <div class="field-border"></div>
+              <div class="center-line"></div>
+              <div class="center-circle">
+                <div class="center-dot"></div>
+              </div>
+              <div class="penalty-area penalty-top">
+                <div class="small-area"></div>
+                <div class="goal-area"></div>
+                <div class="penalty-spot"></div>
+              </div>
+              <div class="penalty-area penalty-bottom">
+                <div class="small-area"></div>
+                <div class="goal-area"></div>
+                <div class="penalty-spot"></div>
+              </div>
+            </div>
+            
+            <!-- LOCAL PLAYERS -->
+            <div 
+              *ngFor="let jugador of alineacionLocal(); trackBy: trackByJugadorId"
+              class="player player-local"
+              [class.has-red-card]="jugador.tarjetas_rojas && jugador.tarjetas_rojas > 0"
+              [style.left.%]="jugador.posicion_x"
+              [style.top.%]="jugador.posicion_y"
+              (click)="seleccionarJugadorParaEvento(jugador)"
+              (contextmenu)="mostrarMenuContextual($event, jugador)"
+              [attr.aria-label]="jugador.nombre + ', dorsal ' + jugador.dorsal"
+              role="button"
+              tabindex="0"
+              (keydown.enter)="seleccionarJugadorParaEvento(jugador)"
+              (keydown.space)="seleccionarJugadorParaEvento(jugador)">
+              
+              <div class="player-circle" [style.border-color]="getColorPosicion(jugador.posicion)">
+                <span class="player-number">{{ jugador.dorsal }}</span>
+                <div class="event-indicators">
+                  <span *ngIf="jugador.goles && jugador.goles > 0" class="badge-goal">⚽{{ jugador.goles }}</span>
+                  <span *ngIf="jugador.tarjetas_amarillas && jugador.tarjetas_amarillas > 0" class="badge-yellow">🟨</span>
+                  <span *ngIf="jugador.tarjetas_rojas && jugador.tarjetas_rojas > 0" class="badge-red">🟥</span>
+                </div>
+              </div>
+              <div class="player-name">{{ jugador.nombre }}</div>
+            </div>
+            
+            <!-- VISITOR PLAYERS -->
+            <div 
+              *ngFor="let jugador of alineacionVisitante(); trackBy: trackByJugadorId"
+              class="player player-visitor"
+              [class.has-red-card]="jugador.tarjetas_rojas && jugador.tarjetas_rojas > 0"
+              [style.left.%]="jugador.posicion_x"
+              [style.top.%]="jugador.posicion_y"
+              (click)="seleccionarJugadorParaEvento(jugador)"
+              (contextmenu)="mostrarMenuContextual($event, jugador)"
+              [attr.aria-label]="jugador.nombre + ', dorsal ' + jugador.dorsal"
+              role="button"
+              tabindex="0"
+              (keydown.enter)="seleccionarJugadorParaEvento(jugador)"
+              (keydown.space)="seleccionarJugadorParaEvento(jugador)">
+              
+              <div class="player-circle" [style.border-color]="getColorPosicion(jugador.posicion)">
+                <span class="player-number">{{ jugador.dorsal }}</span>
+                <div class="event-indicators">
+                  <span *ngIf="jugador.goles && jugador.goles > 0" class="badge-goal">⚽{{ jugador.goles }}</span>
+                  <span *ngIf="jugador.tarjetas_amarillas && jugador.tarjetas_amarillas > 0" class="badge-yellow">🟨</span>
+                  <span *ngIf="jugador.tarjetas_rojas && jugador.tarjetas_rojas > 0" class="badge-red">🟥</span>
+                </div>
+              </div>
+              <div class="player-name">{{ jugador.nombre }}</div>
+            </div>
+            
+          </div>
+        </div>
+      </section>
+      
+      <!-- CONTROL PANEL -->
+      <aside class="control-panel" aria-label="Panel de control del partido">
+        
+        <!-- EVENT TYPE SELECTOR -->
+        <div class="event-selector-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined" aria-hidden="true">add_circle</span>
+            Registrar Evento
+          </h3>
+          
+          <div class="event-buttons">
+            <button 
+              class="event-btn btn-goal"
+              (click)="abrirSelectorJugador('gol')"
+              [disabled]="modoSeleccion() !== null"
+              aria-label="Registrar gol">
+              <span class="material-symbols-outlined" aria-hidden="true">sports_soccer</span>
+              <span>Gol</span>
+            </button>
+            
+            <button 
+              class="event-btn btn-yellow"
+              (click)="abrirSelectorJugador('tarjeta_amarilla')"
+              [disabled]="modoSeleccion() !== null"
+              aria-label="Tarjeta amarilla">
+              <div class="card-icon yellow" aria-hidden="true"></div>
+              <span>Amarilla</span>
+            </button>
+            
+            <button 
+              class="event-btn btn-red"
+              (click)="abrirSelectorJugador('tarjeta_roja')"
+              [disabled]="modoSeleccion() !== null"
+              aria-label="Tarjeta roja">
+              <div class="card-icon red" aria-hidden="true"></div>
+              <span>Roja</span>
+            </button>
+          </div>
+          
+          <!-- MINUTE INPUT -->
+          <div class="minute-input-group">
+            <label for="minuto-evento">Minuto:</label>
+            <input 
+              type="number" 
+              id="minuto-evento"
+              [(ngModel)]="minutoActual"
+              min="0"
+              max="120"
+              class="minute-input"
+              aria-label="Minuto del evento">
+          </div>
+        </div>
+        
+        <!-- PLAYER SELECTOR -->
+        <div *ngIf="modoSeleccion()" class="player-selector-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined" aria-hidden="true">person</span>
+            Selecciona Jugador
+            <button class="btn-cancel-select" (click)="cancelarSeleccion()" aria-label="Cancelar selección">
+              <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+          </h3>
+          
+          <div class="teams-tabs">
+            <button 
+              class="tab-btn"
+              [class.active]="equipoSeleccionado() === 'local'"
+              (click)="equipoSeleccionado.set('local')">
+              {{ partido()?.equipo_local }}
+            </button>
+            <button 
+              class="tab-btn"
+              [class.active]="equipoSeleccionado() === 'visitante'"
+              (click)="equipoSeleccionado.set('visitante')">
+              {{ partido()?.equipo_visitante }}
+            </button>
+          </div>
+          
+          <div class="players-list">
+            <div 
+              *ngFor="let jugador of getJugadoresEquipoSeleccionado(); trackBy: trackByJugadorId"
+              class="player-item"
+              [class.selected]="jugadorSeleccionado()?.id_jugador === jugador.id_jugador"
+              [class.suspended]="jugador.tarjetas_rojas && jugador.tarjetas_rojas > 0"
+              (click)="confirmarEvento(jugador)"
+              role="button"
+              tabindex="0"
+              (keydown.enter)="confirmarEvento(jugador)"
+              (keydown.space)="confirmarEvento(jugador)">
+              
+              <div class="player-dorsal">{{ jugador.dorsal }}</div>
+              <div class="player-info">
+                <div class="player-name-full">{{ jugador.nombre }} {{ jugador.apellido }}</div>
+                <div class="player-position">{{ jugador.posicion }}</div>
+              </div>
+              <div class="player-stats">
+                <span *ngIf="jugador.goles && jugador.goles > 0" class="stat-goal">⚽{{ jugador.goles }}</span>
+                <span *ngIf="jugador.tarjetas_amarillas && jugador.tarjetas_amarillas > 0" class="stat-yellow">🟨{{ jugador.tarjetas_amarillas }}</span>
+                <span *ngIf="jugador.tarjetas_rojas && jugador.tarjetas_rojas > 0" class="stat-red">🟥</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- TIMELINE -->
+        <div class="timeline-section">
+          <h3 class="section-title">
+            <span class="material-symbols-outlined" aria-hidden="true">timeline</span>
+            Cronología del Partido
+            <span class="events-count">{{ eventos().length }}</span>
+          </h3>
+          
+          <div class="timeline-list">
+            <div *ngIf="eventos().length === 0" class="timeline-empty">
+              <span class="material-symbols-outlined" aria-hidden="true">event_note</span>
+              <p>No hay eventos registrados</p>
+            </div>
+            
+            <div 
+              *ngFor="let evento of eventosOrdenados(); trackBy: trackByEventoId"
+              class="timeline-item"
+              [class.timeline-goal]="evento.tipo === 'gol'"
+              [class.timeline-yellow]="evento.tipo === 'tarjeta_amarilla'"
+              [class.timeline-red]="evento.tipo === 'tarjeta_roja'">
+              
+              <div class="timeline-time">{{ evento.minuto }}'</div>
+              <div class="timeline-icon">
+                <span *ngIf="evento.tipo === 'gol'">⚽</span>
+                <span *ngIf="evento.tipo === 'tarjeta_amarilla'">🟨</span>
+                <span *ngIf="evento.tipo === 'tarjeta_roja'">🟥</span>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-type">{{ getTipoEventoTexto(evento.tipo) }}</div>
+                <div class="timeline-player">
+                  <strong>#{{ evento.jugador.dorsal }}</strong> {{ evento.jugador.nombre }} {{ evento.jugador.apellido }}
+                </div>
+                <div class="timeline-team">
+                  {{ evento.equipo === 'local' ? partido()?.equipo_local : partido()?.equipo_visitante }}
+                </div>
+                <div *ngIf="evento.asistidor" class="timeline-assist">
+                  Asistencia: #{{ evento.asistidor.dorsal }} {{ evento.asistidor.nombre }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </aside>
+      
+    </div>
+  </div>
+  
+  <!-- CONTEXT MENU (FALLBACK) -->
+  <div 
+    *ngIf="menuContextual().visible"
+    class="context-menu"
+    [style.left.px]="menuContextual().x"
+    [style.top.px]="menuContextual().y"
+    (click)="$event.stopPropagation()"
+    role="menu">
+    
+    <div class="menu-header">
+      <div class="player-dorsal">#{{ menuContextual().jugador?.dorsal }}</div>
+      <div class="player-info">
+        <strong>{{ menuContextual().jugador?.nombre }}</strong>
+        <span>{{ menuContextual().jugador?.posicion }}</span>
+      </div>
+    </div>
+    
+    <div class="menu-options">
+      <button class="menu-option option-goal" (click)="registrarGol(menuContextual().jugador!)">
+        <span class="material-symbols-outlined">sports_soccer</span>
+        <span>Gol</span>
+      </button>
+      <button class="menu-option option-yellow" (click)="registrarTarjetaAmarilla(menuContextual().jugador!)">
+        <div class="card yellow"></div>
+        <span>Amarilla</span>
+      </button>
+      <button class="menu-option option-red" (click)="registrarTarjetaRoja(menuContextual().jugador!)">
+        <div class="card red"></div>
+        <span>Roja</span>
+      </button>
+      <div class="menu-separator"></div>
+      <button class="menu-option option-cancel" (click)="cerrarMenuContextual()">
+        <span class="material-symbols-outlined">close</span>
+        <span>Cancelar</span>
+      </button>
+    </div>
+  </div>
+  
+  <div 
+    *ngIf="menuContextual().visible"
+    class="overlay"
+    (click)="cerrarMenuContextual()">
+  </div>
+  
+</div>

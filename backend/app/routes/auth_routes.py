@@ -79,6 +79,10 @@ error_response_model = auth_ns.model('ErrorResponse', {
 # 📝 REGISTRO DE USUARIOS
 # ============================================
 
+    # ============================================
+# 📝 REGISTRO DE USUARIOS
+# ============================================
+
 @auth_ns.route('/register')
 class Register(Resource):
     @auth_ns.expect(register_model)
@@ -93,10 +97,9 @@ class Register(Resource):
         """Registro de nuevos usuarios (SOLO GMAIL)"""
         try:
             data = auth_ns.payload
-
-            if not data.get('nombre') or not data.get('email') or not data.get('contrasena'):
+            password = data.get('contrasena') or data.get('password')
+            if not data.get('nombre') or not data.get('email') or not password:
                 auth_ns.abort(400, error='Nombre, email y contraseña son requeridos')
-
             if not validar_email(data['email']):
                 auth_ns.abort(400, error='Email no válido')
 
@@ -117,21 +120,49 @@ class Register(Resource):
                 email_verified=False,
                 email_verification_token=verification_token
             )
-            nuevo_usuario.set_password(data['contrasena'])
+            #nuevo_usuario.set_password(data['contrasena'])
+            nuevo_usuario.set_password(password)
 
             db.session.add(nuevo_usuario)
             db.session.commit()
 
+            # ✅ AQUÍ VA EL CÓDIGO QUE TE PASÉ
+            # ============================================
+            # ENVIAR EMAIL DE VERIFICACIÓN
+            # ============================================
+            print("=" * 50)
+            print("🔍 DEBUG - ENVIANDO EMAIL DE VERIFICACIÓN")
+            print(f"   📧 Email destino: {nuevo_usuario.email}")
+            print(f"   👤 Nombre: {nuevo_usuario.nombre}")
+            print(f"   🎫 Token generado: {verification_token[:20]}...")
+            print("=" * 50)
+
             email_sent = False
             try:
-                verification_link = f"http://localhost:5000/auth/verify-email?token={verification_token}"
+                # Link debe apuntar al FRONTEND, no al backend
+                verification_link = f"http://localhost:4200/auth/verify-email?token={verification_token}"
+                
+                print(f"🔗 Link de verificación: {verification_link}")
+                print("📨 Llamando a EmailService.send_verification_email()...")
+                
                 email_sent = EmailService.send_verification_email(
                     email=nuevo_usuario.email,
                     nombre=nuevo_usuario.nombre,
                     verification_link=verification_link
                 )
+                
+                print(f"✅ EmailService retornó: {email_sent}")
+                
             except Exception as e:
-                print(f"⚠️ Error al enviar email de verificación: {str(e)}")
+                print(f"❌ EXCEPCIÓN AL ENVIAR EMAIL:")
+                print(f"   Error: {str(e)}")
+                import traceback
+                traceback.print_exc()
+
+            print("=" * 50)
+            # ============================================
+            # FIN DEL CÓDIGO DE EMAIL
+            # ============================================
 
             SecurityLog.log_event(
                 event_type='login_success',
@@ -151,7 +182,6 @@ class Register(Resource):
         except Exception as e:
             db.session.rollback()
             auth_ns.abort(500, error=str(e))
-
 
 # ============================================
 # ✅ VERIFICAR EMAIL
@@ -228,9 +258,14 @@ class Login(Resource):
                 auth_ns.abort(401, error='Credenciales inválidas')
 
             # 2️⃣ VERIFICAR EMAIL VERIFICADO
+            # 2️⃣ VERIFICAR EMAIL VERIFICADO
             if not usuario.email_verified:
                 LoginTracker.record_attempt(email, False, ip_address, user_agent, 'email_no_verificado')
-                auth_ns.abort(403, error='Email no verificado', info='📧 Revisa tu correo de Gmail')
+                return make_response(jsonify({
+                       'error': 'Email no verificado',
+                        'mensaje': 'Debes verificar tu email antes de iniciar sesión',
+                        'info': '📧 Revisa tu correo de Gmail (incluyendo spam)'
+                     }), 403)
 
             # 3️⃣ VERIFICAR CUENTA ACTIVA
             if not usuario.activo:

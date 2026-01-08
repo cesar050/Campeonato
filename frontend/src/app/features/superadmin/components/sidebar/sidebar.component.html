@@ -1,114 +1,110 @@
-<!-- OVERLAY for mobile -->
-<div class="sidebar-overlay" [class.active]="!isCollapsed()" (click)="closeSidebar()"></div>
+<!-- Skip Link para accesibilidad -->
+<a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
-<aside class="sidebar" [class.collapsed]="isCollapsed()">
-  <!-- TOGGLE BUTTON DENTRO DEL SIDEBAR -->
-  <button class="sidebar-toggle" (click)="toggleSidebar()" type="button">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      @if (!isCollapsed()) {
-        <!-- Icono X cuando está abierto -->
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      } @else {
-        <!-- Icono hamburguesa cuando está cerrado -->
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      }
-    </svg>
+<!-- Overlay para móvil -->
+<div class="sidebar-overlay" [class.active]="!isCollapsed()" (click)="toggleSidebar()"></div>
+
+<aside class="sidebar" [class.collapsed]="isCollapsed()" role="navigation" aria-label="Navegación principal">
+  <!-- Botón hamburguesa -->
+  <button
+    type="button"
+    class="sidebar-toggle"
+    (click)="toggleSidebar()"
+    [attr.aria-expanded]="!isCollapsed()"
+    [attr.aria-label]="isCollapsed() ? 'Expandir menú lateral' : 'Colapsar menú lateral'"
+    aria-controls="sidebar-nav">
+    <span class="material-symbols-outlined">{{ isCollapsed() ? 'menu' : 'menu_open' }}</span>
   </button>
 
-  <!-- LOGO & BRAND -->
-  <div class="sidebar-header">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-          <path d="M2 12h20"></path>
-        </svg>
-      </div>
-      <span class="brand-name">Campeonato Libre</span>
-    </div>
-  </div>
-
-  <!-- USER INFO -->
-  <div class="user-info">
-    <div class="user-avatar">
+  <div class="user-section" role="region" aria-label="Información de usuario">
+    <div class="user-avatar" aria-hidden="true">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
         <circle cx="12" cy="7" r="4"></circle>
       </svg>
     </div>
-    <div class="user-details">
-      <div class="user-name">{{ currentUser()?.nombre || 'Admin User' }}</div>
-      <div class="user-role">Super Administrador</div>
+    <div class="user-details" *ngIf="!isCollapsed()">
+      <div class="user-name" [title]="currentUser()?.nombre || 'Admin'" aria-label="Usuario actual">
+        {{ (currentUser()?.nombre || 'Admin').length > 20 ? ((currentUser()?.nombre || 'Admin').substring(0, 20) + '...') : (currentUser()?.nombre || 'Admin') }}
+      </div>
+      <div class="user-role">SUPER ADMIN</div>
     </div>
   </div>
 
-  <!-- NAVIGATION -->
-  <nav class="sidebar-nav">
+  <nav class="sidebar-nav" aria-label="Menú de navegación">
     @for (item of menuItems; track item.route) {
       <a 
         [routerLink]="item.route" 
         routerLinkActive="active"
         class="nav-item"
+        [attr.aria-current]="item.route === router.url.split('?')[0] ? 'page' : null"
+        [attr.aria-label]="item.label + (item.route === router.url.split('?')[0] ? ' - página actual' : '')"
         (click)="onNavigate()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
-          @switch (item.icon) {
-            @case ('grid') {
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            }
-            @case ('trophy') {
-              <circle cx="12" cy="8" r="7"></circle>
-              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            }
-            @case ('users') {
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            }
-            @case ('user') {
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            }
-            @case ('bar-chart') {
-              <line x1="12" y1="20" x2="12" y2="10"></line>
-              <line x1="18" y1="20" x2="18" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="16"></line>
-            }
-            @case ('settings') {
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M12 1v6m0 6v6m5.2-13.2l-4.2 4.2m0 6l4.2 4.2m5-11.2l-6 0m-6 0l-6 0m13.2 5.2l-4.2-4.2m0-6l-4.2-4.2"></path>
-            }
-          }
-        </svg>
-        <span class="nav-label">{{ item.label }}</span>
+        <span class="material-symbols-outlined nav-icon" aria-hidden="true">{{ item.icon }}</span>
+        <span class="nav-label" *ngIf="!isCollapsed()">{{ item.label }}</span>
       </a>
     }
   </nav>
 
-  <!-- BOTTOM SECTION -->
-  <div class="sidebar-bottom">
-    <a href="#" class="nav-item">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M12 16v-4"></path>
-        <path d="M12 8h.01"></path>
-      </svg>
-      <span class="nav-label">Ayuda</span>
-    </a>
-    <button type="button" class="nav-item logout-btn" (click)="logout()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-        <polyline points="16 17 21 12 16 7"></polyline>
-        <line x1="21" y1="12" x2="9" y2="12"></line>
-      </svg>
-      <span class="nav-label">Cerrar Sesión</span>
+  <div class="sidebar-bottom" role="region" aria-label="Acciones de usuario">
+    <button 
+      type="button" 
+      class="nav-item" 
+      (click)="toggleAccessibilityCenter()"
+      aria-label="Abrir centro de accesibilidad"
+      aria-expanded="showAccessibilityCenter()"
+      aria-controls="accessibility-modal">
+      <span class="material-symbols-outlined nav-icon" aria-hidden="true">accessibility_new</span>
+      <span class="nav-label" *ngIf="!isCollapsed()">Accesibilidad</span>
+    </button>
+
+    <button 
+      type="button" 
+      class="nav-item logout-btn" 
+      (click)="logout()"
+      aria-label="Cerrar sesión">
+      <span class="material-symbols-outlined nav-icon" aria-hidden="true">logout</span>
+      <span class="nav-label" *ngIf="!isCollapsed()">Cerrar Sesión</span>
     </button>
   </div>
 </aside>
+
+<!-- Modal de Centro de Accesibilidad -->
+@if (showAccessibilityCenter()) {
+  <div 
+    class="modal-overlay" 
+    (click)="closeAccessibilityCenter()"
+    (keydown)="onKeyDown($event)"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="accessibility-modal-title"
+    id="accessibility-modal">
+    <div 
+      class="modal-content" 
+      (click)="$event.stopPropagation()"
+      role="document">
+      <div class="modal-header">
+        <h2 id="accessibility-modal-title">Centro de Accesibilidad</h2>
+        <button 
+          type="button"
+          class="modal-close"
+          (click)="closeAccessibilityCenter()"
+          aria-label="Cerrar centro de accesibilidad">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-accessibility-center></app-accessibility-center>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Dialog de confirmación de logout -->
+<app-confirm-dialog
+  [show]="showConfirmDialog()"
+  title="Cerrar Sesión"
+  message="¿Estás seguro de que deseas cerrar sesión?"
+  type="warning"
+  (confirm)="confirmLogout($event.confirmed)">
+</app-confirm-dialog>

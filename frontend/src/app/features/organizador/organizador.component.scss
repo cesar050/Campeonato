@@ -2,16 +2,35 @@
   display: flex;
   min-height: 100vh;
   background: #F8F9FA;
+  
+  [data-dark-mode="true"] & {
+    background: #000000 !important;
+  }
 }
 
 .main-content {
   flex: 1;
   margin-left: 260px;
   overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+  
+  // Cuando el sidebar está colapsado (se oculta completamente)
+  &.sidebar-collapsed {
+    margin-left: 0;
+  }
+  
+  [data-dark-mode="true"] & {
+    background: #000000 !important;
+    color: #e0e0e0 !important;
+  }
 }
 
-@media (max-width: 968px) {
+@media (max-width: 768px) {
   .main-content {
     margin-left: 0;
+    
+    &.sidebar-collapsed {
+      margin-left: 0;
+    }
   }
 }

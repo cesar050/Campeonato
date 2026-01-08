@@ -1,0 +1,43 @@
+<div class="datepicker-container">
+  <!-- INPUT -->
+  <div class="datepicker-input" (click)="toggleCalendar()">
+    <span class="material-symbols-outlined calendar-icon">calendar_today</span>
+    <input type="text" [value]="formattedValue()" [placeholder]="placeholder" readonly class="datepicker-input-field">
+  </div>
+
+  <!-- DROPDOWN CALENDAR -->
+  <div *ngIf="showCalendar()" class="datepicker-dropdown">
+    <!-- Header con navegación -->
+    <div class="calendar-header">
+      <button type="button" (click)="previousMonth()" class="nav-button">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <span class="month-year">{{ getMonthYearLabel() }}</span>
+      <button type="button" (click)="nextMonth()" class="nav-button">
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+
+    <!-- Días de la semana -->
+    <div class="calendar-weekdays">
+      <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+    </div>
+
+    <!-- Días del mes -->
+    <!-- Días del mes -->
+    <div class="calendar-days">
+      <button type="button" *ngFor="let day of calendarDays()" class="day"
+        [class.disabled]="!day.currentMonth || day.disabled" [class.selected]="day.selected" [class.today]="day.isToday"
+        (click)="selectDate(day)" [disabled]="!day.currentMonth || day.disabled">
+        {{ day.day }}
+      </button>
+    </div>
+
+    <!-- Botón cerrar -->
+    <div class="calendar-footer">
+      <button type="button" (click)="closeCalendar()" class="btn-close">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>

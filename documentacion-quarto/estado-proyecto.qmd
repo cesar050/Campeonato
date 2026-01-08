@@ -1,0 +1,28 @@
+---
+title: "Estado del proyecto"
+format: html
+---
+
+## Funcionalidades implementadas (verificadas en el código)
+
+- API REST completa para gestión de usuarios y autenticación JWT.
+- Endpoints para gestión de campeonatos, equipos, jugadores, partidos, goles y tarjetas; namespaces y blueprints organizan las rutas.
+- Proxy para integración con microservicio de alineaciones (peticiones a `http://localhost:5001`).
+- Mecanismos de seguridad: roles, comprobaciones de permisos, lista negra de tokens, límites de login y rate limiting configurables en `create_app`.
+- Persistencia mediante SQLAlchemy y migraciones (Flask-Migrate); creación automática de tablas al inicializar la app.
+
+## Funcionalidades parciales o dependientes de componentes externos
+
+- Alineaciones: el backend actúa como proxy hacia un microservicio externo; la lógica de validación (mínimo 6 titulares) está implementada en el proxy, pero el microservicio no está incluido en el repositorio.
+- Frontend: el proyecto Angular está presente y preparado para servir la aplicación; la implementación completa de todas las vistas puede requerir revisar componentes concretos en `frontend/src/app` (no todos los componentes se han auditado en detalle para esta documentación).
+
+## Limitaciones actuales
+
+- Ausencia del microservicio de alineaciones en el repositorio: para disponer de la funcionalidad de definición y obtención de alineaciones es necesario desplegar el servicio externo o adaptar el `MICROSERVICIO_URL` a un servicio disponible.
+- No existe en el código una regla automática de conversión de dos tarjetas amarillas a una roja; tal regla no está implementada y, si se requiere, debe añadirse.
+- Las pruebas unitarias y de integración son limitadas; se observan archivos de prueba (`test_routes.py`, `test_email.py`) pero no hay una suite de cobertura amplia documentada.
+
+## Notas de despliegue y ejecución mínima
+
+- Backend: `python run.py` arranca la aplicación en `http://0.0.0.0:5000` por defecto. Variables sensibles (correo, credenciales JWT) se deben configurar mediante `.env`.
+- Frontend: `npm install` y `npx ng serve` para desarrollo — el `package.json` indica Angular CLI y Material.

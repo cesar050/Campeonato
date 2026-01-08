@@ -1,0 +1,247 @@
+<div class="pricing-page">
+  <!-- Header -->
+  <header class="pricing-header">
+    <div class="container">
+      <a routerLink="/" class="back-link">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <span>Volver al inicio</span>
+      </a>
+      <div class="header-content">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+        <h1>Precios</h1>
+        <p class="subtitle">Planes flexibles para todos los tamaños de campeonatos</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pricing-content">
+    <div class="container">
+      <!-- Pricing Introduction -->
+      <section class="pricing-intro">
+        <div class="intro-text">
+          <h2>Tarifas por Partido</h2>
+          <p>
+            En <strong>Campeonato Libre</strong>, creemos en un modelo de precios simple y transparente. 
+            Pagas únicamente por los partidos que organices, sin costos ocultos ni suscripciones mensuales.
+          </p>
+        </div>
+      </section>
+
+      <!-- Pricing Plans -->
+      <section class="pricing-plans">
+        <div class="plans-grid">
+          <!-- Plan Básico -->
+          <div class="pricing-card">
+            <div class="card-header">
+              <div class="plan-badge">Más Popular</div>
+              <h3>Plan Estándar</h3>
+              <div class="price-container">
+                <span class="currency">$</span>
+                <span class="amount">3</span>
+                <span class="period">por partido</span>
+              </div>
+              <p class="plan-description">Ideal para campeonatos pequeños y medianos</p>
+            </div>
+            <div class="card-body">
+              <ul class="features-list">
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Aplicable para campeonatos con <strong>menos de 50 partidos</strong></span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Gestión completa de equipos y jugadores</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Generación automática de fixture</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Tabla de posiciones en tiempo real</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Estadísticas y reportes</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Soporte técnico incluido</span>
+                </li>
+              </ul>
+              <div class="pricing-example">
+                <p class="example-title">Ejemplo:</p>
+                <p class="example-text">
+                  Si organizas un campeonato con <strong>30 partidos</strong>, 
+                  el costo total sería: <strong>$90</strong>
+                </p>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a routerLink="/auth/register" class="btn-plan">Comenzar Ahora</a>
+            </div>
+          </div>
+
+          <!-- Plan Premium -->
+          <div class="pricing-card featured">
+            <div class="card-header">
+              <div class="plan-badge premium">Recomendado</div>
+              <h3>Plan Premium</h3>
+              <div class="price-container">
+                <span class="currency">$</span>
+                <span class="amount">4</span>
+                <span class="period">por partido</span>
+              </div>
+              <p class="plan-description">Para campeonatos grandes y profesionales</p>
+            </div>
+            <div class="card-body">
+              <ul class="features-list">
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Aplicable para campeonatos con <strong>50 o más partidos</strong></span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Todas las características del Plan Estándar</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Prioridad en soporte técnico</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Análisis avanzado de estadísticas</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Personalización de reportes</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Asesoría personalizada</span>
+                </li>
+              </ul>
+              <div class="pricing-example">
+                <p class="example-title">Ejemplo:</p>
+                <p class="example-text">
+                  Si organizas un campeonato con <strong>80 partidos</strong>, 
+                  el costo total sería: <strong>$320</strong>
+                </p>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a routerLink="/auth/register" class="btn-plan btn-premium">Comenzar Ahora</a>
+            </div>
+          </div>
+
+          <!-- Plan Enterprise -->
+          <div class="pricing-card enterprise">
+            <div class="card-header">
+              <h3>Plan Enterprise</h3>
+              <div class="price-container">
+                <span class="custom-text">Personalizado</span>
+              </div>
+              <p class="plan-description">Soluciones a medida para ligas grandes</p>
+            </div>
+            <div class="card-body">
+              <ul class="features-list">
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Para campeonatos con <strong>más de 50 partidos</strong></span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Todas las características Premium</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Descuentos por volumen</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Personalización completa de la plataforma</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Soporte técnico dedicado 24/7</span>
+                </li>
+                <li>
+                  <span class="material-symbols-outlined">check_circle</span>
+                  <span>Gestión de cuenta asignada</span>
+                </li>
+              </ul>
+              <div class="pricing-example enterprise-box">
+                <p class="example-title">Contacta con nuestro equipo</p>
+                <p class="example-text">
+                  Para campeonatos grandes o necesidades especiales, contáctanos para diseñar un plan personalizado.
+                </p>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="tel:+593989341808" class="btn-plan btn-enterprise">
+                <span class="material-symbols-outlined">phone</span>
+                <span>Llamar: 0989341808</span>
+              </a>
+              <a href="https://wa.me/593989341808" target="_blank" rel="noopener noreferrer" class="btn-plan btn-whatsapp">
+                <span class="material-symbols-outlined">chat</span>
+                <span>WhatsApp: 0989341808</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section">
+        <h2>Preguntas Frecuentes</h2>
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h3>¿Cuándo debo pagar?</h3>
+            <p>El pago se realiza una vez que hayas generado tu fixture y definido el número total de partidos de tu campeonato.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Hay costos adicionales?</h3>
+            <p>No. El precio mostrado es el precio final. No hay costos ocultos, comisiones ni tarifas adicionales.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Puedo cambiar de plan?</h3>
+            <p>Sí, puedes cambiar de plan en cualquier momento. Si tu campeonato crece, puedes actualizar automáticamente a un plan superior.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Qué métodos de pago aceptan?</h3>
+            <p>Aceptamos transferencias bancarias, tarjetas de crédito/débito y otros métodos locales. Contacta con nosotros para más detalles.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="cta-section">
+        <div class="cta-content">
+          <h2>¿Listo para comenzar tu campeonato?</h2>
+          <p>Regístrate gratis y comienza a organizar tu torneo hoy mismo</p>
+          <a routerLink="/auth/register" class="btn-cta">Crear Cuenta Gratis</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="pricing-footer">
+    <div class="container">
+      <div class="footer-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+        <span>Campeonato Libre</span>
+      </div>
+      <p>© 2024 Campeonato Libre. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>

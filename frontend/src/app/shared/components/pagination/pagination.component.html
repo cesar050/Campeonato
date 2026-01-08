@@ -1,0 +1,108 @@
+<nav 
+  [attr.aria-label]="ariaLabel" 
+  class="pagination-container"
+  *ngIf="hasPages || showItemsPerPage">
+  
+  <!-- Información de resultados -->
+  <div class="pagination-info" *ngIf="totalItems > 0">
+    <span class="sr-only">Mostrando</span>
+    <span class="pagination-info-text">
+      {{ itemsRange.start }} - {{ itemsRange.end }}
+      <span class="sr-only"> de </span>
+      <span class="sr-only" aria-hidden="true">/</span>
+      {{ totalItems }}
+      <span class="sr-only">resultados. Página {{ currentPage }} de {{ totalPages }}</span>
+    </span>
+  </div>
+
+  <!-- Control de elementos por página -->
+  <div class="pagination-per-page" *ngIf="showItemsPerPage && totalItems > 0">
+    <label for="items-per-page" class="sr-only">Elementos por página</label>
+    <select
+      id="items-per-page"
+      [value]="itemsPerPage"
+      (change)="onChangeItemsPerPage($event)"
+      class="pagination-select"
+      aria-label="Cambiar número de elementos por página">
+      <option *ngFor="let option of itemsPerPageOptions" [value]="option">
+        {{ option }} por página
+      </option>
+    </select>
+  </div>
+
+  <!-- Controles de navegación -->
+  <div class="pagination-controls" *ngIf="hasPages">
+    <!-- Primera página -->
+    <button
+      type="button"
+      (click)="goToFirst()"
+      (keydown)="onKeyDown($event, 'first')"
+      [disabled]="isFirstPage"
+      class="pagination-btn pagination-btn-nav"
+      aria-label="Ir a la primera página"
+      [attr.aria-disabled]="isFirstPage">
+      <span class="material-symbols-outlined" aria-hidden="true">first_page</span>
+      <span class="sr-only">Primera página</span>
+    </button>
+
+    <!-- Página anterior -->
+    <button
+      type="button"
+      (click)="goToPrevious()"
+      (keydown)="onKeyDown($event, 'prev')"
+      [disabled]="isFirstPage"
+      class="pagination-btn pagination-btn-nav"
+      aria-label="Ir a la página anterior"
+      [attr.aria-disabled]="isFirstPage">
+      <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+      <span class="sr-only">Página anterior</span>
+    </button>
+
+    <!-- Páginas numeradas -->
+    <div class="pagination-pages" role="list">
+      <button
+        *ngFor="let page of visiblePages"
+        type="button"
+        role="listitem"
+        [class.active]="page === currentPage"
+        [class.separator]="page === -1"
+        [disabled]="page === -1 || page === currentPage"
+        (click)="page !== -1 && goToPage(page)"
+        (keydown)="page !== -1 && onKeyDown($event, 'page', page)"
+        class="pagination-btn pagination-btn-page"
+        [attr.aria-label]="page === -1 ? null : (page === currentPage ? 'Página actual ' + page : 'Ir a la página ' + page)"
+        [attr.aria-current]="page === currentPage ? 'page' : null"
+        [attr.aria-disabled]="page === currentPage || page === -1">
+        <span *ngIf="page === -1" aria-hidden="true">...</span>
+        <span *ngIf="page !== -1">{{ page }}</span>
+      </button>
+    </div>
+
+    <!-- Página siguiente -->
+    <button
+      type="button"
+      (click)="goToNext()"
+      (keydown)="onKeyDown($event, 'next')"
+      [disabled]="isLastPage"
+      class="pagination-btn pagination-btn-nav"
+      aria-label="Ir a la página siguiente"
+      [attr.aria-disabled]="isLastPage">
+      <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+      <span class="sr-only">Página siguiente</span>
+    </button>
+
+    <!-- Última página -->
+    <button
+      type="button"
+      (click)="goToLast()"
+      (keydown)="onKeyDown($event, 'last')"
+      [disabled]="isLastPage"
+      class="pagination-btn pagination-btn-nav"
+      aria-label="Ir a la última página"
+      [attr.aria-disabled]="isLastPage">
+      <span class="material-symbols-outlined" aria-hidden="true">last_page</span>
+      <span class="sr-only">Última página</span>
+    </button>
+  </div>
+</nav>
+

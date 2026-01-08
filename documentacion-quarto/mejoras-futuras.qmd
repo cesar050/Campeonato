@@ -1,0 +1,36 @@
+---
+title: "Mejoras futuras"
+format: html
+---
+
+Esta sección propone mejoras técnicas, funcionales y de experiencia de usuario que se derivan directamente del análisis del código y las limitaciones detectadas.
+
+1) Mejoras técnicas
+
+- Extraer e implementar el microservicio de alineaciones dentro del repositorio o proveer un contenedor Docker con su imagen de referencia para facilitar despliegues replicables.
+- Añadir reglas automáticas de negocio (p. ej. convertir dos tarjetas amarillas en una roja) en el backend y registrar el impacto en sanciones mediante una tabla de suspensiones.
+- Completar y ampliar la suite de pruebas (unitarias e integración) para endpoints críticos: partidos, registro de resultados, eventos y proxy de alineaciones. Integrar CI que ejecute las pruebas.
+
+2) Mejoras funcionales
+
+- Registrar y auditar modificaciones: actualmente existe historial de cambios de estado (`HistorialEstado`) pero se podría extender a auditoría completa de cambios en entidades críticas.
+- Implementar permisos más finos (p. ej. delegación temporal a líderes para administrar alineaciones durante el partido).
+- Añadir un mecanismo robusto de gestión de sanciones y calendario automático para suspensiones por tarjetas rojas o acumulación.
+
+3) Mejoras de UX
+
+- Diseñar una vista de partido en tiempo real con actualización mediante WebSockets o Server-Sent Events para mostrar eventos a espectadores sin refrescar la página.
+- Mejorar accesibilidad con pruebas automatizadas (axe-core) y checklist de cumplimiento de WCAG 2.1.
+- Crear componentes reutilizables para cronologías y tarjetas de evento que permitan desplegar rápidamente resúmenes y acciones (por ejemplo, revertir un evento con control de permisos y registro de auditoría).
+
+4) Operacional / DevOps
+
+- Añadir Dockerfiles para backend y frontend y un `docker-compose` que incluya la base de datos y, opcionalmente, el microservicio de alineaciones.
+- Automatizar despliegue y gestión de secretos (variables de correo, JWT, credenciales de base de datos) mediante un gestor de secretos en los entornos académicos.
+
+Prioridades sugeridas (ordenadas):
+
+1. Integrar/añadir el microservicio de alineaciones y proveer una imagen Docker.
+2. Implementar reglas automáticas de tarjetas y registrar suspensiones.
+3. Ampliar tests e integrar CI.
+4. Añadir soporte en frontend para actualización en tiempo real.

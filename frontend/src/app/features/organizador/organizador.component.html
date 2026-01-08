@@ -1,6 +1,6 @@
 <div class="organizador-layout">
   <app-organizador-sidebar></app-organizador-sidebar>
-  <main class="main-content">
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed()">
     <router-outlet></router-outlet>
   </main>
 </div>

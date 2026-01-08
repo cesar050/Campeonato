@@ -1,0 +1,40 @@
+---
+title: "Reglas de negocio"
+format: html
+---
+
+Las reglas de negocio que siguen se han extraído directamente de los modelos y de la lógica de las rutas del backend. Se citan los puntos concretos que el código impone.
+
+1) Tipos de campeonatos
+
+- El modelo `Campeonato` define `tipo_deporte` con valores `futbol` e `indoor`.
+
+2) Estados y duración de partidos
+
+- El modelo `Partido` define el campo `estado` con valores manejados por la API: `programado`, `en_juego`, `finalizado`, `cancelado`. El cambio de estado queda registrado en `HistorialEstado`.
+- La duración numérica de un partido no está codificada como constante en el backend; sin embargo, validaciones relacionadas con minutos de eventos permiten rangos hasta 120 (p. ej. en `gol_routes.py` el minuto debe estar entre 1 y 120). Esto implica soporte para prórrogas.
+
+3) Reglas sobre tarjetas
+
+- El modelo `Tarjeta` distingue entre `amarilla` y `roja`. Las tarjetas se registran con minuto y motivo. No se han hallado reglas automáticas de acumulación (p.ej. dos amarillas → roja) en el código; por tanto, la conversión automática no está implementada y debe realizarse manualmente por el operador o mediante una futura regla de negocio.
+
+4) Expulsiones
+
+- Las expulsiones son representadas por tarjetas de tipo `roja`. No se detecta en el código una lógica adicional (por ejemplo suspensión automática de partidos) fuera del registro de la tarjeta.
+
+5) Consideraciones especiales y restricciones observadas
+
+- Inmutabilidad de resultado: una vez que en `Partido` se establece `resultado_registrado = True` (operación `PATCH /partidos/<id>/resultado`), el sistema impide modificaciones de partidos o eliminación/agregado de goles asociados.
+- Restricción de equipos distintos: el modelo `Partido` aplica una `CheckConstraint` que impide crear un partido con el mismo equipo local y visitante.
+- Restricción sobre eliminación de partido: no se permite eliminar un partido que tenga goles registrados (comprobación en `partido_routes.py`).
+- Validaciones de alineaciones: la comprobación de que ambos equipos tienen alineaciones utiliza como criterio mínimo 6 titulares (esta regla está codificada en el proxy de alineaciones). Si alguno no cumple, el partido no puede iniciar según la respuesta del proxy.
+- Control de permisos: operaciones críticas (crear/editar/eliminar partidos, registrar resultado final, eliminar eventos) requieren roles con privilegios (`admin`, `superadmin`) o que el usuario sea el creador del campeonato en cuestión.
+
+6) Reglas específicas de eventos
+
+- Los eventos de tipo `gol` actualizan el marcador directamente al insertarse y se refleja en la entidad `Partido`.
+- La API registra asistidor opcionalmente para goles; cuando se proporciona `id_asistidor` se valida que exista y que pertenezca al mismo equipo.
+
+7) Observaciones de integridad
+
+- El sistema depende de la consistencia entre tablas (partidos, jugadores, equipos). Muchas operaciones consultan y validan relaciones antes de persistir; en caso de error se realiza rollback de la sesión.

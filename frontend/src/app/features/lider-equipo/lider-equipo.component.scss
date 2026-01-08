@@ -1,0 +1,385 @@
+$white: #FFFFFF;
+$bg-light: #F8F9FA;
+$text-dark: #1A1A1A;
+$text-gray: #666666;
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$border-color: #E0E0E0;
+
+// BREAKPOINTS
+$breakpoint-mobile: 768px;
+
+// OVERLAY for mobile
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+
+  @media (max-width: $breakpoint-mobile) {
+    display: block;
+
+    &.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: $white;
+  border-right: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+
+  // Desktop: collapsed state - se oculta completamente
+  @media (min-width: $breakpoint-mobile + 1px) {
+    &.collapsed {
+      transform: translateX(-260px);
+    }
+  }
+
+  // Mobile: hidden by default
+  @media (max-width: $breakpoint-mobile) {
+    transform: translateX(-280px);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    width: 280px;
+
+    &:not(.collapsed) {
+      transform: translateX(0);
+    }
+  }
+}
+
+.sidebar-toggle {
+  position: absolute;
+  right: -48px;
+  top: 20px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: 0 10px 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: $bg-light;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:focus-visible {
+    outline: 3px solid $green-primary;
+    outline-offset: 2px;
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+
+  [data-dark-mode="true"] & {
+    background: $green-light;
+
+    &:hover {
+      background: #66bb6a;
+    }
+  }
+
+  @media (max-width: 768px) {
+    right: -45px;
+    width: 45px;
+    height: 45px;
+  }
+}
+
+// Modo oscuro para sidebar
+[data-dark-mode="true"] .sidebar {
+  background-color: #000000 !important;
+  border-right-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+.user-section {
+  padding: 2rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid $border-color;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  background: $bg-light;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    color: $text-gray;
+  }
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $text-dark;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 0.8rem;
+  color: $text-gray;
+  margin-top: 0.125rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0.75rem;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: 3px;
+  }
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  color: $text-gray;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    background: $bg-light;
+    color: $text-dark;
+  }
+
+  &.active {
+    background: rgba(76, 175, 80, 0.1);
+    color: $green-primary;
+    font-weight: 600;
+
+    .nav-icon {
+      color: $green-primary;
+    }
+  }
+
+  &:focus-visible {
+    outline: 3px solid $green-primary;
+    outline-offset: 2px;
+  }
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  color: $text-gray;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  flex: 1;
+  white-space: normal;
+  word-wrap: break-word;
+  text-transform: none;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.sidebar-bottom {
+  padding: 0.75rem;
+  border-top: 1px solid $border-color;
+}
+
+.logout-btn {
+  color: #DC2626;
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.1);
+    color: #B91C1C;
+  }
+
+  .nav-icon {
+    color: #DC2626;
+  }
+}
+
+// MAIN CONTENT
+.main-content {
+  min-height: 100vh;
+  margin-left: 260px;
+  transition: margin-left 0.3s ease;
+  background-color: #F8F9FA;
+
+  [data-dark-mode="true"] & {
+    background: #000000 !important;
+    color: #e0e0e0 !important;
+  }
+
+  &.sidebar-collapsed {
+    margin-left: 0;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    margin-left: 0;
+  }
+}
+
+// Skip link
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: $green-primary;
+  color: white;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  z-index: 10001;
+  border-radius: 0 0 8px 0;
+  font-weight: 600;
+
+  &:focus {
+    top: 0;
+  }
+}
+
+// Modal overlay
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+}
+
+.modal-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-gray;
+  transition: all 0.2s;
+
+  &:hover {
+    background: $bg-light;
+    color: $text-dark;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $green-primary;
+    outline-offset: 2px;
+  }
+
+  .material-symbols-outlined {
+    font-size: 1.5rem;
+  }
+}
+
+.modal-body {
+  padding: 0;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+ 

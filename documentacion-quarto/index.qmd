@@ -1,0 +1,22 @@
+---
+title: "Portada"
+format: html
+---
+
+# Sistema de Gestión de Campeonatos Deportivos
+
+Proyecto: Sistema de Gestión de Campeonatos Deportivos
+
+Breve descripción
+
+Este documento reúne la documentación oficial y académica del proyecto "Campeonato". Contiene la visión general, la arquitectura del sistema, las funcionalidades implementadas, las reglas de negocio extraídas del código, consideraciones de UI/UX, el estado actual del proyecto y una lista ordenada de mejoras futuras recomendadas.
+
+Contexto académico
+
+La documentación está preparada para presentación en un entorno académico. Se basa exclusivamente en el código y artefactos reales presentes en el repositorio: un backend implementado en Python/Flask con API REST (Flask-RESTx), y un frontend en Angular (versión aproximada 21) con Angular Material. Donde el sistema delega responsabilidades a servicios externos (por ejemplo, un microservicio de alineaciones) se indica explícitamente.
+
+Enlaces rápidos
+
+- Introducción: introduccion.qmd
+- Arquitectura: arquitectura.qmd
+- Funcionalidades: funcionalidades.qmd

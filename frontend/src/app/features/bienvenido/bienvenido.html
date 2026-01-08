@@ -1,0 +1,143 @@
+<div class="welcome-page">
+  <!-- Header -->
+  <header class="welcome-header">
+    <div class="container">
+      <a routerLink="/" class="back-link">
+        <span class="material-symbols-outlined">arrow_back</span>
+        <span>Volver al inicio</span>
+      </a>
+      <div class="header-content">
+        <h1>¡Bienvenido al Sistema!</h1>
+        <p class="subtitle">Conoce a nuestra mascota oficial</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="welcome-content">
+    <div class="container">
+      <!-- Mascot Presentation -->
+      <section class="mascot-section">
+        <div class="mascot-card">
+          <div class="mascot-image-container">
+            <div class="mascot-frame">
+              <img 
+                src="assets/images/Bienvenido.jpg" 
+                alt="Manigol - Mascota de Campeonato Libre" 
+                class="mascot-image"
+                (error)="onImageError($event)">
+              <div class="mascot-sparkle mascot-sparkle-1">✨</div>
+              <div class="mascot-sparkle mascot-sparkle-2">🌟</div>
+              <div class="mascot-sparkle mascot-sparkle-3">⭐</div>
+            </div>
+          </div>
+          
+          <div class="mascot-info">
+            <div class="name-badge">
+              <h2 class="mascot-name">Manigol</h2>
+            </div>
+            <p class="mascot-title">Mascota Oficial de Campeonato Libre</p>
+            
+            <div class="welcome-message">
+              <div class="speech-bubble">
+                <p class="greeting">¡Hola! 👋</p>
+                <p>
+                  Soy <strong>Manigol</strong>, la mascota oficial de Campeonato Libre. 
+                  Estoy aquí para darte la bienvenida y ayudarte a descubrir todo lo que nuestra plataforma puede hacer por ti.
+                </p>
+                <p>
+                  Ya sea que organices un campeonato pequeño con tus amigos o una liga profesional, 
+                  estamos aquí para hacer que la gestión sea fácil, rápida y divertida.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features with Mascot -->
+      <section class="features-section">
+        <h2>¿Qué puedes hacer en Campeonato Libre?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">⚽</div>
+            <h3>Gestiona Equipos</h3>
+            <p>Registra y administra todos tus equipos y jugadores en un solo lugar</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Genera Fixtures</h3>
+            <p>Crea automáticamente los calendarios de partidos sin complicaciones</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Estadísticas en Vivo</h3>
+            <p>Sigue resultados, goleadores y tablas de posiciones en tiempo real</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <h3>Organiza Campeonatos</h3>
+            <p>Desde ligas locales hasta torneos profesionales, todo es posible</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mascot Fun Facts -->
+      <section class="fun-facts-section">
+        <div class="fun-facts-card">
+          <h2>¿Sabías que...?</h2>
+          <div class="facts-content">
+            <div class="fact-item">
+              <span class="fact-icon">⚽</span>
+              <p>
+                <strong>Manigol</strong> fue elegido como mascota porque representa la pasión y energía 
+                del fútbol, siempre listo para acompañarte en cada partido de tu campeonato y celebrar 
+                contigo cada gol.
+              </p>
+            </div>
+            <div class="fact-item">
+              <span class="fact-icon">💪</span>
+              <p>
+                Representamos la fuerza y determinación necesarias para organizar campeonatos exitosos, 
+                ¡con un toque divertido y amigable!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="cta-section">
+        <div class="cta-content">
+          <div class="cta-mascot">
+            <span class="mascot-emoji">⚽</span>
+          </div>
+          <h2>¿Listo para comenzar?</h2>
+          <p>Manigol y todo el equipo estamos emocionados de acompañarte en tu próximo campeonato</p>
+          <div class="cta-buttons">
+            <a routerLink="/auth/register" class="btn-primary">Crear Mi Campeonato</a>
+            <a routerLink="/sobre-nosotros" class="btn-secondary">Conocer Más</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="welcome-footer">
+    <div class="container">
+      <div class="footer-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+          <path d="M2 12h20"></path>
+        </svg>
+        <span>Campeonato Libre</span>
+      </div>
+      <p>© 2024 Campeonato Libre. Todos los derechos reservados. - Con ❤️ por Manigol</p>
+    </div>
+  </footer>
+</div>

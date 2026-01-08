@@ -6,13 +6,18 @@ class BackendAPIClient:
     
     def __init__(self):
         self.base_url = current_app.config['BACKEND_API_URL']
+        print(f"🔍 BackendAPIClient URL: {self.base_url}")  # Debug
     
     def get_partido(self, id_partido):
         """Consulta un partido al backend principal"""
         try:
-            response = requests.get(f"{self.base_url}/partido/{id_partido}", timeout=5)
+            url = f"{self.base_url}/partidos/{id_partido}"  # ← PLURAL
+            print(f"🔍 GET {url}")
+            response = requests.get(url, timeout=5)
+            
             if response.status_code == 200:
                 return response.json().get('partido')
+            print(f"⚠️ Status: {response.status_code}")
             return None
         except Exception as e:
             print(f"❌ Error consultando partido: {e}")

@@ -1,382 +1,234 @@
-$white: #FFFFFF;
-$bg-light: #F8F9FA;
-$text-dark: #1A1A1A;
-$text-gray: #666666;
+// ==================== VARIABLES ====================
 $green-primary: #2E7D32;
-$green-light: #4CAF50;
-$border-color: #E0E0E0;
+$green-dark: #1B5E20;
 
-.tabla-container {
-  padding: 2rem;
-  max-width: 1600px;
-  min-height: 100vh;
-  background: $bg-light;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: $text-dark;
-    margin: 0;
+// Mejoras de diseño para tabla
+.standings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  
+  thead {
+    background: linear-gradient(135deg, $green-primary 0%, $green-dark 100%);
+    
+    th {
+      padding: 1rem 0.75rem;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: white;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      
+      &:first-child {
+        border-top-left-radius: 0.75rem;
+        padding-left: 1.5rem;
+      }
+      
+      &:last-child {
+        border-top-right-radius: 0.75rem;
+        padding-right: 1.5rem;
+      }
+    }
   }
-}
-
-.header-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.btn-action,
-.btn-share {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.875rem;
-}
-
-.btn-action {
-  background: $bg-light;
-  border: 1px solid $border-color;
-  color: $text-dark;
-
-  svg {
-    color: $text-gray;
+  
+  tbody {
+    tr {
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #e5e7eb;
+      
+      &:hover {
+        background-color: #f9fafb;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      td {
+        padding: 1.25rem 0.75rem;
+        vertical-align: middle;
+        
+        &:first-child {
+          padding-left: 1.5rem;
+        }
+        
+        &:last-child {
+          padding-right: 1.5rem;
+        }
+      }
+    }
   }
-
-  &:hover {
-    background: #EEEFF0;
-    border-color: $green-primary;
-    color: $green-primary;
-
-    svg {
-      color: $green-primary;
+  
+  // Modo oscuro
+  [data-dark-mode="true"] & {
+    tbody tr {
+      border-bottom-color: #374151;
+      
+      &:hover {
+        background-color: #1f2937;
+      }
     }
   }
 }
 
-.btn-share {
-  background: linear-gradient(135deg, $green-light, $green-primary);
-  color: $white;
-  border: none;
-
-  svg {
-    color: $white;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-  }
-}
-
-.filters-card {
-  background: $white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+// Mejorar visualización de logos
+.team-logo-container {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-
-  label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: $text-dark;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 2px solid #e5e7eb;
+  flex-shrink: 0;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  [data-dark-mode="true"] & {
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-color: #4b5563;
   }
 }
 
-.date-input,
-.select-input {
-  padding: 0.75rem 1rem;
-  border: 1px solid $border-color;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  min-width: 180px;
-  transition: all 0.2s;
-
-  &:focus {
-    outline: none;
-    border-color: $green-primary;
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+// ==================== ANIMACIONES ====================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.ultima-actualizacion {
-  margin-left: auto;
-  font-size: 0.875rem;
-  color: $text-gray;
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4rem 2rem;
-
-  .spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid $border-color;
-    border-top-color: $green-primary;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 1rem;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
   }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to { 
+    transform: rotate(360deg); 
+  }
 }
 
-.tabla-card {
-  background: $white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  overflow: hidden;
+// ==================== FLIP ANIMATION ====================
+.flip-animation {
+  animation: scaleIn 0.3s ease-out;
 }
 
-.tabla-wrapper {
-  overflow-x: auto;
+// ==================== LOADING STATE ====================
+.loading {
+  animation: fadeIn 0.3s ease-out;
+}
 
+// ==================== BORDES DE ZONA ====================
+.border-l-yellow-400 {
+  border-left-color: #FBBF24 !important;
+}
+
+.border-l-green-500 {
+  border-left-color: #10B981 !important;
+}
+
+.border-l-red-500 {
+  border-left-color: #EF4444 !important;
+}
+
+.border-l-gray-300 {
+  border-left-color: #D1D5DB !important;
+}
+
+// ==================== SCROLLBAR PERSONALIZADO ====================
+.overflow-y-auto,
+.overflow-x-auto {
   &::-webkit-scrollbar {
+    width: 8px;
     height: 8px;
   }
 
-  &::-webkit-scrollbar-thumb {
-    background: $border-color;
+  &::-webkit-scrollbar-track {
+    background: #F3F4F6;
     border-radius: 4px;
   }
-}
 
-.tabla {
-  width: 100%;
-  border-collapse: collapse;
-
-  thead {
-    background: $bg-light;
-
-    th {
-      padding: 1rem;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: $text-gray;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-      border-bottom: 2px solid $border-color;
-
-      &.col-pos {
-        width: 60px;
-      }
-
-      &.col-equipo {
-        min-width: 200px;
-      }
-
-      &.col-cambio {
-        width: 80px;
-      }
-
-      &.col-pts {
-        width: 80px;
-      }
-
-      &.col-forma {
-        min-width: 140px;
-      }
+  &::-webkit-scrollbar-thumb {
+    background: $green-primary;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+    
+    &:hover {
+      background: $green-dark;
     }
   }
+}
 
-  tbody {
-    tr {
-      border-bottom: 1px solid $border-color;
-      transition: all 0.2s;
+// ==================== DARK MODE SCROLLBAR ====================
+.dark {
+  .overflow-y-auto,
+  .overflow-x-auto {
+    &::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
 
+    &::-webkit-scrollbar-thumb {
+      background: #2a452b;
+      
       &:hover {
-        background: #FAFAFA;
-      }
-
-      &.zona-champions {
-        border-left: 4px solid #1E88E5;
-      }
-
-      &.zona-europa {
-        border-left: 4px solid #FB8C00;
-      }
-
-      &.zona-descenso {
-        border-left: 4px solid #E53935;
-        background: #FFEBEE;
+        background: #3d5e3e;
       }
     }
-
-    td {
-      padding: 1rem;
-      font-size: 0.95rem;
-      color: $text-dark;
-      white-space: nowrap;
-    }
   }
 }
 
-.col-pos {
-  .posicion {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: $bg-light;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 0.95rem;
+// ==================== ACCESIBILIDAD ====================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-.equipo-info {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+*:focus-visible {
+  outline: 3px solid $green-primary;
+  outline-offset: 3px;
+  border-radius: 0.5rem;
 }
 
-.equipo-logo {
-  width: 32px;
-  height: 32px;
-  background: $bg-light;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  svg {
-    color: $green-primary;
-  }
-}
-
-.equipo-nombre {
-  font-weight: 600;
-}
-
-.cambio-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &.cambio-up {
-    color: $green-primary;
-  }
-
-  &.cambio-down {
-    color: #DC2626;
-  }
-
-  &.cambio-none {
-    color: $text-gray;
-  }
-}
-
-.dif-positive {
-  color: $green-primary;
-  font-weight: 600;
-}
-
-.dif-negative {
-  color: #DC2626;
-  font-weight: 600;
-}
-
-.col-pts {
-  strong {
-    font-size: 1.125rem;
-    color: $text-dark;
-  }
-}
-
-.forma-list {
-  display: flex;
-  gap: 0.375rem;
-}
-
-.forma-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 700;
-
-  &.forma-win {
-    background: #E8F5E9;
-    color: $green-primary;
-  }
-
-  &.forma-draw {
-    background: #FFF3E0;
-    color: #F97316;
-  }
-
-  &.forma-loss {
-    background: #FFEBEE;
-    color: #DC2626;
-  }
-}
-
-.leyenda {
-  display: flex;
-  gap: 2rem;
-  padding: 1.5rem;
-  border-top: 1px solid $border-color;
-  flex-wrap: wrap;
-}
-
-.leyenda-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  color: $text-gray;
-}
-
-.leyenda-color {
-  width: 24px;
-  height: 4px;
-  border-radius: 2px;
-
-  &.zona-champions {
-    background: #1E88E5;
-  }
-
-  &.zona-europa {
-    background: #FB8C00;
-  }
-
-  &.zona-descenso {
-    background: #E53935;
-  }
+// Screen reader only
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

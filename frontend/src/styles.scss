@@ -42,6 +42,47 @@ select {
 
 button {
   cursor: pointer;
+  
+  // Accesibilidad: Focus visible mejorado
+  &:focus-visible {
+    outline: var(--focus-width, 3px) var(--focus-style, solid) var(--focus-color, var(--color-primary));
+    outline-offset: var(--focus-offset, 2px);
+    border-radius: var(--radius-md, 8px);
+  }
+  
+  // Desactivar outline por defecto (solo mouse)
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+// Inputs accesibles
+input,
+textarea,
+select {
+  &:focus-visible {
+    outline: var(--focus-width, 3px) var(--focus-style, solid) var(--focus-color, var(--color-primary));
+    outline-offset: var(--focus-offset, 2px);
+    border-color: var(--focus-color, var(--color-primary));
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+// Links accesibles
+a {
+  &:focus-visible {
+    outline: var(--focus-width, 3px) var(--focus-style, solid) var(--focus-color, var(--color-primary));
+    outline-offset: var(--focus-offset, 2px);
+    border-radius: var(--radius-sm, 4px);
+    text-decoration: underline;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
 }
 
 /* Imágenes */
@@ -105,6 +146,575 @@ ol {
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
+  
+  /* Accesibilidad - Focus (usando color del sistema verde) */
+  --focus-width: 3px;
+  --focus-offset: 2px;
+  --focus-color: #2E7D32;
+  --focus-style: solid;
+  
+  /* Accesibilidad - Alto Contraste */
+  --high-contrast-mode: 0;
+  --high-contrast-focus-width: 4px;
+  
+  /* Accesibilidad - Tamaño de texto */
+  --font-size-base: 1rem;
+  --font-size-scale: 1;
+}
+
+/* Modo alto contraste */
+[data-high-contrast="true"] {
+  --focus-width: 4px;
+  --focus-offset: 3px;
+  --focus-color: #000000;
+  --color-primary: #2E7D32;
+  background-color: #000000 !important;
+  color: #FFFF00 !important;
+}
+
+/* Modo oscuro - APLICADO A TODO EL SISTEMA */
+[data-dark-mode="true"] {
+  --color-gray-50: #1f2937;
+  --color-gray-100: #374151;
+  --color-gray-200: #4b5563;
+  --color-gray-300: #4b5563;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #f9fafb;
+  --bg-dark: #000000;
+  --focus-color: #4CAF50;
+  
+  // Aplicar a body y todos los elementos
+  background-color: #000000 !important;
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] body {
+  background-color: #000000 !important;
+  color: #e0e0e0 !important;
+}
+
+// Sidebar en modo oscuro - NEGRO con verde como acento
+[data-dark-mode="true"] .sidebar {
+  background-color: #000000 !important;
+  border-right-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] .sidebar-header,
+[data-dark-mode="true"] .sidebar-nav,
+[data-dark-mode="true"] .sidebar-bottom {
+  background-color: #000000 !important;
+}
+
+[data-dark-mode="true"] .nav-item {
+  color: #d1d5db !important;
+  
+  &:hover {
+    background-color: #1a1a1a !important;
+    color: #4CAF50 !important; // Verde resalta en hover
+  }
+  
+  &.active {
+    background-color: rgba(46, 125, 50, 0.15) !important;
+    color: #4CAF50 !important; // Verde para activo
+    border-left: 3px solid #4CAF50 !important;
+  }
+}
+
+[data-dark-mode="true"] .brand-name,
+[data-dark-mode="true"] .user-name,
+[data-dark-mode="true"] .user-role {
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] .bg-white {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] .bg-gray-50,
+[data-dark-mode="true"] .bg-gray-100 {
+  background-color: #1a1a1a !important;
+}
+
+[data-dark-mode="true"] .text-gray-900 {
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] .text-gray-700,
+[data-dark-mode="true"] .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+[data-dark-mode="true"] .border-gray-200,
+[data-dark-mode="true"] .border-gray-300 {
+  border-color: #2a2a2a !important;
+}
+
+// Cards y contenedores
+[data-dark-mode="true"] .bg-white,
+[data-dark-mode="true"] [class*="bg-white"] {
+  background-color: #1a1a1a !important;
+}
+
+// Mantener verde como acento visible
+[data-dark-mode="true"] [class*="text-\[#2E7D32\]"],
+[data-dark-mode="true"] [class*="text-green"] {
+  color: #4CAF50 !important;
+}
+
+[data-dark-mode="true"] [class*="bg-\[#2E7D32\]"],
+[data-dark-mode="true"] [class*="from-\[#2E7D32\]"] {
+  background-color: #4CAF50 !important;
+}
+
+// ============================================
+// MODO OSCURO COMPLETO - TODO EL SISTEMA
+// ============================================
+
+// Fondo principal del body y HTML
+[data-dark-mode="true"] body,
+[data-dark-mode="true"],
+[data-dark-mode="true"] html {
+  background-color: #0d0d0d !important;
+  color: #e0e0e0 !important;
+}
+
+// Aplicar a TODOS los elementos por defecto (texto claro sobre fondo oscuro)
+[data-dark-mode="true"] * {
+  color: inherit;
+}
+
+// Todos los contenedores y cards
+[data-dark-mode="true"] .max-w-7xl,
+[data-dark-mode="true"] .max-w-6xl,
+[data-dark-mode="true"] .max-w-5xl,
+[data-dark-mode="true"] .max-w-4xl,
+[data-dark-mode="true"] [class*="rounded-xl"],
+[data-dark-mode="true"] [class*="rounded-lg"],
+[data-dark-mode="true"] [class*="container"],
+[data-dark-mode="true"] [class*="mx-auto"] {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+// TODOS los divs y contenedores genéricos
+[data-dark-mode="true"] div:not([class*="bg-"]):not([class*="text-"]) {
+  color: #e0e0e0 !important;
+}
+
+// Textos específicos del dashboard
+[data-dark-mode="true"] [class*="text-\[#111811\]"] {
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] [class*="text-\[#618963\]"] {
+  color: #4CAF50 !important;
+}
+
+// Bordes
+[data-dark-mode="true"] [class*="border-\[#e0e6e0\]"] {
+  border-color: #2a2a2a !important;
+}
+
+// Fondos específicos
+[data-dark-mode="true"] [class*="bg-\[#f6f8f6\]"] {
+  background-color: #1a1a1a !important;
+}
+
+// Tablas
+[data-dark-mode="true"] table,
+[data-dark-mode="true"] th,
+[data-dark-mode="true"] td {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+[data-dark-mode="true"] thead {
+  background-color: #0d0d0d !important;
+}
+
+[data-dark-mode="true"] tbody tr:hover {
+  background-color: #252525 !important;
+}
+
+// Inputs y selects
+[data-dark-mode="true"] input,
+[data-dark-mode="true"] select,
+[data-dark-mode="true"] textarea,
+[data-dark-mode="true"] button:not([class*="bg-"]) {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+[data-dark-mode="true"] input::placeholder,
+[data-dark-mode="true"] textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+// Select options
+[data-dark-mode="true"] option {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+// TODOS los textos - convertir negros a claros
+[data-dark-mode="true"] p,
+[data-dark-mode="true"] span,
+[data-dark-mode="true"] h1,
+[data-dark-mode="true"] h2,
+[data-dark-mode="true"] h3,
+[data-dark-mode="true"] h4,
+[data-dark-mode="true"] h5,
+[data-dark-mode="true"] h6,
+[data-dark-mode="true"] label,
+[data-dark-mode="true"] a:not([class*="text-"]) {
+  color: #e0e0e0 !important;
+}
+
+// Textos específicos de Tailwind que deben cambiar
+[data-dark-mode="true"] [class*="text-gray-900"],
+[data-dark-mode="true"] [class*="text-gray-800"],
+[data-dark-mode="true"] [class*="text-black"],
+[data-dark-mode="true"] [class*="text-gray-700"] {
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] [class*="text-gray-600"],
+[data-dark-mode="true"] [class*="text-gray-500"] {
+  color: #d1d5db !important;
+}
+
+// Fondos blancos y claros
+[data-dark-mode="true"] [class*="bg-white"],
+[data-dark-mode="true"] [class*="bg-gray-50"],
+[data-dark-mode="true"] [class*="bg-gray-100"],
+[data-dark-mode="true"] [class*="bg-gray-200"] {
+  background-color: #1a1a1a !important;
+}
+
+// Bordes claros
+[data-dark-mode="true"] [class*="border-gray-200"],
+[data-dark-mode="true"] [class*="border-gray-300"],
+[data-dark-mode="1"] [class*="border-gray-400"] {
+  border-color: #2a2a2a !important;
+}
+
+// Tailwind dark: classes - Aplicar modo oscuro a todas
+[data-dark-mode="true"] [class*="dark:bg-"],
+[data-dark-mode="true"] [class*="dark:text-"],
+[data-dark-mode="true"] [class*="dark:border-"] {
+  // Ya aplicado por el sistema global
+}
+
+// Asegurar que las clases dark: de Tailwind funcionen cuando data-dark-mode está activo
+// Tailwind requiere la clase 'dark' en el elemento raíz, que ahora se agrega automáticamente
+// Pero también aplicamos estilos directos para garantizar cobertura completa
+
+// Botones y elementos interactivos
+[data-dark-mode="true"] button:not([class*="bg-"]):not([class*="text-"]) {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+// Enlaces
+[data-dark-mode="true"] a:not([class*="text-"]) {
+  color: #4CAF50 !important; // Verde para enlaces en dark mode
+}
+
+// Listas
+[data-dark-mode="true"] ul,
+[data-dark-mode="true"] ol,
+[data-dark-mode="true"] li {
+  color: #e0e0e0 !important;
+}
+
+// Material Symbols - asegurar que sean visibles
+[data-dark-mode="true"] .material-symbols-outlined {
+  color: inherit;
+}
+
+// Cards y paneles
+[data-dark-mode="true"] [class*="card"],
+[data-dark-mode="true"] [class*="panel"],
+[data-dark-mode="true"] [class*="shadow"] {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+// Modales y overlays
+[data-dark-mode="true"] [class*="modal"],
+[data-dark-mode="true"] [class*="overlay"],
+[data-dark-mode="true"] [class*="dialog"] {
+  background-color: rgba(13, 13, 13, 0.95) !important;
+  color: #e0e0e0 !important;
+}
+
+// Grids y layouts
+[data-dark-mode="true"] [class*="grid"],
+[data-dark-mode="true"] [class*="flex"],
+[data-dark-mode="true"] [class*="grid-cols"] {
+  color: inherit;
+}
+
+// Estados hover y active
+[data-dark-mode="true"] [class*="hover:"]:hover {
+  background-color: #252525 !important;
+}
+
+[data-dark-mode="true"] [class*="active"],
+[data-dark-mode="true"] [aria-current="page"] {
+  background-color: rgba(76, 175, 80, 0.15) !important;
+  color: #4CAF50 !important;
+}
+
+// Scrollbars en dark mode
+[data-dark-mode="true"] ::-webkit-scrollbar-track {
+  background: #1a1a1a !important;
+}
+
+[data-dark-mode="true"] ::-webkit-scrollbar-thumb {
+  background: #4CAF50 !important;
+}
+
+[data-dark-mode="true"] ::-webkit-scrollbar-thumb:hover {
+  background: #66bb6a !important;
+}
+
+// ============================================
+// DARK MODE - COBERTURA COMPLETA DE CARDS
+// ============================================
+
+// TODAS las cards, contenedores y elementos con fondo blanco
+[data-dark-mode="true"] .bg-white,
+[data-dark-mode="true"] [class*="bg-white"],
+[data-dark-mode="true"] [class*="card"],
+[data-dark-mode="true"] [class*="Card"],
+[data-dark-mode="true"] .vista-contenido,
+[data-dark-mode="true"] .tabla-responsive,
+[data-dark-mode="true"] .goleadores-grid,
+[data-dark-mode="true"] .trofeos-grid,
+[data-dark-mode="true"] .selectores-section,
+[data-dark-mode="true"] .content,
+[data-dark-mode="true"] .estadisticas-container,
+[data-dark-mode="true"] .campeonatos-disponibles-container {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+// Tablas en dark mode
+[data-dark-mode="true"] table,
+[data-dark-mode="true"] .tabla-posiciones,
+[data-dark-mode="true"] .tabla-jugadores {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] thead {
+  background-color: #0d0d0d !important;
+}
+
+[data-dark-mode="true"] tbody tr {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] tbody tr:hover {
+  background-color: #252525 !important;
+}
+
+[data-dark-mode="true"] th,
+[data-dark-mode="true"] td {
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+// Cards individuales y contenedores específicos
+[data-dark-mode="true"] .goleador-card,
+[data-dark-mode="true"] .trofeo-card,
+[data-dark-mode="true"] .campeonato-card,
+[data-dark-mode="true"] .partido-card,
+[data-dark-mode="true"] .equipo-card,
+[data-dark-mode="true"] .formation-card,
+[data-dark-mode="true"] .formacion-card {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+// Secciones específicas de componentes
+[data-dark-mode="true"] .campeonatos-publicos,
+[data-dark-mode="true"] .codigo-busqueda-section {
+  background-color: #1a1a1a !important;
+}
+
+[data-dark-mode="true"] .codigo-busqueda-card {
+  background-color: #252525 !important;
+  border-color: #2a2a2a !important;
+  color: #e0e0e0 !important;
+}
+
+// Formaciones cards - sección de información (parte blanca)
+[data-dark-mode="true"] .formacion-info,
+[data-dark-mode="true"] .formation-info {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+// Inputs y selects en cards
+[data-dark-mode="true"] .custom-select,
+[data-dark-mode="true"] .selector-group select,
+[data-dark-mode="true"] input[type="text"],
+[data-dark-mode="true"] input[type="search"] {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border-color: #2a2a2a !important;
+}
+
+// Textos en cards - títulos y subtítulos
+[data-dark-mode="true"] .page-title,
+[data-dark-mode="true"] .tabla-header h2,
+[data-dark-mode="true"] .campeonato-card h3,
+[data-dark-mode="true"] .campeonato-card h4 {
+  color: #e0e0e0 !important;
+}
+
+[data-dark-mode="true"] .page-subtitle,
+[data-dark-mode="true"] .empty-data p,
+[data-dark-mode="true"] .campeonato-card p {
+  color: #d1d5db !important;
+}
+
+// Equipo con logo en tabla
+[data-dark-mode="true"] .equipo-con-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Modos para daltónicos */
+[data-colorblind="protanopia"] {
+  // Protanopia: dificultad con rojos
+  --color-error: #0066CC;
+  --color-success: #00CC66;
+  --color-warning: #FFCC00;
+  
+  .bg-red-100 { background-color: #E6F2FF !important; }
+  .bg-red-500 { background-color: #0066CC !important; }
+  .text-red-700 { color: #004499 !important; }
+  .border-red-500 { border-color: #0066CC !important; }
+  
+  // Aplicar a todo el sistema
+  [class*="bg-\[#2E7D32\]"],
+  [class*="from-\[#2E7D32\]"] {
+    background-color: #0066CC !important;
+  }
+  
+  [class*="text-\[#2E7D32\]"] {
+    color: #0066CC !important;
+  }
+}
+
+[data-colorblind="deuteranopia"] {
+  // Deuteranopia: dificultad con verdes
+  --color-success: #0066FF;
+  --color-error: #FF0066;
+  --color-warning: #FFCC00;
+  
+  .bg-green-100 { background-color: #E6F2FF !important; }
+  .bg-green-500 { background-color: #0066FF !important; }
+  .text-green-700 { color: #004499 !important; }
+  .border-green-500 { border-color: #0066FF !important; }
+  
+  // Reemplazar verde del sistema por azul
+  [class*="bg-\[#2E7D32\]"],
+  [class*="from-\[#2E7D32\]"] {
+    background-color: #0066FF !important;
+  }
+  
+  [class*="text-\[#2E7D32\]"] {
+    color: #0066FF !important;
+  }
+  
+  [class*="border-\[#2E7D32\]"] {
+    border-color: #0066FF !important;
+  }
+}
+
+[data-colorblind="tritanopia"] {
+  // Tritanopia: dificultad con azules
+  --color-info: #FF6600;
+  --color-primary: #FF6600;
+  
+  .bg-blue-100 { background-color: #FFF0E6 !important; }
+  .bg-blue-500 { background-color: #FF6600 !important; }
+  .text-blue-700 { color: #CC3300 !important; }
+  .border-blue-500 { border-color: #FF6600 !important; }
+}
+
+// ============================================
+// MODO OSCURO + DALTÓNICO COMBINADOS
+// ============================================
+[data-dark-mode="true"][data-colorblind="deuteranopia"] {
+  [class*="bg-\[#2E7D32\]"],
+  [class*="from-\[#2E7D32\]"] {
+    background-color: #0066FF !important;
+  }
+  
+  .nav-item.active {
+    background-color: rgba(0, 102, 255, 0.15) !important;
+    color: #3399FF !important;
+    border-left-color: #0066FF !important;
+  }
+  
+  .nav-item:hover {
+    color: #3399FF !important;
+  }
+}
+
+[data-dark-mode="true"][data-colorblind="protanopia"] {
+  [class*="bg-\[#2E7D32\]"],
+  [class*="from-\[#2E7D32\]"] {
+    background-color: #0066CC !important;
+  }
+  
+  .nav-item.active {
+    background-color: rgba(0, 102, 204, 0.15) !important;
+    color: #3399CC !important;
+    border-left-color: #0066CC !important;
+  }
+}
+
+/* Tamaño de texto aumentado */
+[data-font-size="large"] {
+  font-size: 112.5% !important; // 18px si base es 16px
+}
+
+[data-font-size="large"] * {
+  font-size: inherit !important;
+}
+
+[data-font-size="xlarge"] {
+  font-size: 125% !important; // 20px si base es 16px
+}
+
+[data-font-size="xlarge"] * {
+  font-size: inherit !important;
+}
+
+[data-font-size="xxlarge"] {
+  font-size: 137.5% !important; // 22px si base es 16px
+}
+
+[data-font-size="xxlarge"] * {
+  font-size: inherit !important;
 }
 
 /* Scrollbar personalizado */
@@ -163,5 +773,92 @@ ol {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD GLOBAL - ESTADOS DE FOCO
+   ============================================ */
+
+/* Focus visible global - Cumple WCAG 2.4.7 */
+*:focus-visible {
+  outline: var(--focus-width, 3px) var(--focus-style, solid) var(--focus-color, var(--color-primary));
+  outline-offset: var(--focus-offset, 2px);
+  border-radius: var(--radius-sm, 4px);
+}
+
+/* Desactivar outline para interacciones con mouse */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Mejoras para elementos interactivos específicos */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline-width: var(--focus-width, 3px);
+  outline-style: var(--focus-style, solid);
+  outline-color: var(--focus-color, var(--color-primary));
+  outline-offset: var(--focus-offset, 2px);
+}
+
+/* Reducción de movimiento - Respeta prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-reduce-motion="true"] {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mejoras de contraste para texto */
+body {
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-100);
+}
+
+/* Alto contraste para enlaces */
+a {
+  color: var(--color-primary);
+  
+  &:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+  }
+}
+
+/* Skip link para navegación por teclado */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary);
+  color: white;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  z-index: 10000;
+  border-radius: 0 0 var(--radius-md, 8px) 0;
+  font-weight: 600;
+  
+  &:focus {
+    top: 0;
   }
 }

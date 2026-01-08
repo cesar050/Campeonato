@@ -11,6 +11,7 @@ class Jugador(db.Model):
     documento = db.Column(db.String(20), unique=True, nullable=False, index=True)
     dorsal = db.Column(db.Integer, nullable=False)
     documento_pdf = db.Column(db.String(255), nullable=True)
+    foto_url = db.Column(db.String(255), nullable=True)  # ← AGREGADO
     posicion = db.Column(db.Enum('portero', 'defensa', 'mediocampista', 'delantero', name='posicion_enum'), default='delantero')
     fecha_nacimiento = db.Column(db.Date, nullable=True)
     fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
@@ -33,6 +34,8 @@ class Jugador(db.Model):
             'documento': self.documento,
             'dorsal': self.dorsal,
             'documento_pdf': self.documento_pdf,
+            'documento_url': self.documento_pdf,  # ← AGREGAR ESTA LÍNEA COMPLETA
+            'foto_url': self.foto_url,
             'posicion': self.posicion,
             'fecha_nacimiento': self.fecha_nacimiento.isoformat() if self.fecha_nacimiento else None,
             'activo': self.activo,

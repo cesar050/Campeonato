@@ -1,0 +1,468 @@
+$white: #FFFFFF;
+$bg-light: #F8F9FA;
+$text-dark: #1A1A1A;
+$text-gray: #666666;
+$text-light: #999999;
+$green-primary: #2E7D32;
+$green-light: #4CAF50;
+$border-color: #E0E0E0;
+$blue: #2196F3;
+$red: #DC2626;
+$orange: #FF9800;
+$purple: #9C27B0;
+
+.usuarios-container {
+  padding: 2rem;
+  max-width: 1400px;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0 0 0.5rem;
+  }
+
+  .subtitle {
+    color: $text-gray;
+    margin: 0;
+  }
+}
+
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: $white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    color: $white;
+  }
+
+  &.total {
+    background: linear-gradient(135deg, #42A5F5, $blue);
+  }
+
+  &.organizadores {
+    background: linear-gradient(135deg, $green-light, $green-primary);
+  }
+
+  &.lideres {
+    background: linear-gradient(135deg, #AB47BC, $purple);
+  }
+
+  &.espectadores {
+    background: linear-gradient(135deg, #FFA726, $orange);
+  }
+}
+
+.stat-content {
+  label {
+    display: block;
+    font-size: 0.875rem;
+    color: $text-gray;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0;
+  }
+}
+
+.filters-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+
+  @media (max-width: 968px) {
+    flex-wrap: wrap;
+  }
+}
+
+.search-box {
+  flex: 1;
+  position: relative;
+  min-width: 300px;
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-gray;
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $green-primary;
+      box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-light;
+    }
+  }
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.875rem;
+    color: $text-gray;
+    font-weight: 500;
+  }
+
+  select {
+    padding: 0.75rem 1rem;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: $white;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $green-primary;
+    }
+  }
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $border-color;
+    border-top-color: $green-primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: $text-gray;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state {
+  background: $white;
+  border-radius: 12px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  svg {
+    color: $text-light;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    color: $text-gray;
+    margin: 0;
+  }
+}
+
+.table-container {
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: $bg-light;
+
+    tr {
+      border-bottom: 1px solid $border-color;
+    }
+
+    th {
+      text-align: left;
+      padding: 1rem 1.25rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: $text-light;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background 0.2s;
+
+      &:hover {
+        background: $bg-light;
+      }
+    }
+
+    td {
+      padding: 1.25rem;
+      font-size: 0.875rem;
+      color: $text-dark;
+    }
+  }
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: $bg-light;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    color: $text-gray;
+  }
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: 600;
+  color: $text-dark;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 0.8rem;
+  color: $text-gray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rol-badge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.rol-admin {
+    background: #E8F5E9;
+    color: $green-primary;
+  }
+
+  &.rol-lider {
+    background: #F3E5F5;
+    color: $purple;
+  }
+
+  &.rol-espectador {
+    background: #E3F2FD;
+    color: $blue;
+  }
+}
+
+.campeonato-text,
+.equipo-text {
+  color: $text-gray;
+  font-size: 0.875rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #F5F5F5;
+  color: $text-gray;
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: $text-gray;
+  }
+
+  &.active {
+    background: #E8F5E9;
+    color: $green-primary;
+
+    .status-dot {
+      background: $green-primary;
+    }
+  }
+}
+
+.icon-verified {
+  color: $green-primary;
+}
+
+.icon-pending {
+  color: $orange;
+}
+
+.date-text {
+  color: $text-gray;
+  font-size: 0.875rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  background: $white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  svg {
+    color: $text-gray;
+  }
+
+  &:hover {
+    background: $bg-light;
+    border-color: $green-primary;
+
+    svg {
+      color: $green-primary;
+    }
+  }
+}
+
+.table-footer {
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $border-color;
+  font-size: 0.875rem;
+  color: $text-gray;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 0.75rem;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  background: $white;
+  color: $text-dark;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: $bg-light;
+    border-color: $green-primary;
+  }
+
+  &.active {
+    background: $green-primary;
+    color: $white;
+    border-color: $green-primary;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

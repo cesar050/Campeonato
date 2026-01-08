@@ -1,0 +1,628 @@
+.partido-detalle-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+/* Estilos añadidos para selección y panel compacto de eventos */
+.jugador-card.selected {
+  border-color: #2563eb;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.15);
+  transform: translateY(-2px);
+}
+
+.jugador-card.expulsado {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+  position: relative;
+}
+
+.jugador-badges {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.badge-yellow { background: #fde68a; padding: 0.15rem 0.4rem; border-radius: 6px; }
+.badge-red { background: #fecaca; padding: 0.15rem 0.4rem; border-radius: 6px; }
+.badge-expelled { color: #b91c1c; font-weight: bold; }
+
+.panel-eventos-compacto {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 260px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  padding: 0.75rem 1rem;
+  z-index: 1200;
+}
+
+.panel-eventos-compacto .panel-header { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+.panel-eventos-compacto .panel-actions { display:flex; gap:6px; flex-wrap:wrap; }
+.btn-event { flex:1; padding:0.5rem; border-radius:8px; border:none; cursor:pointer; font-weight:600 }
+.btn-goal { background:#fef3c7 }
+.btn-yellow { background:#fde68a }
+.btn-red { background:#fecaca }
+.btn-cancel { background:#f3f4f6 }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .btn-back {
+    padding: 0.5rem 1rem;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e5e7eb;
+    }
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.partido-info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  .partido-header {
+    margin-bottom: 1.5rem;
+
+    .equipos-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+
+      @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .equipo-header-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 16px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+
+        &.mi-equipo {
+          background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+          border-color: #2E7D32;
+          box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+        }
+
+        .equipo-logo-container {
+          width: 100px;
+          height: 100px;
+          border-radius: 16px;
+          overflow: hidden;
+          background: white;
+          border: 3px solid #e0e0e0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          flex-shrink: 0;
+
+          &.mi-equipo {
+            border-color: #2E7D32;
+          }
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          @media (max-width: 768px) {
+            width: 80px;
+            height: 80px;
+          }
+        }
+
+        .equipo-logo-placeholder {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+          color: white;
+
+          .material-symbols-outlined {
+            font-size: 3rem;
+
+            @media (max-width: 768px) {
+              font-size: 2.5rem;
+            }
+          }
+        }
+
+        .equipo-info-header {
+          text-align: center;
+
+          h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+            color: #1a1a1a;
+
+            @media (max-width: 768px) {
+              font-size: 1.25rem;
+            }
+          }
+
+          .mi-equipo-badge {
+            display: inline-block;
+            background: #2E7D32;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+      }
+
+      .vs-container-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 120px;
+        justify-content: center;
+
+        @media (max-width: 768px) {
+          min-width: auto;
+          width: 100%;
+        }
+      }
+
+      .vs-divider {
+        flex: 1;
+        height: 2px;
+        background: #e0e0e0;
+
+        @media (max-width: 768px) {
+          display: none;
+        }
+      }
+
+      .vs-content-header {
+        padding: 0 1rem;
+        text-align: center;
+
+        .vs-text {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #666;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+
+        .resultado-text {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: #1a1a1a;
+          letter-spacing: 3px;
+
+          @media (max-width: 768px) {
+            font-size: 2rem;
+            letter-spacing: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  .partido-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #6b7280;
+
+      .estado-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 500;
+
+        &.estado-programado {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        &.estado-en_juego {
+          background: #d1fae5;
+          color: #065f46;
+        }
+
+        &.estado-finalizado {
+          background: #e0e7ff;
+          color: #3730a3;
+        }
+      }
+    }
+  }
+}
+
+.alineacion-card, .cronologia-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+}
+
+.alineacion-content {
+  .titulares-section, .suplentes-section {
+    margin-bottom: 2rem;
+
+    h4 {
+      margin-bottom: 1rem;
+      color: #374151;
+    }
+  }
+
+  .jugadores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+
+    .jugador-card {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.2s;
+
+      &.puede-cambiar {
+        cursor: pointer;
+        border-color: #2E7D32;
+
+        &:hover {
+          background: #f0fdf4;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(46, 125, 50, 0.2);
+        }
+      }
+
+      .jugador-dorsal {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2E7D32;
+        margin-bottom: 0.5rem;
+      }
+
+      .jugador-nombre {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+      }
+
+      .jugador-posicion {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      .btn-cambiar {
+        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #2E7D32;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        justify-content: center;
+        width: 100%;
+
+        &:hover {
+          background: #1B5E20;
+        }
+      }
+    }
+  }
+}
+
+.empty-events {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+
+  .material-symbols-outlined {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.eventos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .evento-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.2s;
+
+    &.evento-local, &.evento-visitante {
+      border-color: #2E7D32;
+      background: #f0fdf4;
+    }
+
+    .evento-minuto {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #2E7D32;
+      min-width: 3rem;
+      text-align: center;
+    }
+
+    .evento-icon {
+      font-size: 2rem;
+    }
+
+    .evento-content {
+      flex: 1;
+
+      .evento-tipo {
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+      }
+
+      .evento-jugador {
+        margin-bottom: 0.25rem;
+      }
+
+      .evento-asistidor {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+      }
+
+      .evento-equipo {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+
+    h2 {
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 4px;
+
+      &:hover {
+        background: #f3f4f6;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+
+    .cambio-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .jugador-sale, .jugador-entra {
+        h4 {
+          margin-bottom: 0.75rem;
+          color: #374151;
+        }
+      }
+
+      .jugador-selected {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border: 2px solid #2E7D32;
+        border-radius: 8px;
+
+        .jugador-dorsal {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #2E7D32;
+        }
+      }
+
+      .suplentes-select {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-height: 300px;
+        overflow-y: auto;
+
+        .jugador-option {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.75rem;
+          background: #f9fafb;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            background: #f3f4f6;
+            border-color: #2E7D32;
+          }
+
+          &.selected {
+            background: #f0fdf4;
+            border-color: #2E7D32;
+          }
+
+          .jugador-dorsal {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2E7D32;
+          }
+        }
+      }
+
+      .minuto-input {
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+
+        input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 1rem;
+
+          &:focus {
+            outline: none;
+            border-color: #2E7D32;
+          }
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+
+    .btn-secondary {
+      padding: 0.75rem 1.5rem;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+
+    .btn-primary {
+      padding: 0.75rem 1.5rem;
+      background: #2E7D32;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+
+      &:hover:not(:disabled) {
+        background: #1B5E20;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+

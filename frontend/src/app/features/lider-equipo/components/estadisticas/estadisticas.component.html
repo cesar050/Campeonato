@@ -1,0 +1,383 @@
+<div class="estadisticas-container min-h-screen bg-gray-50 dark:bg-[#102211]">
+    <!-- HEADER -->
+    <div class="page-header bg-white dark:bg-[#182c19] border-b-2 border-gray-200 dark:border-[#2a452b] sticky top-0 z-40 shadow-sm">
+      <div class="header-content max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <h1 class="page-title text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E7D32]">bar_chart</span>
+          Estadísticas
+        </h1>
+        <p class="page-subtitle text-gray-600 dark:text-gray-400 mt-1">Consulta el rendimiento de tu equipo</p>
+      </div>
+    </div>
+  
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+  
+    <!-- EMPTY STATE - SIN EQUIPOS -->
+    <div *ngIf="!loading() && misEquipos().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <span class="material-symbols-outlined">shield</span>
+      </div>
+      <h2>No tienes equipos registrados</h2>
+      <p>Primero debes crear un equipo para ver estadísticas</p>
+      <button [routerLink]="['/lider-equipo/mis-equipos']" class="btn-primary">
+        <span class="material-symbols-outlined">add</span>
+        Crear Equipo
+      </button>
+    </div>
+  
+    <!-- CONTENIDO PRINCIPAL -->
+    <div *ngIf="!loading() && misEquipos().length > 0" class="content">
+  
+      <!-- SELECTORES -->
+      <div class="selectores-section bg-white dark:bg-[#182c19] border-2 border-gray-200 dark:border-[#2a452b] rounded-xl p-6 mb-6">
+        <!-- SELECTOR DE EQUIPO -->
+        <div class="selector-group" *ngIf="misEquipos().length > 1">
+          <label for="equipo-select">
+            <span class="material-symbols-outlined">shield</span>
+            Equipo:
+          </label>
+          <select 
+            id="equipo-select" 
+            [value]="equipoSeleccionado()?.id_equipo"
+            (change)="onEquipoChange($any($event.target).value)" 
+            class="custom-select">
+            <option *ngFor="let equipo of misEquipos()" [value]="equipo.id_equipo">
+              {{ equipo.nombre }}
+            </option>
+          </select>
+        </div>
+  
+        <!-- SELECTOR DE CAMPEONATO -->
+        <div class="selector-group">
+          <label for="campeonato-select">
+            <span class="material-symbols-outlined">emoji_events</span>
+            Campeonato:
+          </label>
+          <select 
+            id="campeonato-select" 
+            [value]="campeonatoSeleccionado()?.id_campeonato"
+            (change)="onCampeonatoChange($any($event.target).value)" 
+            class="custom-select"
+            [disabled]="campeonatosInscritos().length === 0">
+            <option value="" *ngIf="campeonatosInscritos().length === 0">
+              No hay campeonatos inscritos
+            </option>
+            <option *ngFor="let campeonato of campeonatosInscritos()" [value]="campeonato.id_campeonato">
+              {{ campeonato.nombre }}
+            </option>
+          </select>
+        </div>
+  
+        <!-- INFO BADGE -->
+        <div class="info-badge" *ngIf="equipoSeleccionado()">
+          <span class="material-symbols-outlined">info</span>
+          {{ equipoSeleccionado()!.tipo_deporte === 'indoor' ? 'Indoor' : 'Fútbol 11' }}
+        </div>
+      </div>
+  
+      <!-- TABS DE VISTAS -->
+      <div class="tabs-container">
+        <button 
+          class="tab-btn" 
+          [class.active]="vistaActiva() === 'tabla'"
+          (click)="cambiarVista('tabla')">
+          <span class="material-symbols-outlined">table_chart</span>
+          Tabla de Posiciones
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="vistaActiva() === 'goleadores'"
+          (click)="cambiarVista('goleadores')">
+          <span class="material-symbols-outlined">sports_soccer</span>
+          Goleadores
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="vistaActiva() === 'asistencias'"
+          (click)="cambiarVista('asistencias')">
+          <span class="material-symbols-outlined">people</span>
+          Asistencias
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="vistaActiva() === 'jugadores'"
+          (click)="cambiarVista('jugadores')">
+          <span class="material-symbols-outlined">groups</span>
+          Jugadores
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="vistaActiva() === 'trofeos'"
+          (click)="cambiarVista('trofeos')">
+          <span class="material-symbols-outlined">emoji_events</span>
+          Trofeos
+        </button>
+      </div>
+  
+      <!-- VISTA: TABLA DE POSICIONES -->
+      <div *ngIf="vistaActiva() === 'tabla'" class="vista-contenido bg-white dark:bg-[#182c19] border-2 border-gray-200 dark:border-[#2a452b] rounded-xl p-6">
+        <div class="tabla-header mb-4">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Tabla de Posiciones</h2>
+          <div class="mi-posicion flex items-center gap-2" *ngIf="getMiPosicion() && campeonatoSeleccionado()">
+            <span class="posicion-badge px-3 py-1 rounded-full font-bold text-white" [class]="getClasePosicion(getMiPosicion()!.posicion)">
+              {{ getMiPosicion()!.posicion }}°
+            </span>
+            <span class="text-gray-600 dark:text-gray-300">Tu posición actual</span>
+          </div>
+        </div>
+  
+        <div *ngIf="!campeonatoSeleccionado() && campeonatosInscritos().length === 0" class="empty-data text-center py-12">
+          <span class="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-600 mb-4">table_chart</span>
+          <p class="text-gray-600 dark:text-gray-400 text-lg">No tienes campeonatos inscritos</p>
+          <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">Inscríbete en un campeonato para ver la tabla de posiciones</p>
+        </div>
+  
+        <div *ngIf="!campeonatoSeleccionado() && campeonatosInscritos().length > 0" class="empty-data text-center py-12">
+          <span class="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-600 mb-4">table_chart</span>
+          <p class="text-gray-600 dark:text-gray-400 text-lg">Selecciona un campeonato para ver la tabla de posiciones</p>
+        </div>
+  
+        <div *ngIf="campeonatoSeleccionado() && tablaPosiciones().length === 0 && !loading()" class="empty-data text-center py-12">
+          <span class="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-600 mb-4">table_chart</span>
+          <p class="text-gray-600 dark:text-gray-400 text-lg">No hay datos de tabla de posiciones disponibles aún</p>
+          <p class="text-gray-500 dark:text-gray-500 text-sm mt-2">La tabla se mostrará cuando se hayan jugado partidos</p>
+        </div>
+  
+        <div class="tabla-responsive" *ngIf="tablaPosiciones().length > 0 && campeonatoSeleccionado()">
+          <table class="tabla-posiciones w-full" role="table" aria-label="Tabla de posiciones del campeonato">
+            <caption class="sr-only">Tabla de posiciones del campeonato {{ campeonatoSeleccionado()?.nombre }}</caption>
+            <thead>
+              <tr>
+                <th scope="col" role="columnheader">Pos</th>
+                <th scope="col" role="columnheader">Equipo</th>
+                <th scope="col" role="columnheader">PJ</th>
+                <th scope="col" role="columnheader">G</th>
+                <th scope="col" role="columnheader">E</th>
+                <th scope="col" role="columnheader">P</th>
+                <th scope="col" role="columnheader">GF</th>
+                <th scope="col" role="columnheader">GC</th>
+                <th scope="col" role="columnheader">DG</th>
+                <th scope="col" role="columnheader">Pts</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let equipo of tablaPosiciones(); let i = index" 
+                role="row"
+                [attr.aria-rowindex]="i + 1"
+                [class.mi-equipo]="equipo.id_equipo === equipoSeleccionado()?.id_equipo"
+                [class]="getClasePosicion(equipo.posicion)">
+                <td class="pos-col text-center font-bold">
+                  <span class="pos-number">{{ equipo.posicion }}</span>
+                </td>
+                <td class="equipo-col">
+                  <div class="equipo-con-logo flex items-center gap-3">
+                    <app-image-placeholder
+                      [src]="obtenerLogoEquipo(equipo.id_equipo)"
+                      [alt]="'Logo de ' + equipo.nombre_equipo"
+                      [type]="'team'"
+                      [size]="'sm'"
+                      class="equipo-logo-tabla">
+                    </app-image-placeholder>
+                    <strong class="text-gray-800 dark:text-gray-100">{{ equipo.nombre_equipo }}</strong>
+                  </div>
+                </td>
+                <td class="text-center">{{ equipo.partidos_jugados }}</td>
+                <td class="verde text-center font-semibold text-green-600 dark:text-green-400">{{ equipo.ganados }}</td>
+                <td class="gris text-center text-gray-600 dark:text-gray-400">{{ equipo.empatados }}</td>
+                <td class="rojo text-center font-semibold text-red-600 dark:text-red-400">{{ equipo.perdidos }}</td>
+                <td class="text-center">{{ equipo.goles_favor }}</td>
+                <td class="text-center">{{ equipo.goles_contra }}</td>
+                <td class="text-center font-semibold" [class.positivo]="equipo.diferencia_goles > 0" [class.negativo]="equipo.diferencia_goles < 0" [class.text-green-600]="equipo.diferencia_goles > 0" [class.text-red-600]="equipo.diferencia_goles < 0" [class.dark:text-green-400]="equipo.diferencia_goles > 0" [class.dark:text-red-400]="equipo.diferencia_goles < 0">
+                  {{ equipo.diferencia_goles > 0 ? '+' : '' }}{{ equipo.diferencia_goles }}
+                </td>
+                <td class="puntos-col text-center">
+                  <strong class="text-lg font-bold text-gray-800 dark:text-gray-100">{{ equipo.puntos }}</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+      </div>
+  
+      <!-- VISTA: GOLEADORES -->
+      <div *ngIf="vistaActiva() === 'goleadores'" class="vista-contenido bg-white dark:bg-[#182c19] border-2 border-gray-200 dark:border-[#2a452b] rounded-xl p-6">
+        <h2>Goleadores del Equipo</h2>
+  
+        <div class="goleadores-grid" *ngIf="goleadores().length > 0">
+          <div *ngFor="let goleador of goleadores(); let i = index" class="goleador-card">
+            <div class="ranking-badge" [class.oro]="i === 0" [class.plata]="i === 1" [class.bronce]="i === 2">
+              {{ i + 1 }}
+            </div>
+            <div class="goleador-info">
+              <div class="jugador-nombre">
+                <strong>{{ goleador.nombre }} {{ goleador.apellido }}</strong>
+                <span class="dorsal-badge">#{{ goleador.dorsal }}</span>
+              </div>
+              <div class="stats-row">
+                <div class="stat-item">
+                  <span class="material-symbols-outlined">sports_soccer</span>
+                  <strong>{{ goleador.goles }}</strong>
+                  <span>goles</span>
+                </div>
+                <div class="stat-item">
+                  <span class="material-symbols-outlined">event</span>
+                  <span>{{ goleador.partidos_jugados }} partidos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="material-symbols-outlined">trending_up</span>
+                  <span>{{ goleador.promedio.toFixed(2) }} promedio</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="empty-data" *ngIf="goleadores().length === 0">
+          <span class="material-symbols-outlined">sports_soccer</span>
+          <p>No hay goleadores registrados</p>
+        </div>
+      </div>
+  
+      <!-- VISTA: ASISTENCIAS -->
+      <div *ngIf="vistaActiva() === 'asistencias'" class="vista-contenido bg-white dark:bg-[#182c19] border-2 border-gray-200 dark:border-[#2a452b] rounded-xl p-6">
+        <h2>Asistidores del Equipo</h2>
+  
+        <div class="goleadores-grid" *ngIf="asistidores().length > 0">
+          <div *ngFor="let asistidor of asistidores(); let i = index" class="goleador-card">
+            <div class="ranking-badge" [class.oro]="i === 0" [class.plata]="i === 1" [class.bronce]="i === 2">
+              {{ i + 1 }}
+            </div>
+            <div class="goleador-info">
+              <div class="jugador-nombre">
+                <strong>{{ asistidor.nombre }} {{ asistidor.apellido }}</strong>
+                <span class="dorsal-badge">#{{ asistidor.dorsal }}</span>
+              </div>
+              <div class="stats-row">
+                <div class="stat-item">
+                  <span class="material-symbols-outlined">people</span>
+                  <strong>{{ asistidor.asistencias }}</strong>
+                  <span>asistencias</span>
+                </div>
+                <div class="stat-item">
+                  <span class="material-symbols-outlined">event</span>
+                  <span>{{ asistidor.partidos_jugados }} partidos</span>
+                </div>
+                <div class="stat-item">
+                  <span class="material-symbols-outlined">trending_up</span>
+                  <span>{{ asistidor.promedio.toFixed(2) }} promedio</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="empty-data" *ngIf="asistidores().length === 0">
+          <span class="material-symbols-outlined">people</span>
+          <p>No hay asistidores registrados</p>
+        </div>
+      </div>
+  
+      <!-- VISTA: JUGADORES -->
+      <div *ngIf="vistaActiva() === 'jugadores'" class="vista-contenido bg-white dark:bg-[#182c19] border-2 border-gray-200 dark:border-[#2a452b] rounded-xl p-6">
+        <h2>Estadísticas de Jugadores</h2>
+  
+        <div class="tabla-responsive" *ngIf="estadisticasJugadores().length > 0">
+          <table class="tabla-jugadores">
+            <thead>
+              <tr>
+                <th scope="col" role="columnheader">Dorsal</th>
+                <th scope="col" role="columnheader">Jugador</th>
+                <th scope="col" role="columnheader">Pos</th>
+                <th scope="col" role="columnheader">PJ</th>
+                <th scope="col" role="columnheader">
+                  <span class="material-symbols-outlined text-sm align-middle mr-1">sports_soccer</span>
+                  Goles
+                </th>
+                <th scope="col" role="columnheader">
+                  <span class="material-symbols-outlined text-sm align-middle mr-1">people</span>
+                  Asist
+                </th>
+                <th scope="col" role="columnheader">
+                  <span class="material-symbols-outlined text-sm align-middle mr-1">warning</span>
+                  TA
+                </th>
+                <th scope="col" role="columnheader">
+                  <span class="material-symbols-outlined text-sm align-middle mr-1">error</span>
+                  TR
+                </th>
+                <th scope="col" role="columnheader">
+                  <span class="material-symbols-outlined text-sm align-middle mr-1">schedule</span>
+                  Min
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let jugador of estadisticasJugadores(); let i = index" role="row" [attr.aria-rowindex]="i + 1">
+                <td class="dorsal-col text-center">
+                  <span class="dorsal-num font-bold text-gray-800 dark:text-gray-100">{{ jugador.dorsal || '-' }}</span>
+                </td>
+                <td class="jugador-col">
+                  <strong class="text-gray-800 dark:text-gray-100">{{ jugador.nombre }} {{ jugador.apellido }}</strong>
+                </td>
+                <td class="text-center text-gray-600 dark:text-gray-400">{{ jugador.posicion || '-' }}</td>
+                <td class="text-center">{{ jugador.partidos_jugados || 0 }}</td>
+                <td class="stat-goles text-center font-bold text-green-600 dark:text-green-400">{{ jugador.goles || 0 }}</td>
+                <td class="stat-asist text-center font-semibold text-blue-600 dark:text-blue-400">{{ jugador.asistencias || 0 }}</td>
+                <td class="stat-amarilla text-center text-yellow-600 dark:text-yellow-400">{{ jugador.tarjetas_amarillas || 0 }}</td>
+                <td class="stat-roja text-center font-bold text-red-600 dark:text-red-400">{{ jugador.tarjetas_rojas || 0 }}</td>
+                <td class="text-center text-gray-600 dark:text-gray-400">{{ jugador.minutos_jugados || 0 }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <div class="empty-data" *ngIf="estadisticasJugadores().length === 0">
+          <span class="material-symbols-outlined">groups</span>
+          <p>No hay estadísticas de jugadores disponibles</p>
+        </div>
+      </div>
+  
+      <!-- VISTA: TROFEOS -->
+      <div *ngIf="vistaActiva() === 'trofeos'" class="vista-contenido bg-white dark:bg-[#182c19] border-2 border-gray-200 dark:border-[#2a452b] rounded-xl p-6">
+        <h2>Campeonatos Ganados</h2>
+  
+        <div class="trofeos-grid" *ngIf="campeonatosGanados().length > 0">
+          <div *ngFor="let campeonato of campeonatosGanados()" class="trofeo-card">
+            <div class="trofeo-icono">
+              <span class="material-symbols-outlined">emoji_events</span>
+            </div>
+            <div class="trofeo-info">
+              <h3>{{ campeonato.nombre_campeonato }}</h3>
+              <div class="trofeo-detalles">
+                <div class="detalle-item">
+                  <span class="material-symbols-outlined">calendar_today</span>
+                  <span>{{ formatearFecha(campeonato.fecha_fin) }}</span>
+                </div>
+                <div class="detalle-item">
+                  <span class="material-symbols-outlined">shield</span>
+                  <span>{{ campeonato.nombre_equipo }}</span>
+                </div>
+                <div class="detalle-item posicion-final">
+                  <span class="material-symbols-outlined">workspace_premium</span>
+                  <strong>{{ campeonato.posicion_final }}° Lugar</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <div class="empty-data" *ngIf="campeonatosGanados().length === 0">
+          <span class="material-symbols-outlined">emoji_events</span>
+          <p>Aún no has ganado campeonatos</p>
+          <p class="subtitle">¡Sigue compitiendo para conseguir tu primer trofeo!</p>
+        </div>
+      </div>
+  
+    </div>
+  </div>

@@ -1,285 +1,503 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.extensions import db
 from app.models.usuario import Usuario
 from app.models.campeonato import Campeonato
+from app.extensions import db
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash 
+from app.security.email_service import EmailService  # ✅ CORREGIDO
+from functools import wraps
 import secrets
 import string
 
-# Crear namespace
-superadmin_ns = Namespace('superadmin', description='Operaciones de SuperAdmin')
+superadmin_ns = Namespace('superadmin', description='SuperAdmin operations')
 
-# Modelos para documentación
-organizador_input = superadmin_ns.model('OrganizadorInput', {
-    'nombre': fields.String(required=True, description='Nombre completo del organizador'),
-    'email': fields.String(required=True, description='Email del organizador (debe ser Gmail)'),
-    'nombre_campeonato': fields.String(required=True, description='Nombre del campeonato que gestionará')
-})
-
-organizador_output = superadmin_ns.model('OrganizadorOutput', {
-    'id': fields.Integer(description='ID del organizador'),
-    'nombre': fields.String(description='Nombre del organizador'),
-    'email': fields.String(description='Email del organizador'),
-    'campeonato': fields.String(description='Nombre del campeonato'),
-    'rol': fields.String(description='Rol del usuario'),
-    'activo': fields.Boolean(description='Estado del usuario')
-})
-
-# Decorador para verificar rol de superadmin
 def superadmin_required():
     def decorator(f):
+        @wraps(f)
         @jwt_required()
         def wrapper(*args, **kwargs):
             current_user_id = get_jwt_identity()
             user = Usuario.query.get(current_user_id)
             
-            if not user:
-                superadmin_ns.abort(404, 'Usuario no encontrado')
-            
-            if user.rol != 'superadmin':
-                superadmin_ns.abort(403, 'Acceso denegado. Se requiere rol de SuperAdmin')
+            if not user or user.rol != 'superadmin':
+                return {'error': 'Acceso denegado. Se requieren privilegios de superadmin'}, 403
             
             return f(*args, **kwargs)
         return wrapper
     return decorator
 
-@superadmin_ns.route('/organizadores')
-class OrganizadorList(Resource):
+def generate_secure_password(length=16):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(secrets.choice(characters) for _ in range(length))
+    return password
+
+@superadmin_ns.route('/dashboard')
+class Dashboard(Resource):
     @superadmin_required()
-    @superadmin_ns.doc('listar_organizadores')
-    @superadmin_ns.marshal_list_with(organizador_output)
     def get(self):
-        """Listar todos los organizadores"""
         try:
-            organizadores = Usuario.query.filter_by(rol='admin').all()
+            now = datetime.utcnow()
+            thirty_days_ago = now - timedelta(days=30)
+            sixty_days_ago = now - timedelta(days=60)
+
+            total_organizadores = Usuario.query.filter_by(rol='admin').count()
+            organizadores_activos = Usuario.query.filter_by(rol='admin', activo=True).count()
+
+            total_campeonatos = Campeonato.query.count()
+            campeonatos_activos = Campeonato.query.filter_by(estado='en_curso').count()
+            campeonatos_planificacion = Campeonato.query.filter_by(estado='planificacion').count()
+            campeonatos_finalizados = Campeonato.query.filter_by(estado='finalizado').count()
+
+            usuarios_totales = Usuario.query.filter(Usuario.rol != 'superadmin').count()
+            usuarios_espectadores = Usuario.query.filter_by(rol='espectador').count()
+            usuarios_lideres = Usuario.query.filter_by(rol='lider').count()
+
+            org_last_30 = Usuario.query.filter(
+                Usuario.rol == 'admin',
+                Usuario.fecha_registro >= thirty_days_ago
+            ).count()
+            org_prev_30 = Usuario.query.filter(
+                Usuario.rol == 'admin',
+                Usuario.fecha_registro >= sixty_days_ago,
+                Usuario.fecha_registro < thirty_days_ago
+            ).count()
+
+            camp_last_30 = Campeonato.query.filter(
+                Campeonato.fecha_creacion >= thirty_days_ago
+            ).count()
+            camp_prev_30 = Campeonato.query.filter(
+                Campeonato.fecha_creacion >= sixty_days_ago,
+                Campeonato.fecha_creacion < thirty_days_ago
+            ).count()
+
+            users_last_30 = Usuario.query.filter(
+                Usuario.rol != 'superadmin',
+                Usuario.fecha_registro >= thirty_days_ago
+            ).count()
+            users_prev_30 = Usuario.query.filter(
+                Usuario.rol != 'superadmin',
+                Usuario.fecha_registro >= sixty_days_ago,
+                Usuario.fecha_registro < thirty_days_ago
+            ).count()
+
+            def calcular_tendencia(actual, anterior):
+                if anterior == 0:
+                    return 100 if actual > 0 else 0
+                return round(((actual - anterior) / anterior) * 100, 1)
+
+            trend_organizadores = calcular_tendencia(org_last_30, org_prev_30)
+            trend_campeonatos = calcular_tendencia(camp_last_30, camp_prev_30)
+            trend_usuarios = calcular_tendencia(users_last_30, users_prev_30)
+
+            crecimiento_usuarios = []
+            for i in range(29, -1, -1):
+                fecha = now - timedelta(days=i)
+                count = Usuario.query.filter(
+                    Usuario.rol != 'superadmin',
+                    Usuario.fecha_registro <= fecha
+                ).count()
+                crecimiento_usuarios.append({
+                    'fecha': fecha.strftime('%Y-%m-%d'),
+                    'usuarios': count
+                })
+
+            actividad_reciente = []
+            recent_users = Usuario.query.order_by(Usuario.fecha_registro.desc()).limit(10).all()
+            for user in recent_users:
+                actividad_reciente.append({
+                    'id': user.id_usuario,
+                    'accion': f'Nuevo usuario registrado: {user.nombre}',
+                    'usuario': user.nombre,
+                    'fecha': user.fecha_registro.isoformat(),
+                    'estado': 'Completado'
+                })
+
+            return {
+                'estadisticas': {
+                    'total_organizadores': total_organizadores,
+                    'organizadores_activos': organizadores_activos,
+                    'total_campeonatos': total_campeonatos,
+                    'campeonatos_activos': campeonatos_activos,
+                    'campeonatos_planificacion': campeonatos_planificacion,
+                    'campeonatos_finalizados': campeonatos_finalizados,
+                    'solicitudes_pendientes': 0,
+                    'usuarios_totales': usuarios_totales,
+                    'usuarios_espectadores': usuarios_espectadores,
+                    'usuarios_lideres': usuarios_lideres,
+                    'trend_organizadores': trend_organizadores,
+                    'trend_campeonatos': trend_campeonatos,
+                    'trend_usuarios': trend_usuarios
+                },
+                'actividad_reciente': actividad_reciente,
+                'crecimiento_usuarios': crecimiento_usuarios
+            }, 200
+
+        except Exception as e:
+            return {'error': f'Error al obtener dashboard: {str(e)}'}, 500
+
+@superadmin_ns.route('/organizadores')
+class OrganizadoresList(Resource):
+    @superadmin_required()
+    def get(self):
+        try:
+            search = request.args.get('search', '').strip()
+            estado = request.args.get('estado', 'Todos')
+            orden = request.args.get('orden', 'recent')
             
-            resultado = []
+            query = Usuario.query.filter_by(rol='admin')
+            
+            if search:
+                search_pattern = f'%{search}%'
+                query = query.filter(
+                    db.or_(
+                        Usuario.nombre.ilike(search_pattern),
+                        Usuario.email.ilike(search_pattern)
+                    )
+                )
+            
+            if estado == 'Activo':
+                query = query.filter_by(activo=True)
+            elif estado == 'Inactivo':
+                query = query.filter_by(activo=False)
+            
+            if orden == 'name_asc':
+                query = query.order_by(Usuario.nombre.asc())
+            elif orden == 'name_desc':
+                query = query.order_by(Usuario.nombre.desc())
+            elif orden == 'email_asc':
+                query = query.order_by(Usuario.email.asc())
+            elif orden == 'email_desc':
+                query = query.order_by(Usuario.email.desc())
+            else:
+                query = query.order_by(Usuario.fecha_registro.desc())
+            
+            organizadores = query.all()
+            
+            result = []
             for org in organizadores:
-                # Buscar campeonato asociado
                 campeonato = Campeonato.query.filter_by(creado_por=org.id_usuario).first()
                 
-                resultado.append({
-                    'id': org.id_usuario,
+                result.append({
+                    'id_usuario': org.id_usuario,
                     'nombre': org.nombre,
                     'email': org.email,
-                    'campeonato': campeonato.nombre if campeonato else 'Sin campeonato',
-                    'rol': org.rol,
-                    'activo': org.activo
+                    'activo': org.activo,
+                    'email_verified': org.email_verified,
+                    'fecha_registro': org.fecha_registro.isoformat() if org.fecha_registro else None,
+                    'campeonato': campeonato.nombre if campeonato else None
                 })
             
-            return resultado, 200
-            
+            return {'organizadores': result}, 200
+
         except Exception as e:
-            print(f"❌ Error al listar organizadores: {str(e)}")
-            superadmin_ns.abort(500, 'Error al obtener la lista de organizadores')
-    
+            return {'error': f'Error al obtener organizadores: {str(e)}'}, 500
+
     @superadmin_required()
-    @superadmin_ns.doc('crear_organizador')
-    @superadmin_ns.expect(organizador_input)
     def post(self):
-        """Crear nuevo organizador"""
         try:
             data = request.get_json()
-            
-            print(f"📥 Datos recibidos: {data}")
-            
-            # Validar datos requeridos
-            if not data.get('nombre'):
-                superadmin_ns.abort(400, 'El nombre es requerido')
-            
-            if not data.get('email'):
-                superadmin_ns.abort(400, 'El email es requerido')
-            
-            if not data.get('nombre_campeonato'):
-                superadmin_ns.abort(400, 'El nombre del campeonato es requerido')
-            
-            # Verificar que el email sea Gmail
-            if not data['email'].endswith('@gmail.com'):
-                superadmin_ns.abort(400, 'Solo se permiten correos de Gmail')
-            
-            # Verificar que el email no exista
-            if Usuario.query.filter_by(email=data['email']).first():
-                superadmin_ns.abort(400, 'El email ya está registrado')
-            
-            # Generar contraseña temporal segura
-            password_temp = ''.join(secrets.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(16))
-            print(f"🔑 Contraseña temporal generada: {password_temp}")
-            
-            # Crear usuario organizador - SIN email_verificado
+        
+            nombre = data.get('nombre')
+            email = data.get('email')
+            nombre_campeonato = data.get('nombre_campeonato')
+        
+            if not nombre or not email or not nombre_campeonato:
+                return {'error': 'Nombre, email y nombre del campeonato son requeridos'}, 400
+        
+            if not email.lower().endswith('@gmail.com'):
+                return {'error': 'Solo se permiten correos de Gmail'}, 400
+        
+            if Usuario.query.filter_by(email=email).first():
+                return {'error': 'El email ya esta registrado'}, 400
+        
+            password_temporal = generate_secure_password(16)
+        
             nuevo_organizador = Usuario(
-                nombre=data['nombre'],
-                email=data['email'],
+                nombre=nombre,
+                email=email,
+                contrasena=generate_password_hash(password_temporal),
                 rol='admin',
-                activo=True
+                activo=True,
+                email_verified=False
             )
-            nuevo_organizador.set_password(password_temp)
-            print(f"👤 Usuario creado en memoria: {nuevo_organizador.email}")
-            
+        
             db.session.add(nuevo_organizador)
-            db.session.flush()  # Para obtener el ID
-            print(f"✅ Usuario guardado con ID: {nuevo_organizador.id_usuario}")
-            
-            # Crear campeonato asociado
+            db.session.flush()
+        
+            fecha_inicio = datetime.utcnow().date()
+            fecha_fin = fecha_inicio + timedelta(days=90)
+        
             nuevo_campeonato = Campeonato(
-                nombre=data['nombre_campeonato'],
-                descripcion=f"Campeonato gestionado por {data['nombre']}",
-                fecha_inicio=datetime.utcnow().date(),
-                fecha_fin=(datetime.utcnow() + timedelta(days=90)).date(),
+                nombre=nombre_campeonato,
+                descripcion=f'Campeonato gestionado por {nombre}',
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
                 estado='planificacion',
                 max_equipos=16,
                 creado_por=nuevo_organizador.id_usuario
             )
-            
+        
             db.session.add(nuevo_campeonato)
             db.session.commit()
-            
-            print(f"✅ Organizador creado exitosamente: {nuevo_organizador.email}")
-            print(f"✅ Campeonato creado: {nuevo_campeonato.nombre}")
-            print(f"🔑 Credenciales temporales - Email: {data['email']}, Password: {password_temp}")
-            
+        
+            # Enviar email con credenciales
+            try:
+                email_enviado = EmailService.send_organizador_credentials(
+                    email=email,
+                    nombre=nombre,
+                    contrasena=password_temporal,
+                    nombre_campeonato=nombre_campeonato
+                )
+                print(f"📧 Email enviado: {email_enviado}")
+            except Exception as e:
+                print(f"❌ ERROR AL ENVIAR EMAIL: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                email_enviado = False
+        
             return {
-                'mensaje': 'Organizador creado exitosamente',
+                'message': 'Organizador creado exitosamente',
                 'organizador': {
-                    'id': nuevo_organizador.id_usuario,
+                    'id_usuario': nuevo_organizador.id_usuario,
                     'nombre': nuevo_organizador.nombre,
-                    'email': nuevo_organizador.email,
-                    'campeonato': nuevo_campeonato.nombre
+                    'email': nuevo_organizador.email
                 },
+                'campeonato': {
+                    'id_campeonato': nuevo_campeonato.id_campeonato,
+                    'nombre': nuevo_campeonato.nombre
+                },
+                'email_enviado': email_enviado,
                 'credenciales_temporales': {
-                    'email': data['email'],
-                    'password': password_temp,
-                    'nota': 'IMPORTANTE: Guarda estas credenciales de forma segura y envíalas al organizador'
+                    'email': email,
+                    'password': password_temporal,
+                    'nota': 'Credenciales enviadas por email. Si no llega, usa estas.'
                 }
             }, 201
-            
+
         except Exception as e:
             db.session.rollback()
-            print(f"❌ Error al crear organizador: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            superadmin_ns.abort(500, f'Error al crear el organizador: {str(e)}')
-
+            return {'error': f'Error al crear organizador: {str(e)}'}, 500  # ✅ INDENTACIÓN CORRECTA
 
 @superadmin_ns.route('/organizadores/<int:id>')
-class OrganizadorDetail(Resource):
+class OrganizadorDetalle(Resource):
     @superadmin_required()
-    @superadmin_ns.doc('obtener_organizador')
     def get(self, id):
-        """Obtener detalles de un organizador"""
         try:
             organizador = Usuario.query.get(id)
             
             if not organizador or organizador.rol != 'admin':
-                superadmin_ns.abort(404, 'Organizador no encontrado')
+                return {'error': 'Organizador no encontrado'}, 404
             
-            campeonato = Campeonato.query.filter_by(creado_por=organizador.id_usuario).first()
+            campeonato = Campeonato.query.filter_by(creado_por=id).first()
             
-            # Verificar si tiene el atributo email_verified o email_verificado
-            email_verificado = False
-            if hasattr(organizador, 'email_verified'):
-                email_verificado = organizador.email_verified
-            elif hasattr(organizador, 'email_verificado'):
-                email_verificado = organizador.email_verificado
+            actividad_reciente = [
+                {
+                    'id': 1,
+                    'accion': 'Inicio de sesion',
+                    'fecha': organizador.last_login_at.isoformat() if organizador.last_login_at else None,
+                    'detalles': 'Acceso desde la plataforma web'
+                }
+            ]
             
             return {
-                'id': organizador.id_usuario,
-                'nombre': organizador.nombre,
-                'email': organizador.email,
-                'rol': organizador.rol,
-                'activo': organizador.activo,
-                'email_verificado': email_verificado,
-                'fecha_registro': organizador.fecha_registro.isoformat() if organizador.fecha_registro else None,
-                'campeonato': {
-                    'id': campeonato.id_campeonato,
-                    'nombre': campeonato.nombre,
-                    'estado': campeonato.estado
-                } if campeonato else None
+                'organizador': {
+                    'id_usuario': organizador.id_usuario,
+                    'nombre': organizador.nombre,
+                    'email': organizador.email,
+                    'activo': organizador.activo,
+                    'email_verified': organizador.email_verified,
+                    'fecha_registro': organizador.fecha_registro.isoformat() if organizador.fecha_registro else None,
+                    'last_login_at': organizador.last_login_at.isoformat() if organizador.last_login_at else None,
+                    'campeonato': {
+                        'nombre': campeonato.nombre if campeonato else 'Sin campeonato',
+                        'estado': campeonato.estado if campeonato else 'N/A',
+                        'equipos_count': 0
+                    }
+                },
+                'actividad_reciente': actividad_reciente
             }, 200
-            
+
         except Exception as e:
-            print(f"❌ Error al obtener organizador: {str(e)}")
-            superadmin_ns.abort(500, 'Error al obtener el organizador')
-    
+            return {'error': f'Error al obtener organizador: {str(e)}'}, 500
+
     @superadmin_required()
-    @superadmin_ns.doc('actualizar_organizador')
     def put(self, id):
-        """Actualizar organizador"""
         try:
             organizador = Usuario.query.get(id)
             
             if not organizador or organizador.rol != 'admin':
-                superadmin_ns.abort(404, 'Organizador no encontrado')
+                return {'error': 'Organizador no encontrado'}, 404
             
             data = request.get_json()
-            
-            if 'nombre' in data:
-                organizador.nombre = data['nombre']
             
             if 'activo' in data:
                 organizador.activo = data['activo']
             
             db.session.commit()
             
-            return {
-                'mensaje': 'Organizador actualizado exitosamente',
-                'organizador': {
-                    'id': organizador.id_usuario,
-                    'nombre': organizador.nombre,
-                    'email': organizador.email,
-                    'activo': organizador.activo
-                }
-            }, 200
-            
+            return {'message': 'Organizador actualizado exitosamente'}, 200
+
         except Exception as e:
             db.session.rollback()
-            print(f"❌ Error al actualizar organizador: {str(e)}")
-            superadmin_ns.abort(500, 'Error al actualizar el organizador')
-    
+            return {'error': f'Error al actualizar organizador: {str(e)}'}, 500
+
     @superadmin_required()
-    @superadmin_ns.doc('eliminar_organizador')
     def delete(self, id):
-        """Eliminar organizador"""
         try:
             organizador = Usuario.query.get(id)
             
             if not organizador or organizador.rol != 'admin':
-                superadmin_ns.abort(404, 'Organizador no encontrado')
+                return {'error': 'Organizador no encontrado'}, 404
             
-            # Eliminar campeonatos asociados
-            Campeonato.query.filter_by(creado_por=organizador.id_usuario).delete()
-            
+            Campeonato.query.filter_by(creado_por=id).delete()
             db.session.delete(organizador)
             db.session.commit()
             
-            return {'mensaje': 'Organizador eliminado exitosamente'}, 200
-            
+            return {'message': 'Organizador eliminado exitosamente'}, 200
+
         except Exception as e:
             db.session.rollback()
-            print(f"❌ Error al eliminar organizador: {str(e)}")
-            superadmin_ns.abort(500, 'Error al eliminar el organizador')
+            return {'error': f'Error al eliminar organizador: {str(e)}'}, 500
 
-
-@superadmin_ns.route('/dashboard')
-class SuperAdminDashboard(Resource):
+@superadmin_ns.route('/organizadores/<int:id>/reenviar-credenciales')
+class ReenviarCredenciales(Resource):
     @superadmin_required()
-    @superadmin_ns.doc('dashboard_superadmin')
-    def get(self):
-        """Obtener estadísticas del dashboard de SuperAdmin"""
+    def post(self, id):
         try:
-            total_organizadores = Usuario.query.filter_by(rol='admin').count()
-            organizadores_activos = Usuario.query.filter_by(rol='admin', activo=True).count()
-            total_campeonatos = Campeonato.query.count()
-            campeonatos_activos = Campeonato.query.filter_by(estado='en_curso').count()
+            organizador = Usuario.query.get(id)
+            
+            if not organizador or organizador.rol != 'admin':
+                return {'error': 'Organizador no encontrado'}, 404
+            
+            nueva_password = generate_secure_password(16)
+            organizador.contrasena = generate_password_hash(nueva_password)  # ✅ CORREGIDO
+            db.session.commit()
             
             return {
-                'total_organizadores': total_organizadores,
-                'organizadores_activos': organizadores_activos,
-                'total_campeonatos': total_campeonatos,
-                'campeonatos_activos': campeonatos_activos
+                'message': 'Credenciales generadas exitosamente',
+                'credenciales': {
+                    'email': organizador.email,
+                    'password': nueva_password
+                }
             }, 200
-            
+
         except Exception as e:
-            print(f"❌ Error en dashboard: {str(e)}")
-            superadmin_ns.abort(500, 'Error al obtener estadísticas')
+            db.session.rollback()
+            return {'error': f'Error al reenviar credenciales: {str(e)}'}, 500
+
+@superadmin_ns.route('/campeonatos')
+class CampeonatosList(Resource):
+    @superadmin_required()
+    def get(self):
+        try:
+            search = request.args.get('search', '').strip()
+            estado = request.args.get('estado', 'Todos')
+            orden = request.args.get('orden', 'recent')
+            
+            query = Campeonato.query
+            
+            if search:
+                search_pattern = f'%{search}%'
+                query = query.join(Usuario, Campeonato.creado_por == Usuario.id_usuario).filter(
+                    db.or_(
+                        Campeonato.nombre.ilike(search_pattern),
+                        Usuario.nombre.ilike(search_pattern)
+                    )
+                )
+            
+            if estado != 'Todos':
+                query = query.filter_by(estado=estado.lower())
+            
+            if orden == 'name_asc':
+                query = query.order_by(Campeonato.nombre.asc())
+            elif orden == 'name_desc':
+                query = query.order_by(Campeonato.nombre.desc())
+            else:
+                query = query.order_by(Campeonato.fecha_creacion.desc())
+            
+            campeonatos = query.all()
+            
+            result = []
+            for camp in campeonatos:
+                organizador = Usuario.query.get(camp.creado_por)
+                
+                result.append({
+                    'id_campeonato': camp.id_campeonato,
+                    'nombre': camp.nombre,
+                    'descripcion': camp.descripcion,
+                    'fecha_inicio': camp.fecha_inicio.isoformat() if camp.fecha_inicio else None,
+                    'fecha_fin': camp.fecha_fin.isoformat() if camp.fecha_fin else None,
+                    'estado': camp.estado,
+                    'equipos_count': 0,
+                    'partidos_count': 0,
+                    'organizador_nombre': organizador.nombre if organizador else 'Desconocido',
+                    'organizador_id': camp.creado_por
+                })
+            
+            return {'campeonatos': result}, 200
+
+        except Exception as e:
+            return {'error': f'Error al obtener campeonatos: {str(e)}'}, 500
+
+@superadmin_ns.route('/usuarios')
+class UsuariosList(Resource):
+    @superadmin_required()
+    def get(self):
+        try:
+            search = request.args.get('search', '').strip()
+            rol = request.args.get('rol', 'Todos')
+            estado = request.args.get('estado', 'Todos')
+            orden = request.args.get('orden', 'recent')
+            
+            query = Usuario.query.filter(Usuario.rol != 'superadmin')
+            
+            if search:
+                search_pattern = f'%{search}%'
+                query = query.filter(
+                    db.or_(
+                        Usuario.nombre.ilike(search_pattern),
+                        Usuario.email.ilike(search_pattern)
+                    )
+                )
+            
+            if rol != 'Todos':
+                query = query.filter_by(rol=rol.lower())
+            
+            if estado == 'Activo':
+                query = query.filter_by(activo=True)
+            elif estado == 'Inactivo':
+                query = query.filter_by(activo=False)
+            
+            if orden == 'name_asc':
+                query = query.order_by(Usuario.nombre.asc())
+            elif orden == 'name_desc':
+                query = query.order_by(Usuario.nombre.desc())
+            elif orden == 'email_asc':
+                query = query.order_by(Usuario.email.asc())
+            elif orden == 'email_desc':
+                query = query.order_by(Usuario.email.desc())
+            else:
+                query = query.order_by(Usuario.fecha_registro.desc())
+            
+            usuarios = query.all()
+            
+            result = []
+            for user in usuarios:
+                result.append({
+                    'id_usuario': user.id_usuario,
+                    'nombre': user.nombre,
+                    'email': user.email,
+                    'rol': user.rol,
+                    'activo': user.activo,
+                    'email_verified': user.email_verified,
+                    'fecha_registro': user.fecha_registro.isoformat() if user.fecha_registro else None,
+                    'campeonato_nombre': None,
+                    'equipo_nombre': None
+                })
+            
+            return {'usuarios': result}, 200
+
+        except Exception as e:
+            return {'error': f'Error al obtener usuarios: {str(e)}'}, 500

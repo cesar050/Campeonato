@@ -33,53 +33,79 @@ export class LoginComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
-  
+
     this.isLoading.set(true);
     this.errorMessage.set('');
     this.accountLocked.set(false);
-  
 
     const loginData = {
       email: this.loginForm.value.email,
       contrasena: this.loginForm.value.password
     };
-  
-    console.log('Sending login request...', loginData); 
+
+    console.log('Sending login request...', loginData);
+
     this.authService.login(loginData).subscribe({
       next: (response) => {
-        console.log('Login successful! Response:', response);
-        this.isLoading.set(false);
+        console.log('✅ Login successful! Full response:', response);
         
+        this.isLoading.set(false);
+
         // Verificar estructura de la respuesta
         const user = response.usuario || (response as any).user;
-        
+
         if (!user) {
-          console.error('No user data in response:', response);
+          console.error('❌ No user data in response:', response);
           this.errorMessage.set('Error en la respuesta del servidor');
           return;
         }
-  
+
         console.log('👤 User data:', user);
         console.log('🔑 User role:', user.rol);
-  
+
+        // ============================================
+        // GUARDAR TOKEN Y USUARIO EN LOCALSTORAGE
+        // ============================================
+        if (response.access_token) {
+          console.log('💾 Saving token to localStorage...');
+          localStorage.setItem('token', response.access_token);
+        } else {
+          console.error('❌ No access_token in response!');
+        }
+
+        console.log('💾 Saving user to localStorage...');
+        localStorage.setItem('user', JSON.stringify(user));
+
+        console.log('✅ Token and user saved successfully!');
+
+        // Verificar si hay returnUrl
         const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-  
+
         if (returnUrl) {
           console.log('↪️ Redirecting to returnUrl:', returnUrl);
           this.router.navigateByUrl(returnUrl);
-        } else if (user.rol === 'superadmin') {
+        } 
+        // ============================================
+        // REDIRIGIR SEGÚN EL ROL
+        // ============================================
+        else if (user.rol === 'superadmin') {
           console.log('👑 Redirecting to superadmin dashboard');
           this.router.navigate(['/superadmin/dashboard']);
-        } else if (user.rol === 'admin') {
+        } 
+        else if (user.rol === 'admin') {
           console.log('⚙️ Redirecting to organizador dashboard');
           this.router.navigate(['/organizador/dashboard']);
-        } else if (user.rol === 'lider') {
-          console.log('👥 Redirecting to lider dashboard');
-          this.router.navigate(['/dashboard']);
-        } else {
+        } 
+        else if (user.rol === 'lider') {
+          console.log('⚽ Redirecting to lider-equipo dashboard');
+          this.router.navigate(['/lider-equipo/dashboard']);
+        } 
+        else {
           console.log('❓ Unknown role, redirecting to default dashboard');
           this.router.navigate(['/dashboard']);
         }
+
+        console.log('🎯 Navigation command sent!');
       },
       error: (err) => {
         console.error('❌ Login error:', err);
@@ -87,15 +113,35 @@ export class LoginComponent {
         console.error('Error body:', err.error);
         
         this.isLoading.set(false);
-        
+
         if (err.status === 403) {
-          this.accountLocked.set(true);
-          this.errorMessage.set('Cuenta bloqueada temporalmente');
-        } else if (err.status === 401) {
+          // Verificar si es por email no verificado
+          if (err.error?.error === 'Email no verificado') {
+            this.errorMessage.set('⚠️ Debes verificar tu email antes de iniciar sesión. Revisa tu bandeja de entrada (incluyendo spam).');
+          } else {
+            // Es por cuenta bloqueada
+            this.accountLocked.set(true);
+            
+            if (err.error?.locked_until) {
+              const lockedUntil = new Date(err.error.locked_until);
+              const now = new Date();
+              const minutesLeft = Math.ceil((lockedUntil.getTime() - now.getTime()) / 60000);
+              
+              this.errorMessage.set(
+                `Cuenta bloqueada temporalmente. Intenta de nuevo en ${minutesLeft} minutos.`
+              );
+            } else {
+              this.errorMessage.set('Cuenta bloqueada temporalmente por intentos fallidos.');
+            }
+          }
+        }
+        else if (err.status === 401) {
           this.errorMessage.set('Las credenciales proporcionadas son incorrectas.');
-        } else if (err.error?.error) {
+        } 
+        else if (err.error?.error) {
           this.errorMessage.set(err.error.error);
-        } else {
+        } 
+        else {
           this.errorMessage.set('Error al iniciar sesión. Inténtalo de nuevo.');
         }
       }

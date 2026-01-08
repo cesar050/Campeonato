@@ -1,17 +1,18 @@
 .superadmin-layout {
   display: flex;
   min-height: 100vh;
-  background: #F8F9FA;
+  background: #F5F7FA;
 }
 
 .main-content {
   flex: 1;
-  margin-left: 260px;
+  margin-left: 280px;
   overflow-x: hidden;
-}
+  background: #F5F7FA;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
 
-@media (max-width: 968px) {
-  .main-content {
+  @media (max-width: 768px) {
     margin-left: 0;
   }
 }
