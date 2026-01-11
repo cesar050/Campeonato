@@ -1,0 +1,25 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+dist/
+.dist/
+build/
+
+# Angular
+.angular/
+.angular/cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Otros
+.DS_Store
+Thumbs.db
