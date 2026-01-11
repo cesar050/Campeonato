@@ -8,8 +8,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./features/landing/landing.component').then(m => m.LandingComponent),
-    canActivate: [guestGuard]
+      import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
 
   // Public pages
@@ -36,14 +35,12 @@ export const routes: Routes = [
       {
         path: 'login',
         loadComponent: () =>
-          import('./features/auth/components/login/login.component').then(m => m.LoginComponent),
-        canActivate: [guestGuard]
+          import('./features/auth/components/login/login.component').then(m => m.LoginComponent)
       },
       {
         path: 'register',
         loadComponent: () =>
-          import('./features/auth/components/register/register.component').then(m => m.RegisterComponent),
-        canActivate: [guestGuard]
+          import('./features/auth/components/register/register.component').then(m => m.RegisterComponent)
       },
       {
         path: 'unlock',
@@ -114,6 +111,11 @@ export const routes: Routes = [
         path: 'configuracion',
         loadComponent: () =>
           import('./features/superadmin/components/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/perfil/perfil.component').then(m => m.PerfilComponent)
       }
     ]
   },
@@ -189,6 +191,11 @@ export const routes: Routes = [
         path: 'estadisticas',
         loadComponent: () =>
           import('./features/organizador/components/estadisticas/estadisticas.component').then(m => m.EstadisticasComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/perfil/perfil.component').then(m => m.PerfilComponent)
       }
     ]
   },
@@ -257,6 +264,11 @@ export const routes: Routes = [
         path: 'campeonatos-disponibles',
         loadComponent: () =>
           import('./features/lider-equipo/components/campeonatos-disponibles/campeonatos-disponibles.component').then(m => m.CampeonatosDisponiblesComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/perfil/perfil.component').then(m => m.PerfilComponent)
       }
     ]
   },

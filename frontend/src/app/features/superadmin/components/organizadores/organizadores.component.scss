@@ -189,7 +189,7 @@ $orange: #FF9800;
     align-items: center;
     gap: 0.5rem;
     padding: 0.875rem 1.5rem;
-    background: linear-gradient(135deg, $green-light, $green-primary);
+    background: linear-gradient(135deg, #0891b2, #0e7490);
     color: $white;
     border: none;
     border-radius: 8px;
@@ -691,12 +691,12 @@ $orange: #FF9800;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, $green-light, $green-primary);
+    background: linear-gradient(135deg, #0891b2, #0e7490);
     color: $white;
     border: none;
 
     &:hover:not(:disabled) {
-      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
     }
   }
 }

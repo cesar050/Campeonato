@@ -8,7 +8,13 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 @Component({
   selector: 'app-organizador-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, AccessibilityCenterComponent, ConfirmDialogComponent],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    RouterLinkActive, 
+    AccessibilityCenterComponent, 
+    ConfirmDialogComponent
+  ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
@@ -27,7 +33,8 @@ export class SidebarComponent {
     { icon: 'groups', label: 'Equipos', route: '/organizador/equipos' },
     { icon: 'sports_soccer', label: 'Partidos', route: '/organizador/partidos' },
     { icon: 'leaderboard', label: 'Tabla de Posiciones', route: '/organizador/tabla-posiciones' },
-    { icon: 'trending_up', label: 'Estadísticas', route: '/organizador/estadisticas' }
+    { icon: 'trending_up', label: 'Estadísticas', route: '/organizador/estadisticas' },
+    { icon: 'account_circle', label: 'Mi Perfil', route: '/organizador/perfil' }
   ];
 
   toggleSidebar(): void {

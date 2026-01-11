@@ -203,7 +203,7 @@ html {
 
 // ==================== BUTTONS ====================
 .btn-primary {
-  background: linear-gradient(135deg, $green-primary, $green-dark);
+  background: linear-gradient(135deg, #0891b2, #0e7490);
   color: $white;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
@@ -217,7 +217,7 @@ html {
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+    box-shadow: 0 10px 20px rgba(8, 145, 178, 0.3);
   }
   
   &:active {

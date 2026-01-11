@@ -14,7 +14,13 @@ interface MenuItem {
 @Component({
   selector: 'app-superadmin-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, AccessibilityCenterComponent, ConfirmDialogComponent],
+  imports: [
+    CommonModule, 
+    RouterLink, 
+    RouterLinkActive, 
+    AccessibilityCenterComponent, 
+    ConfirmDialogComponent
+  ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
@@ -34,7 +40,8 @@ export class SidebarComponent {
     { label: 'Organizadores', route: '/superadmin/organizadores', icon: 'groups' },
     { label: 'Usuarios', route: '/superadmin/usuarios', icon: 'person' },
     { label: 'Analíticas', route: '/superadmin/analytics', icon: 'bar_chart' },
-    { label: 'Configuración', route: '/superadmin/configuracion', icon: 'settings' }
+    { label: 'Configuración', route: '/superadmin/configuracion', icon: 'settings' },
+    { label: 'Mi Perfil', route: '/superadmin/perfil', icon: 'account_circle' }
   ];
 
   toggleSidebar() {

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AccessibilityCenterComponent } from '../../shared/components/accessibility-center/accessibility-center.component';
@@ -33,8 +33,9 @@ export class LiderEquipoComponent implements OnInit {
     { icon: 'format_list_numbered', label: 'Alineaciones', route: '/lider-equipo/alineaciones' },
     { icon: 'grid_view', label: 'Formaciones', route: '/lider-equipo/formaciones' },
     { icon: 'analytics', label: 'Estadísticas', route: '/lider-equipo/estadisticas' },
-    { icon: 'search', label: 'Campeonatos', route: '/lider-equipo/campeonatos-disponibles' },
-    { icon: 'notifications', label: 'Notificaciones', route: '/lider-equipo/notificaciones' }
+    { icon: 'search', label: 'Campeonatos Disponibles', route: '/lider-equipo/campeonatos-disponibles' },
+    { icon: 'notifications', label: 'Notificaciones', route: '/lider-equipo/notificaciones' },
+    { icon: 'account_circle', label: 'Mi Perfil', route: '/lider-equipo/perfil' }
   ];
   
   constructor(

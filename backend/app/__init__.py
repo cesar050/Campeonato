@@ -161,6 +161,7 @@ def create_app(config_name='development'):
     from app.routes.superadmin_routes import superadmin_ns
     from app.routes.lider_routes import lider_ns
     from app.routes.upload_routes import upload_ns
+    from app.routes.perfil_routes import perfil_ns
     from app.routes.alineaciones_proxy_routes import alineaciones_proxy_bp
     from app.routes.eventos_routes import eventos_bp
 
@@ -180,6 +181,7 @@ def create_app(config_name='development'):
     api.add_namespace(superadmin_ns, path='/superadmin')
     api.add_namespace(lider_ns, path='/lider')
     api.add_namespace(upload_ns, path='/upload')
+    api.add_namespace(perfil_ns, path='/perfil')
     app.register_blueprint(alineaciones_proxy_bp)
     app.register_blueprint(eventos_bp)
 

@@ -13,7 +13,7 @@ export const organizadorGuard: CanActivateFn = (route, state) => {
 
   const user = authService.currentUser();
   
-  if (user?.rol === 'admin') {
+  if (user?.rol === 'admin' || user?.rol === 'superadmin') {
     return true;
   }
 

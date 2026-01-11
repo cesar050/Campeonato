@@ -484,14 +484,14 @@ $red: #DC2626;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, $green-light, $green-primary);
+    background: linear-gradient(135deg, #0891b2, #0e7490);
     color: $white;
     border: none;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.2);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
+      box-shadow: 0 6px 16px rgba(8, 145, 178, 0.3);
     }
 
     svg {

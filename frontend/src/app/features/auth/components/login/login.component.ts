@@ -63,49 +63,24 @@ export class LoginComponent {
         console.log('👤 User data:', user);
         console.log('🔑 User role:', user.rol);
 
-        // ============================================
-        // GUARDAR TOKEN Y USUARIO EN LOCALSTORAGE
-        // ============================================
-        if (response.access_token) {
-          console.log('💾 Saving token to localStorage...');
-          localStorage.setItem('token', response.access_token);
-        } else {
-          console.error('❌ No access_token in response!');
-        }
+        // El AuthService ya guarda el token y usuario automáticamente
+        // Esperar un momento para asegurar que los signals se actualicen
+        setTimeout(() => {
+          // Verificar si hay returnUrl
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'];
 
-        console.log('💾 Saving user to localStorage...');
-        localStorage.setItem('user', JSON.stringify(user));
-
-        console.log('✅ Token and user saved successfully!');
-
-        // Verificar si hay returnUrl
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
-
-        if (returnUrl) {
-          console.log('↪️ Redirecting to returnUrl:', returnUrl);
-          this.router.navigateByUrl(returnUrl);
-        } 
-        // ============================================
-        // REDIRIGIR SEGÚN EL ROL
-        // ============================================
-        else if (user.rol === 'superadmin') {
-          console.log('👑 Redirecting to superadmin dashboard');
-          this.router.navigate(['/superadmin/dashboard']);
-        } 
-        else if (user.rol === 'admin') {
-          console.log('⚙️ Redirecting to organizador dashboard');
-          this.router.navigate(['/organizador/dashboard']);
-        } 
-        else if (user.rol === 'lider') {
-          console.log('⚽ Redirecting to lider-equipo dashboard');
-          this.router.navigate(['/lider-equipo/dashboard']);
-        } 
-        else {
-          console.log('❓ Unknown role, redirecting to default dashboard');
-          this.router.navigate(['/dashboard']);
-        }
-
-        console.log('🎯 Navigation command sent!');
+          if (returnUrl) {
+            console.log('↪️ Redirecting to returnUrl:', returnUrl);
+            this.router.navigateByUrl(returnUrl).catch(err => {
+              console.error('Error navigating to returnUrl:', err);
+              // Si falla, redirigir según rol
+              this.redirectByRole(user.rol);
+            });
+          } else {
+            // Redirigir según el rol
+            this.redirectByRole(user.rol);
+          }
+        }, 100); // Pequeño delay para asegurar que los signals se actualicen
       },
       error: (err) => {
         console.error('❌ Login error:', err);
@@ -160,5 +135,43 @@ export class LoginComponent {
   get passwordInvalid(): boolean {
     const control = this.loginForm.get('password');
     return !!(control?.invalid && control?.touched);
+  }
+
+  private redirectByRole(rol: string): void {
+    try {
+      if (rol === 'superadmin') {
+        console.log('👑 Redirecting to superadmin dashboard');
+        this.router.navigate(['/superadmin/dashboard']).catch(err => {
+          console.error('Error navigating to superadmin dashboard:', err);
+          this.router.navigate(['/dashboard']);
+        });
+      } else if (rol === 'admin') {
+        console.log('⚙️ Redirecting to organizador dashboard');
+        this.router.navigate(['/organizador/dashboard']).catch(err => {
+          console.error('Error navigating to organizador dashboard:', err);
+          this.router.navigate(['/dashboard']);
+        });
+      } else if (rol === 'lider') {
+        console.log('⚽ Redirecting to lider-equipo dashboard');
+        this.router.navigate(['/lider-equipo/dashboard']).catch(err => {
+          console.error('Error navigating to lider-equipo dashboard:', err);
+          this.router.navigate(['/dashboard']);
+        });
+      } else {
+        console.log('❓ Unknown role, redirecting to default dashboard');
+        this.router.navigate(['/dashboard']).catch(err => {
+          console.error('Error navigating to default dashboard:', err);
+        });
+      }
+      console.log('🎯 Navigation command sent!');
+    } catch (error) {
+      console.error('Error in redirectByRole:', error);
+      // Último recurso: intentar ir al dashboard general
+      try {
+        this.router.navigate(['/dashboard']);
+      } catch (navError) {
+        console.error('Critical navigation error:', navError);
+      }
+    }
   }
 }

@@ -1,0 +1,485 @@
+<!-- TOAST NOTIFICATION -->
+<app-toast
+  [show]="showToast()"
+  [type]="toastType()"
+  [title]="toastTitle()"
+  [message]="toastMessage()"
+  (close)="cerrarToast()">
+</app-toast>
+
+<!-- CONFIRM DIALOG -->
+<app-confirm-dialog
+  [show]="showDeleteFotoConfirm()"
+  title="Eliminar Foto"
+  message="¿Estás seguro de que deseas eliminar tu foto de perfil?"
+  type="warning"
+  (confirm)="confirmarEliminarFoto($event.confirmed)">
+</app-confirm-dialog>
+
+<!-- LOADING -->
+<div *ngIf="loading()" class="flex items-center justify-center min-h-screen bg-gray-50">
+  <div class="text-center">
+    <div class="inline-block w-16 h-16 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin mb-4"></div>
+    <p class="text-gray-600 font-medium">Cargando perfil...</p>
+  </div>
+</div>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div *ngIf="!loading()" class="min-h-screen bg-gray-50">
+  
+  <!-- HEADER CON AVATAR -->
+  <div class="bg-white border-b-2 border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+        
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+          <div class="relative">
+            <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 bg-gray-200 flex items-center justify-center">
+              <img
+                *ngIf="previewFoto()"
+                [src]="previewFoto()!"
+                alt="Foto de perfil"
+                class="w-full h-full object-cover">
+              <span *ngIf="!previewFoto()" class="material-symbols-outlined text-6xl text-gray-400">
+                account_circle
+              </span>
+            </div>
+            <button
+              type="button"
+              (click)="fotoInput.click()"
+              class="absolute bottom-0 right-0 bg-[#2E7D32] text-white p-2 rounded-full shadow-lg hover:bg-[#1B5E20] transition-all"
+              title="Cambiar foto">
+              <span class="material-symbols-outlined text-lg">camera_alt</span>
+            </button>
+            <input
+              #fotoInput
+              type="file"
+              accept="image/jpeg,image/jpg,image/png"
+              class="hidden"
+              (change)="onFotoSelected($event)">
+          </div>
+        </div>
+
+        <!-- Información del usuario -->
+        <div class="flex-1 text-center md:text-left">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            {{ perfil()?.nombre }} {{ perfil()?.apellido || '' }}
+          </h1>
+          <p class="text-gray-600 mb-1">{{ perfil()?.email }}</p>
+          <div class="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+              {{ getRolLabel() }}
+            </span>
+            <span [class]="'px-3 py-1 text-white rounded-full text-sm font-semibold ' + getEstadoBadgeClass()">
+              {{ getEstadoLabel() }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+      
+      <!-- Tab Navigation -->
+      <div class="border-b border-gray-200">
+        <nav class="flex flex-wrap -mb-px">
+          <button
+            type="button"
+            (click)="cambiarTab('informacion')"
+            [class]="'px-6 py-4 text-sm font-semibold border-b-2 transition-all ' + 
+                    (activeTab() === 'informacion' 
+                      ? 'border-[#2E7D32] text-[#2E7D32]' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700')">
+            <span class="material-symbols-outlined align-middle mr-2">person</span>
+            Información
+          </button>
+          <button
+            type="button"
+            (click)="cambiarTab('seguridad')"
+            [class]="'px-6 py-4 text-sm font-semibold border-b-2 transition-all ' + 
+                    (activeTab() === 'seguridad' 
+                      ? 'border-[#2E7D32] text-[#2E7D32]' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700')">
+            <span class="material-symbols-outlined align-middle mr-2">lock</span>
+            Seguridad
+          </button>
+          <button
+            type="button"
+            (click)="cambiarTab('preferencias')"
+            [class]="'px-6 py-4 text-sm font-semibold border-b-2 transition-all ' + 
+                    (activeTab() === 'preferencias' 
+                      ? 'border-[#2E7D32] text-[#2E7D32]' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700')">
+            <span class="material-symbols-outlined align-middle mr-2">settings</span>
+            Preferencias
+          </button>
+          <button
+            type="button"
+            (click)="cambiarTab('estadisticas')"
+            [class]="'px-6 py-4 text-sm font-semibold border-b-2 transition-all ' + 
+                    (activeTab() === 'estadisticas' 
+                      ? 'border-[#2E7D32] text-[#2E7D32]' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700')">
+            <span class="material-symbols-outlined align-middle mr-2">bar_chart</span>
+            Estadísticas
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-6">
+        
+        <!-- TAB: INFORMACIÓN -->
+        <div *ngIf="activeTab() === 'informacion'" class="space-y-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Información Personal</h2>
+          
+          <form [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Nombre *
+                </label>
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all"
+                  [class.border-red-500]="perfilForm.get('nombre')?.invalid && perfilForm.get('nombre')?.touched">
+                <p *ngIf="perfilForm.get('nombre')?.invalid && perfilForm.get('nombre')?.touched" 
+                   class="mt-1 text-sm text-red-500">
+                  El nombre es requerido (2-100 caracteres)
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  formControlName="apellido"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                [value]="perfil()?.email"
+                disabled
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-gray-100 text-gray-600 cursor-not-allowed">
+              <p class="mt-1 text-sm text-gray-500">El email no puede ser modificado</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Biografía (opcional, máximo 500 caracteres)
+              </label>
+              <textarea
+                formControlName="biografia"
+                rows="4"
+                maxlength="500"
+                class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all resize-none"></textarea>
+              <p class="mt-1 text-sm text-gray-500">
+                {{ perfilForm.get('biografia')?.value?.length || 0 }} / 500 caracteres
+              </p>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <button
+                type="submit"
+                [disabled]="perfilForm.invalid || loading()"
+                class="px-6 py-3 bg-[#2E7D32] text-white rounded-xl font-semibold hover:bg-[#1B5E20] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                Guardar Cambios
+              </button>
+              <button
+                type="button"
+                (click)="subirFoto()"
+                [disabled]="!fotoFile() || uploadingFoto()"
+                class="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                <span *ngIf="uploadingFoto()" class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                {{ uploadingFoto() ? 'Subiendo...' : 'Subir Foto' }}
+              </button>
+              <button
+                *ngIf="previewFoto()"
+                type="button"
+                (click)="eliminarFoto()"
+                class="px-6 py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700 transition-all">
+                Eliminar Foto
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB: SEGURIDAD -->
+        <div *ngIf="activeTab() === 'seguridad'" class="space-y-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Seguridad</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">Último Acceso</label>
+              <p class="text-gray-900 font-medium">
+                {{ perfil()?.last_login_at ? (perfil()!.last_login_at | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}
+              </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">IP del Último Acceso</label>
+              <p class="text-gray-900 font-medium">
+                {{ perfil()?.last_login_ip || 'N/A' }}
+              </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">Intentos Fallidos</label>
+              <p class="text-gray-900 font-medium">
+                {{ perfil()?.failed_login_attempts || 0 }}
+              </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">Email Verificado</label>
+              <p class="text-gray-900 font-medium">
+                <span [class]="perfil()?.email_verified ? 'text-green-600' : 'text-red-600'">
+                  {{ perfil()?.email_verified ? 'Sí' : 'No' }}
+                </span>
+              </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">Último Cambio de Contraseña</label>
+              <p class="text-gray-900 font-medium">
+                {{ perfil()?.password_changed_at ? (perfil()!.password_changed_at | date:'dd/MM/yyyy HH:mm') : 'Nunca' }}
+              </p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl">
+              <label class="block text-sm font-semibold text-gray-600 mb-1">Estado de Bloqueo</label>
+              <p class="text-gray-900 font-medium">
+                {{ perfil()?.locked_until ? ('Bloqueada hasta ' + (perfil()!.locked_until | date:'dd/MM/yyyy HH:mm')) : 'No bloqueada' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="pt-4">
+            <button
+              type="button"
+              (click)="cambiarPassword()"
+              class="px-6 py-3 bg-[#2E7D32] text-white rounded-xl font-semibold hover:bg-[#1B5E20] transition-all">
+              Cambiar Contraseña
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB: PREFERENCIAS -->
+        <div *ngIf="activeTab() === 'preferencias'" class="space-y-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Preferencias</h2>
+          
+          <form [formGroup]="preferenciasForm" (ngSubmit)="guardarPreferencias()" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Idioma</label>
+                <select
+                  formControlName="idioma"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all">
+                  <option value="es">Español</option>
+                  <option value="en">English</option>
+                  <option value="pt-BR">Português (Brasil)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tema</label>
+                <select
+                  formControlName="tema"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all">
+                  <option value="claro">Claro</option>
+                  <option value="oscuro">Oscuro</option>
+                  <option value="auto">Automático</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Color Primario</label>
+                <select
+                  formControlName="color_primario"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all">
+                  <option value="verde">🟢 Verde</option>
+                  <option value="azul">🔵 Azul</option>
+                  <option value="rojo">🔴 Rojo</option>
+                  <option value="purpura">🟣 Púrpura</option>
+                  <option value="naranja">🟠 Naranja</option>
+                  <option value="cyan">🔷 Cyan</option>
+                  <option value="rosa">🌺 Rosa</option>
+                  <option value="amarillo">🟡 Amarillo</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Formato de Fecha</label>
+                <select
+                  formControlName="formato_fecha"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all">
+                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Zona Horaria</label>
+                <input
+                  type="text"
+                  formControlName="zona_horaria"
+                  class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 bg-white text-gray-900 focus:border-[#2E7D32] focus:outline-none transition-all">
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Notificaciones por Email</label>
+                  <p class="text-sm text-gray-500">Recibir notificaciones importantes por correo electrónico</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    formControlName="notificaciones_email"
+                    class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2E7D32]"></div>
+                </label>
+              </div>
+
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1">Notificaciones Push</label>
+                  <p class="text-sm text-gray-500">Recibir notificaciones en el navegador</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    formControlName="notificaciones_push"
+                    class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#2E7D32]"></div>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                [disabled]="preferenciasForm.invalid || loading()"
+                class="px-6 py-3 bg-[#2E7D32] text-white rounded-xl font-semibold hover:bg-[#1B5E20] transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                Guardar Preferencias
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB: ESTADÍSTICAS -->
+        <div *ngIf="activeTab() === 'estadisticas'" class="space-y-6">
+          <h2 class="text-2xl font-bold text-gray-900 mb-4">Estadísticas</h2>
+          
+          <div *ngIf="loadingEstadisticas()" class="text-center py-8">
+            <div class="inline-block w-12 h-12 border-4 border-gray-200 border-t-[#2E7D32] rounded-full animate-spin"></div>
+          </div>
+
+          <!-- Superadmin -->
+          <div *ngIf="perfil()?.rol === 'superadmin' && estadisticas()" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white">
+              <div class="flex items-center justify-between mb-2">
+                <span class="material-symbols-outlined text-3xl">people</span>
+              </div>
+              <p class="text-sm opacity-90 mb-1">Usuarios Activos</p>
+              <p class="text-3xl font-bold">{{ estadisticas()?.total_usuarios_activos || 0 }}</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white">
+              <div class="flex items-center justify-between mb-2">
+                <span class="material-symbols-outlined text-3xl">emoji_events</span>
+              </div>
+              <p class="text-sm opacity-90 mb-1">Campeonatos</p>
+              <p class="text-3xl font-bold">{{ estadisticas()?.total_campeonatos || 0 }}</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white">
+              <div class="flex items-center justify-between mb-2">
+                <span class="material-symbols-outlined text-3xl">groups</span>
+              </div>
+              <p class="text-sm opacity-90 mb-1">Equipos Registrados</p>
+              <p class="text-3xl font-bold">{{ estadisticas()?.total_equipos_sistema || 0 }}</p>
+            </div>
+          </div>
+
+          <!-- Admin -->
+          <div *ngIf="perfil()?.rol === 'admin' && estadisticas()" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="material-symbols-outlined text-3xl">emoji_events</span>
+                </div>
+                <p class="text-sm opacity-90 mb-1">Campeonatos Gestionados</p>
+                <p class="text-3xl font-bold">{{ estadisticas()?.campeonatos_gestionados || 0 }}</p>
+              </div>
+
+              <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="material-symbols-outlined text-3xl">groups</span>
+                </div>
+                <p class="text-sm opacity-90 mb-1">Equipos Inscritos</p>
+                <p class="text-3xl font-bold">{{ estadisticas()?.total_equipos_inscritos || 0 }}</p>
+              </div>
+            </div>
+
+            <div *ngIf="estadisticas()?.proximo_campeonato" class="bg-gray-50 p-6 rounded-xl">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Próximo Campeonato</h3>
+              <p class="text-gray-900 font-medium mb-2">{{ estadisticas()!.proximo_campeonato!.nombre }}</p>
+              <p class="text-sm text-gray-600">
+                Inicio: {{ estadisticas()!.proximo_campeonato!.fecha_inicio | date:'dd/MM/yyyy' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Lider -->
+          <div *ngIf="perfil()?.rol === 'lider' && estadisticas()" class="space-y-6">
+            <div *ngIf="estadisticas()?.equipo" class="bg-gray-50 p-6 rounded-xl">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Mi Equipo</h3>
+              <p class="text-gray-900 font-medium mb-2">{{ estadisticas()!.equipo!.nombre }}</p>
+              <p class="text-sm text-gray-600">
+                Estado: <span class="font-semibold">{{ estadisticas()!.equipo!.estado }}</span>
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="material-symbols-outlined text-3xl">people</span>
+                </div>
+                <p class="text-sm opacity-90 mb-1">Total Jugadores</p>
+                <p class="text-3xl font-bold">{{ estadisticas()?.total_jugadores || 0 }}</p>
+              </div>
+
+              <div *ngIf="estadisticas()?.proximo_partido" class="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="material-symbols-outlined text-3xl">sports_soccer</span>
+                </div>
+                <p class="text-sm opacity-90 mb-1">Próximo Partido</p>
+                <p class="text-lg font-bold">{{ estadisticas()!.proximo_partido!.rival }}</p>
+                <p class="text-sm opacity-90 mt-2">
+                  {{ estadisticas()!.proximo_partido!.fecha | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

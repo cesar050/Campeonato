@@ -5,31 +5,47 @@ import { AuthService } from '../services/auth.service';
 import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<unknown>, next: HttpHandlerFn) => {
-  const authService = inject(AuthService);
+  try {
+    const authService = inject(AuthService);
 
-  // No agregar token a rutas de auth (excepto logout y me)
-  const publicRoutes = ['/auth/login', '/auth/register', '/auth/verify-email', '/auth/unlock', '/auth/refresh'];
-  const isPublicRoute = publicRoutes.some(route => req.url.includes(route));
+    // No agregar token a rutas de auth (excepto logout y me)
+    const publicRoutes = ['/auth/login', '/auth/register', '/auth/verify-email', '/auth/unlock', '/auth/refresh'];
+    const isPublicRoute = publicRoutes.some(route => req.url.includes(route));
 
-  if (isPublicRoute) {
+    if (isPublicRoute) {
+      return next(req);
+    }
+
+    // Agregar token si existe
+    try {
+      const token = authService.getAccessToken();
+      if (token) {
+        req = addToken(req, token);
+      }
+    } catch (tokenError) {
+      console.warn('authInterceptor: Error al obtener token:', tokenError);
+      // Continuar sin token si hay error
+    }
+
+    return next(req).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Si el token expiró (401), intentar refresh
+        if (error.status === 401 && !req.url.includes('/auth/refresh')) {
+          try {
+            return handleTokenExpired(req, next, authService);
+          } catch (refreshError) {
+            console.error('authInterceptor: Error al refrescar token:', refreshError);
+            return throwError(() => error);
+          }
+        }
+        return throwError(() => error);
+      })
+    );
+  } catch (error) {
+    console.error('authInterceptor: Error crítico:', error);
+    // En caso de error, continuar sin interceptar
     return next(req);
   }
-
-  // Agregar token si existe
-  const token = authService.getAccessToken();
-  if (token) {
-    req = addToken(req, token);
-  }
-
-  return next(req).pipe(
-    catchError((error: HttpErrorResponse) => {
-      // Si el token expiró (401), intentar refresh
-      if (error.status === 401 && !req.url.includes('/auth/refresh')) {
-        return handleTokenExpired(req, next, authService);
-      }
-      return throwError(() => error);
-    })
-  );
 };
 
 function addToken(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
