@@ -7,6 +7,9 @@ class Usuario(db.Model):
     
     id_usuario = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(100), nullable=False)
+    apellido = db.Column(db.String(100), nullable=True)
+    foto_url = db.Column(db.String(255), nullable=True)
+    biografia = db.Column(db.Text, nullable=True)
     email = db.Column(db.String(100), unique=True, nullable=False, index=True)
     email_verified = db.Column(db.Boolean, default=False)
     email_verification_token = db.Column(db.String(255), nullable=True)
@@ -37,12 +40,17 @@ class Usuario(db.Model):
         return {
             'id_usuario': self.id_usuario,
             'nombre': self.nombre,
+            'apellido': self.apellido,
+            'foto_url': self.foto_url,
+            'biografia': self.biografia,
             'email': self.email,
-            'email_verified': self.email_verified,  # ⭐ NUEVO
+            'email_verified': self.email_verified,
             'rol': self.rol,
             'activo': self.activo,
-            'failed_login_attempts': self.failed_login_attempts,  # ⭐ NUEVO
-            'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None,  # ⭐ NUEVO
-            'last_login_ip': self.last_login_ip,  # ⭐ NUEVO
+            'failed_login_attempts': self.failed_login_attempts,
+            'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None,
+            'last_login_ip': self.last_login_ip,
+            'password_changed_at': self.password_changed_at.isoformat() if self.password_changed_at else None,
+            'locked_until': self.locked_until.isoformat() if self.locked_until else None,
             'fecha_registro': self.fecha_registro.isoformat() if self.fecha_registro else None
         }

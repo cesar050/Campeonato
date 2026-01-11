@@ -10,5 +10,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor]))
+    // Los servicios se inicializan automáticamente cuando se inyectan (providedIn: 'root')
+    // NO importarlos aquí para evitar inicialización prematura
   ]
 };

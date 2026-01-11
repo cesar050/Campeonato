@@ -22,7 +22,7 @@ body {
   color: #1a1a2e;
   background-color: #f3f4f6;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* -moz-osx-font-smoothing: grayscale; */ /* Comentado: algunos navegadores lo rechazan */
 }
 
 /* Links */
@@ -100,11 +100,16 @@ ol {
 
 /* Variables CSS */
 :root {
-  /* Colores primarios */
-  --color-primary: #667eea;
-  --color-primary-dark: #764ba2;
+  /* Colores primarios - Se actualizarán dinámicamente por ThemeService */
+  --color-primary: #2E7D32;
+  --color-primary-dark: #1B5E20;
+  --color-primary-light: #4CAF50;
   --color-secondary: #10b981;
   --color-secondary-dark: #059669;
+  
+  /* Color de acento para acciones primarias */
+  --color-accent: #0891b2;
+  --color-accent-dark: #0e7490;
   
   /* Colores de estado */
   --color-success: #16a34a;
@@ -147,10 +152,10 @@ ol {
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
   
-  /* Accesibilidad - Focus (usando color del sistema verde) */
+  /* Accesibilidad - Focus (usando color primario dinámico) */
   --focus-width: 3px;
   --focus-offset: 2px;
-  --focus-color: #2E7D32;
+  --focus-color: var(--color-primary);
   --focus-style: solid;
   
   /* Accesibilidad - Alto Contraste */
@@ -173,6 +178,7 @@ ol {
 }
 
 /* Modo oscuro - APLICADO A TODO EL SISTEMA */
+.dark,
 [data-dark-mode="true"] {
   --color-gray-50: #1f2937;
   --color-gray-100: #374151;
@@ -185,7 +191,7 @@ ol {
   --color-gray-800: #1f2937;
   --color-gray-900: #f9fafb;
   --bg-dark: #000000;
-  --focus-color: #4CAF50;
+  --focus-color: var(--color-primary-light);
   
   // Aplicar a body y todos los elementos
   background-color: #000000 !important;
@@ -407,11 +413,7 @@ ol {
 }
 
 // Tailwind dark: classes - Aplicar modo oscuro a todas
-[data-dark-mode="true"] [class*="dark:bg-"],
-[data-dark-mode="true"] [class*="dark:text-"],
-[data-dark-mode="true"] [class*="dark:border-"] {
-  // Ya aplicado por el sistema global
-}
+// Estas clases ya están aplicadas por el sistema global de Tailwind
 
 // Asegurar que las clases dark: de Tailwind funcionen cuando data-dark-mode está activo
 // Tailwind requiere la clase 'dark' en el elemento raíz, que ahora se agrega automáticamente
@@ -422,6 +424,28 @@ ol {
   background-color: #1a1a1a !important;
   color: #e0e0e0 !important;
   border-color: #2a2a2a !important;
+}
+
+// Botones primarios con color de acento en modo oscuro
+[data-dark-mode="true"] .btn-primary {
+  background: #0891b2 !important;
+  
+  &:hover:not(:disabled) {
+    background: #0e7490 !important;
+  }
+}
+
+// Aplicar color de acento a botones con clases Tailwind inline que usan verde
+button[class*="bg-[#2E7D32]"] {
+  background-color: #0891b2 !important;
+  
+  &:hover:not(:disabled) {
+    background-color: #0e7490 !important;
+  }
+}
+
+button[class*="hover:bg-[#1B5E20]"]:hover:not(:disabled) {
+  background-color: #0e7490 !important;
 }
 
 // Enlaces
@@ -476,15 +500,15 @@ ol {
 }
 
 // Scrollbars en dark mode
-[data-dark-mode="true"] ::-webkit-scrollbar-track {
+[data-dark-mode="true"]::-webkit-scrollbar-track {
   background: #1a1a1a !important;
 }
 
-[data-dark-mode="true"] ::-webkit-scrollbar-thumb {
+[data-dark-mode="true"]::-webkit-scrollbar-thumb {
   background: #4CAF50 !important;
 }
 
-[data-dark-mode="true"] ::-webkit-scrollbar-thumb:hover {
+[data-dark-mode="true"]::-webkit-scrollbar-thumb:hover {
   background: #66bb6a !important;
 }
 
@@ -861,4 +885,33 @@ a {
   &:focus {
     top: 0;
   }
+}
+
+/* ============================================
+   CLASES DINÁMICAS PARA COLORES PRIMARIOS
+   Estas clases sobreescriben los colores hardcodeados
+   ============================================ */
+
+/* Sobrescribir colores hardcodeados usando atributos de tema */
+[data-theme-color] [class*="bg-\[#2E7D32\]"],
+[data-theme-color] [class*="bg-\[#1B5E20\]"],
+[data-theme-color] [class*="from-\[#2E7D32\]"],
+[data-theme-color] [class*="from-\[#1B5E20\]"],
+[data-theme-color] [class*="to-\[#2E7D32\]"],
+[data-theme-color] [class*="to-\[#1B5E20\]"] {
+  background-color: var(--color-primary) !important;
+}
+
+[data-theme-color] [class*="hover:bg-\[#1B5E20\]"]:hover,
+[data-theme-color] [class*="hover:bg-\[#2E7D32\]"]:hover {
+  background-color: var(--color-primary-dark) !important;
+}
+
+[data-theme-color] [class*="text-\[#2E7D32\]"] {
+  color: var(--color-primary) !important;
+}
+
+[data-theme-color] [class*="border-\[#2E7D32\]"],
+[data-theme-color] [class*="focus:border-\[#2E7D32\]"]:focus {
+  border-color: var(--color-primary) !important;
 }

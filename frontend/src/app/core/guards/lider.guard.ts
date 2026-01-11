@@ -6,28 +6,18 @@ export const liderGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Obtener usuario desde localStorage directamente
-  const userStr = localStorage.getItem('user');
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/auth/login']);
+    return false;
+  }
+
+  const user = authService.currentUser();
+  const rol = user?.rol as string | undefined;
   
-  if (!userStr) {
-    router.navigate(['/auth/login']);
-    return false;
+  if (rol === 'lider' || rol === 'admin' || rol === 'superadmin') {
+    return true;
   }
 
-  try {
-    const user = JSON.parse(userStr);
-
-    // Permitir acceso a líder, admin y superadmin
-    if (user.rol === 'lider' || user.rol === 'admin' || user.rol === 'superadmin') {
-      return true;
-    }
-
-    // Si no es líder, redirigir al dashboard general
-    router.navigate(['/dashboard']);
-    return false;
-    
-  } catch (error) {
-    router.navigate(['/auth/login']);
-    return false;
-  }
+  router.navigate(['/dashboard']);
+  return false;
 };

@@ -9,6 +9,7 @@ from app.models.solicitud_equipo import SolicitudEquipo
 from app.models.notificacion import Notificacion
 from app.models.historial_estado import HistorialEstado
 from app.models.campeonato_equipo import CampeonatoEquipo 
+from app.models.preferencias_usuario import PreferenciasUsuario
 
 # Seguridad
 from app.models.token_blacklist import TokenBlacklist
@@ -31,6 +32,7 @@ __all__ = [
     'Notificacion',
     'CampeonatoEquipo',
     'HistorialEstado',
+    'PreferenciasUsuario',
     # Modelos de seguridad
     'TokenBlacklist',
     'RefreshToken',
