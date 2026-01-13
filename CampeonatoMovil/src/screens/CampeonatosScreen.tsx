@@ -1,6 +1,6 @@
-// src/screens/HomeScreen.tsx
+// src/screens/CampeonatosScreen.tsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, FlatList, StyleSheet, RefreshControl, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { campeonatoService } from '../services/api';
 import { Campeonato } from '../types';
 import { CampeonatoCard } from '../components/CampeonatoCard';
@@ -9,9 +9,9 @@ import { LoadingScreen } from '../components/LoadingScreen';
 import { ErrorScreen } from '../components/ErrorScreen';
 import { EmptyState } from '../components/EmptyState';
 import colors from '../theme/colors';
-import { fontSize, spacing } from '../theme/spacing';
+import { spacing } from '../theme/spacing';
 
-export const HomeScreen = () => {
+export const CampeonatosScreen = () => {
   const [campeonatos, setCampeonatos] = useState<Campeonato[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -22,8 +22,7 @@ export const HomeScreen = () => {
       setError(null);
       const response = await campeonatoService.getPublicos();
       const data = response.data;
-      const campeonatosList = data.campeonatos || data || [];
-      setCampeonatos(campeonatosList);
+      setCampeonatos(data.campeonatos || data || []);
     } catch (err) {
       console.error('Error al cargar campeonatos:', err);
       setError('No se pudieron cargar los campeonatos');
@@ -54,19 +53,19 @@ export const HomeScreen = () => {
     />
   ), [handleCampeonatoPress]);
 
-  if (loading && !refreshing) {
+  if (loading) {
     return (
       <View style={styles.container}>
-        <Header title="Inicio" />
+        <Header title="Campeonatos" />
         <LoadingScreen message="Cargando campeonatos..." />
       </View>
     );
   }
 
-  if (error && !refreshing) {
+  if (error) {
     return (
       <View style={styles.container}>
-        <Header title="Inicio" />
+        <Header title="Campeonatos" />
         <ErrorScreen message={error} onRetry={loadCampeonatos} />
       </View>
     );
@@ -74,7 +73,7 @@ export const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="Inicio" />
+      <Header title="Campeonatos" />
       {campeonatos.length === 0 ? (
         <EmptyState
           icon="emoji-events"
