@@ -1,6 +1,7 @@
 // src/components/ErrorScreen.tsx
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../theme/colors';
 import { fontSize, spacing, borderRadius, touchTargetSize } from '../theme/spacing';
 
@@ -17,7 +18,7 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({
 }) => {
   return (
     <View style={styles.container} accessibilityRole="alert">
-      <Text style={styles.icon}>❌</Text>
+      <Icon name="error-outline" size={64} color="#F44336" />
       <Text style={styles.message}>{message}</Text>
       {onRetry && (
         <TouchableOpacity 
@@ -41,10 +42,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
     padding: spacing.lg,
-  },
-  icon: {
-    fontSize: 64,
-    marginBottom: spacing.md,
   },
   message: {
     marginTop: spacing.md,

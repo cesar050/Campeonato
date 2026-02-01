@@ -1,163 +1,305 @@
-// src/screens/EquiposScreen.tsx
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Text } from 'react-native';
-import { campeonatoService, equipoService } from '../services/api';
-import { Campeonato, Equipo } from '../types';
-import { Header } from '../components/Header';
-import { LoadingScreen } from '../components/LoadingScreen';
-import { ErrorScreen } from '../components/ErrorScreen';
-import { EmptyState } from '../components/EmptyState';
-import { Chip } from '../components/Chip';
-import colors from '../theme/colors';
-import { fontSize, spacing, borderRadius, touchTargetSize } from '../theme/spacing';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+  Image,
+  ScrollView,
+} from 'react-native';
+import axios from 'axios';
+import { colors } from '../theme/colors';
+import { API_BASE_URL } from '../utils/constants';
 
-interface EquipoWithCampeonato extends Equipo {
-  campeonato_nombre?: string;
+const API_URL = API_BASE_URL;
+
+interface Equipo {
+  id_equipo: number;
+  nombre: string;
+  logo_url?: string | null;
+  estadio?: string;
+  tipo_deporte?: string;
+  total_jugadores?: number;
+  lider?: {
+    id_usuario: number;
+    nombre: string;
+    email: string;
+  };
 }
 
-export const EquiposScreen = () => {
-  const [equipos, setEquipos] = useState<EquipoWithCampeonato[]>([]);
-  const [campeonatos, setCampeonatos] = useState<Campeonato[]>([]);
-  const [selectedCampeonatoId, setSelectedCampeonatoId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+interface Campeonato {
+  id_campeonato: number;
+  nombre: string;
+  estado: string;
+  logo_url?: string | null;
+  descripcion?: string;
+  tipo_deporte?: string;
+  total_equipos_inscritos?: number;
+}
+
+interface Props {
+  onSelectEquipo?: (id: number) => void;
+}
+
+export const EquiposScreen: React.FC<Props> = ({ onSelectEquipo }) => {
+  const [equipos, setEquipos] = useState<Equipo[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingCampeonatos, setLoadingCampeonatos] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedCampeonato, setSelectedCampeonato] = useState<number | null>(null);
+  const [campeonatos, setCampeonatos] = useState<Campeonato[]>([]);
+  const [showCampeonatos, setShowCampeonatos] = useState(true);
 
   useEffect(() => {
     loadCampeonatos();
   }, []);
 
   useEffect(() => {
-    if (selectedCampeonatoId) {
+    if (selectedCampeonato) {
       loadEquipos();
     } else {
       setEquipos([]);
-    }
-  }, [selectedCampeonatoId]);
-
-  const loadCampeonatos = useCallback(async () => {
-    try {
-      const response = await campeonatoService.getPublicos();
-      const data = response.data;
-      const campeonatosList = data.campeonatos || data || [];
-      setCampeonatos(campeonatosList);
-    } catch (err) {
-      console.error('Error al cargar campeonatos:', err);
-    } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selectedCampeonato]);
 
-  const loadEquipos = useCallback(async () => {
-    if (!selectedCampeonatoId) return;
+  const loadCampeonatos = async () => {
+    try {
+      setLoadingCampeonatos(true);
+      console.log('🔍 Cargando campeonatos desde:', `${API_URL}/campeonatos`);
+      
+      const response = await axios.get(`${API_URL}/campeonatos`, {
+        timeout: 10000,
+      });
+      
+      const data = response.data.campeonatos || response.data || [];
+      const campeonatosFiltrados = data.filter((c: Campeonato) => 
+        c.estado === 'en_curso' || c.estado === 'planificacion' || c.estado === 'finalizado'
+      );
+      
+      console.log('✅ Campeonatos cargados:', campeonatosFiltrados.length);
+      setCampeonatos(campeonatosFiltrados);
+    } catch (error: any) {
+      console.error('❌ Error cargando campeonatos:', error.message);
+    } finally {
+      setLoadingCampeonatos(false);
+    }
+  };
+
+  const loadEquipos = async () => {
+    if (!selectedCampeonato) return;
     
     try {
-      setError(null);
-      const response = await campeonatoService.getById(selectedCampeonatoId);
-      const campeonato = response.data;
-      const equiposData = campeonato.equipos || [];
+      setLoading(true);
+      setRefreshing(true);
+      console.log('🔍 Cargando equipos del campeonato:', selectedCampeonato);
+      
+      // Obtener equipos inscritos aprobados del campeonato
+      const response = await axios.get(`${API_URL}/campeonatos/${selectedCampeonato}/inscripciones?estado=aprobado`, {
+        timeout: 10000,
+      });
+      
+      const data = response.data;
+      const inscripciones = data.inscripciones || [];
+      const equiposData = inscripciones.map((inscripcion: any) => {
+        const equipo = inscripcion.equipo || {};
+        return {
+          id_equipo: equipo.id_equipo,
+          nombre: equipo.nombre,
+          logo_url: equipo.logo_url,
+          estadio: equipo.estadio,
+          tipo_deporte: equipo.tipo_deporte,
+          total_jugadores: equipo.total_jugadores,
+          lider: equipo.lider,
+        };
+      });
+      
+      console.log('✅ Equipos cargados:', equiposData.length);
       setEquipos(equiposData);
-    } catch (err) {
-      console.error('Error al cargar equipos:', err);
-      setError('No se pudieron cargar los equipos');
+    } catch (error: any) {
+      console.error('❌ Error cargando equipos:', error.message);
     } finally {
+      setLoading(false);
       setRefreshing(false);
     }
-  }, [selectedCampeonatoId]);
+  };
 
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
+  const onRefresh = () => {
+    if (selectedCampeonato) {
     loadEquipos();
-  }, [loadEquipos]);
+    } else {
+      loadCampeonatos();
+    }
+  };
 
-  const handleEquipoPress = useCallback((equipoId: number) => {
-    // TODO: Navegación a detalle deshabilitada temporalmente
-    console.log('Equipo seleccionado:', equipoId);
-  }, []);
+  const handleCampeonatoSelect = (campeonato: Campeonato) => {
+    setSelectedCampeonato(campeonato.id_campeonato);
+    setShowCampeonatos(false);
+  };
 
-  const renderEquipo = useCallback(({ item }: { item: EquipoWithCampeonato }) => (
+  const handleBackToCampeonatos = () => {
+    setSelectedCampeonato(null);
+    setShowCampeonatos(true);
+    setEquipos([]);
+  };
+
+  const renderCampeonato = (campeonato: Campeonato) => (
     <TouchableOpacity
-      style={styles.card}
-      onPress={() => handleEquipoPress(item.id)}
-      activeOpacity={0.7}
-      accessibilityRole="button"
-      accessibilityLabel={`Equipo ${item.nombre}`}
-      accessibilityHint="Presiona dos veces para ver detalles del equipo"
+      key={campeonato.id_campeonato}
+      style={styles.campeonatoCard}
+      onPress={() => handleCampeonatoSelect(campeonato)}
     >
-      <View style={styles.cardContent}>
-        <Text style={styles.nombre} numberOfLines={2}>
-          {item.nombre || 'Sin nombre'}
-        </Text>
-        {item.campeonato_nombre && (
-          <Text style={styles.campeonato} numberOfLines={1}>
-            {item.campeonato_nombre}
+      <View style={styles.campeonatoCardContent}>
+        <View style={styles.campeonatoLogoContainer}>
+          {campeonato.logo_url ? (
+            <Image
+              source={{ uri: campeonato.logo_url.includes('localhost') ? campeonato.logo_url.replace('http://localhost:5000', API_URL) : campeonato.logo_url }}
+              style={styles.campeonatoLogo}
+              onError={(error) => console.warn('Error cargando logo campeonato:', campeonato.logo_url, error)}
+            />
+          ) : (
+            <View style={styles.campeonatoLogoPlaceholder}>
+              <Text style={styles.campeonatoLogoText}>{campeonato.nombre.charAt(0).toUpperCase()}</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.campeonatoInfo}>
+          <Text style={styles.campeonatoNombre} numberOfLines={2}>{campeonato.nombre}</Text>
+          <Text style={styles.campeonatoEstado}>
+            {campeonato.estado === 'en_curso' ? 'En Curso' : 
+             campeonato.estado === 'planificacion' ? 'Planificación' : 
+             campeonato.estado === 'finalizado' ? 'Finalizado' : campeonato.estado}
           </Text>
-        )}
+          <View style={styles.campeonatoStats}>
+            <View style={styles.campeonatoStatItem}>
+              <Text style={styles.campeonatoStatValue}>👥 {campeonato.total_equipos_inscritos || 0}</Text>
+              <Text style={styles.campeonatoStatLabel}>equipos</Text>
+            </View>
+          </View>
+        </View>
+        <Text style={styles.campeonatoArrow}>→</Text>
       </View>
     </TouchableOpacity>
-  ), [handleEquipoPress]);
+  );
 
-  if (loading) {
+  const renderEquipo = (equipo: Equipo) => (
+    <TouchableOpacity
+      key={equipo.id_equipo}
+      style={styles.equipoCard}
+      onPress={() => onSelectEquipo && onSelectEquipo(equipo.id_equipo)}
+    >
+      <View style={styles.equipoCardContent}>
+        <View style={styles.equipoLogoContainer}>
+          {equipo.logo_url ? (
+            <Image
+              source={{ uri: equipo.logo_url.includes('localhost') ? equipo.logo_url.replace('http://localhost:5000', API_URL) : equipo.logo_url }}
+              style={styles.equipoLogo}
+              onError={(error) => console.warn('Error cargando logo equipo:', equipo.logo_url, error)}
+            />
+          ) : (
+            <View style={styles.equipoLogoPlaceholder}>
+              <Text style={styles.equipoLogoText}>{equipo.nombre.charAt(0).toUpperCase()}</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.equipoInfo}>
+          <Text style={styles.equipoNombre} numberOfLines={2}>{equipo.nombre}</Text>
+          {equipo.estadio && (
+            <Text style={styles.equipoEstadio} numberOfLines={1}>🏟️ {equipo.estadio}</Text>
+          )}
+          {equipo.total_jugadores !== undefined && (
+            <Text style={styles.equipoJugadores}>👥 {equipo.total_jugadores} jugadores</Text>
+          )}
+          {equipo.lider && (
+            <Text style={styles.equipoLider}>👤 {equipo.lider.nombre}</Text>
+          )}
+        </View>
+        <Text style={styles.equipoArrow}>→</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  if (loadingCampeonatos) {
     return (
       <View style={styles.container}>
-        <Header title="Equipos" />
-        <LoadingScreen message="Cargando..." />
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Equipos</Text>
+        </View>
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>Cargando campeonatos...</Text>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Header title="Equipos" />
-      {campeonatos.length > 0 && (
-        <View style={styles.filterContainer}>
-          <FlatList
-            horizontal
-            data={campeonatos}
-            keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.chipContainer}>
-                <Chip
-                  label={item.nombre}
-                  selected={selectedCampeonatoId === item.id}
-                  onPress={() => setSelectedCampeonatoId(item.id)}
-                />
-              </View>
+      <View style={styles.header}>
+        {!showCampeonatos && (
+          <TouchableOpacity onPress={handleBackToCampeonatos} style={styles.backButton}>
+            <Text style={styles.backButtonText}>← Volver</Text>
+          </TouchableOpacity>
             )}
-            contentContainerStyle={styles.filterContent}
-            showsHorizontalScrollIndicator={false}
-          />
+        <Text style={styles.headerTitle}>
+          {showCampeonatos ? 'Equipos' : 'Equipos del Campeonato'}
+        </Text>
         </View>
-      )}
-      {error ? (
-        <ErrorScreen message={error} onRetry={loadEquipos} />
-      ) : !selectedCampeonatoId ? (
-        <EmptyState
-          icon="groups"
-          title="Selecciona un campeonato"
-          message="Selecciona un campeonato para ver sus equipos"
-        />
-      ) : equipos.length === 0 ? (
-        <EmptyState
-          icon="groups"
-          title="No hay equipos"
-          message="No se encontraron equipos para este campeonato"
-        />
-      ) : (
+
+      {showCampeonatos ? (
         <FlatList
-          data={equipos}
-          renderItem={renderEquipo}
-          keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
+          data={campeonatos}
+          renderItem={({ item }) => renderCampeonato(item)}
+          keyExtractor={(item) => item.id_campeonato.toString()}
           contentContainerStyle={styles.list}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={handleRefresh}
+              onRefresh={onRefresh}
               colors={[colors.primary]}
               tintColor={colors.primary}
             />
           }
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⚽</Text>
+              <Text style={styles.emptyText}>No hay campeonatos disponibles</Text>
+            </View>
+          }
         />
+      ) : (
+        <>
+          {loading ? (
+            <View style={styles.centerContent}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={styles.loadingText}>Cargando equipos...</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={equipos}
+              renderItem={({ item }) => renderEquipo(item)}
+              keyExtractor={(item) => item.id_equipo.toString()}
+              contentContainerStyle={styles.list}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[colors.primary]}
+                  tintColor={colors.primary}
+                />
+              }
+              ListEmptyComponent={
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyIcon}>👥</Text>
+                  <Text style={styles.emptyText}>No hay equipos inscritos en este campeonato</Text>
+                </View>
+              }
+            />
+          )}
+        </>
       )}
     </View>
   );
@@ -166,46 +308,194 @@ export const EquiposScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: '#F5F5F5',
   },
-  filterContainer: {
-    backgroundColor: colors.background,
+  header: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 50,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    paddingVertical: spacing.sm,
+    borderBottomColor: '#E0E0E0',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  filterContent: {
-    paddingHorizontal: spacing.md,
+  backButton: {
+    marginRight: 10,
   },
-  chipContainer: {
-    marginRight: spacing.sm,
+  backButtonText: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#212121',
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#757575',
   },
   list: {
-    padding: spacing.md,
+    padding: 16,
   },
-  card: {
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    minHeight: touchTargetSize,
+  campeonatoCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginBottom: 12,
+    padding: 16,
     elevation: 2,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  cardContent: {
+  campeonatoCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  campeonatoLogoContainer: {
+    width: 60,
+    height: 60,
+    marginRight: 12,
+  },
+  campeonatoLogo: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  campeonatoLogoPlaceholder: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  campeonatoLogoText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  campeonatoInfo: {
     flex: 1,
   },
-  nombre: {
-    fontSize: fontSize.xl,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: spacing.xs,
+  campeonatoNombre: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#212121',
+    marginBottom: 4,
   },
-  campeonato: {
-    fontSize: fontSize.sm,
-    color: colors.textSecondary,
+  campeonatoEstado: {
+    fontSize: 12,
+    color: '#757575',
+    marginBottom: 4,
+  },
+  campeonatoStats: {
+    flexDirection: 'row',
+    marginTop: 4,
+  },
+  campeonatoStatItem: {
+    marginRight: 16,
+  },
+  campeonatoStatValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#212121',
+  },
+  campeonatoStatLabel: {
+    fontSize: 11,
+    color: '#757575',
+  },
+  campeonatoArrow: {
+    fontSize: 20,
+    color: '#757575',
+  },
+  equipoCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginBottom: 12,
+    padding: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  equipoCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  equipoLogoContainer: {
+    width: 60,
+    height: 60,
+    marginRight: 12,
+  },
+  equipoLogo: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  equipoLogoPlaceholder: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  equipoLogoText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  equipoInfo: {
+    flex: 1,
+  },
+  equipoNombre: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#212121',
+    marginBottom: 4,
+  },
+  equipoEstadio: {
+    fontSize: 12,
+    color: '#757575',
+    marginBottom: 2,
+  },
+  equipoJugadores: {
+    fontSize: 12,
+    color: '#757575',
+    marginBottom: 2,
+  },
+  equipoLider: {
+    fontSize: 12,
+    color: '#757575',
+  },
+  equipoArrow: {
+    fontSize: 20,
+    color: '#757575',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#757575',
+    textAlign: 'center',
   },
 });

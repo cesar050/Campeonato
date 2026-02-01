@@ -8,6 +8,9 @@ class Equipo(db.Model):
     nombre = db.Column(db.String(100), nullable=False, unique=True)
     logo_url = db.Column(db.String(255), nullable=True)
     estadio = db.Column(db.String(150), nullable=True)
+    estadio_latitud = db.Column(db.Numeric(10, 8))  
+    estadio_longitud = db.Column(db.Numeric(11, 8))  
+    estadio_foto = db.Column(db.String(255))
     max_jugadores = db.Column(db.Integer, default=22)
     tipo_deporte = db.Column(db.Enum('futbol', 'indoor', name='tipo_deporte_equipo_enum'), default='futbol')
     id_lider = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete='CASCADE'), nullable=False, index=True)
@@ -31,6 +34,9 @@ class Equipo(db.Model):
             'nombre': self.nombre,
             'logo_url': self.logo_url,
             'estadio': self.estadio,
+            'estadio_latitud': float(self.estadio_latitud) if self.estadio_latitud else None,  
+            'estadio_longitud': float(self.estadio_longitud) if self.estadio_longitud else None,  
+            'estadio_foto': self.estadio_foto, 
             'max_jugadores': self.max_jugadores,
             'tipo_deporte': self.tipo_deporte,
             'id_lider': self.id_lider,

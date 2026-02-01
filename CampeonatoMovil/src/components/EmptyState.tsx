@@ -1,6 +1,7 @@
 // src/components/EmptyState.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import colors from '../theme/colors';
 import { fontSize, spacing } from '../theme/spacing';
 
@@ -11,13 +12,13 @@ interface EmptyStateProps {
 }
 
 const iconMap: { [key: string]: string } = {
-  'inbox': '📥',
-  'emoji-events': '🏆',
-  'sports-soccer': '⚽',
-  'groups': '👥',
-  'leaderboard': '📊',
-  'warning': '⚠️',
-  'person': '👤',
+  'inbox': 'inbox',
+  'emoji-events': 'emoji-events',
+  'sports-soccer': 'sports-soccer',
+  'groups': 'groups',
+  'leaderboard': 'leaderboard',
+  'warning': 'warning',
+  'person': 'person',
 };
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ 
@@ -25,11 +26,11 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   title,
   message 
 }) => {
-  const iconEmoji = iconMap[icon] || '📋';
+  const iconName = iconMap[icon] || 'description';
   
   return (
     <View style={styles.container} accessibilityRole="text">
-      <Text style={styles.icon}>{iconEmoji}</Text>
+      <Icon name={iconName} size={64} color="#9E9E9E" />
       <Text style={styles.title}>{title}</Text>
       {message && <Text style={styles.message}>{message}</Text>}
     </View>
@@ -43,10 +44,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.xl,
     minHeight: 200,
-  },
-  icon: {
-    fontSize: 64,
-    marginBottom: spacing.md,
   },
   title: {
     marginTop: spacing.md,
