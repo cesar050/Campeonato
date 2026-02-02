@@ -61,6 +61,7 @@ def create_app(config_name='development'):
     os.makedirs(os.path.join(uploads_base, 'documentos_jugadores'), exist_ok=True)
     os.makedirs(os.path.join(uploads_base, 'fotos_jugadores'), exist_ok=True)
     os.makedirs(os.path.join(uploads_base, 'logos'), exist_ok=True)
+    os.makedirs(os.path.join(uploads_base, 'fotos_estadios'), exist_ok=True)
     
     db.init_app(app)
     migrate.init_app(app, db)

@@ -349,6 +349,34 @@ def obtener_estadisticas_partido(id_partido):
 
 
 # ============================================
+# PÚBLICO - OBTENER EVENTOS DE PARTIDO (SIN AUTH)
+# ============================================
+@eventos_bp.route('/partidos/<int:id_partido>/eventos', methods=['GET'])
+def obtener_eventos_publico(id_partido):
+    """Obtiene todos los eventos de un partido (endpoint público)"""
+    try:
+        partido = Partido.query.get(id_partido)
+        if not partido:
+            return jsonify({'error': 'Partido no encontrado'}), 404
+        
+        # Obtener eventos ordenados por minuto
+        eventos = EventoPartido.query.filter_by(id_partido=id_partido).order_by(EventoPartido.minuto.desc()).all()
+        
+        return jsonify({
+            'eventos': [evento.to_dict() for evento in eventos],
+            'total': len(eventos),
+            'goles_local': partido.goles_local,
+            'goles_visitante': partido.goles_visitante
+        }), 200
+        
+    except Exception as e:
+        print(f"❌ ERROR en obtener_eventos_publico: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================
 # LÍDER - OBTENER EVENTOS DE PARTIDO
 # ============================================
 @eventos_bp.route('/lider/partidos/<int:id_partido>/eventos', methods=['GET'])

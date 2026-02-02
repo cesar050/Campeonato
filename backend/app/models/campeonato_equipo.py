@@ -37,6 +37,9 @@ class CampeonatoEquipo(db.Model):
                 'nombre': self.equipo.nombre,
                 'logo_url': self.equipo.logo_url,
                 'estadio': self.equipo.estadio,
+                'estadio_latitud': float(self.equipo.estadio_latitud) if self.equipo.estadio_latitud else None,  
+                'estadio_longitud': float(self.equipo.estadio_longitud) if self.equipo.estadio_longitud else None, 
+                'estadio_foto': self.equipo.estadio_foto,
                 'lider': {
                     'id_usuario': self.equipo.lider.id_usuario,
                     'nombre': self.equipo.lider.nombre,
