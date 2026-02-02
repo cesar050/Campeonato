@@ -1,8 +1,6 @@
-// src/utils/constants.ts
 import { Platform } from 'react-native';
 
-
-const LOCAL_IP = '10.20.139.22'; // ✅ Tu IP de la red local
+const LOCAL_IP = '10.20.139.22'; 
 const PORT = '5000';
 
 const getBaseURL = () => {
@@ -10,13 +8,10 @@ const getBaseURL = () => {
     console.log('📱 Platform:', Platform.OS);
 
     if (Platform.OS === 'android') {
-      // Usamos adb reverse en emulador o dispositivo físico:
-      // adb reverse tcp:5000 tcp:5000
-      // Entonces el backend es accesible como localhost/127.0.0.1 desde el teléfono
       console.log('🤖 Android con adb reverse');
       return `http://127.0.0.1:${PORT}`;
     } else if (Platform.OS === 'ios') {
-      const isSimulator = true; // cambia a false si usas iPhone físico
+      const isSimulator = true; 
       
       if (isSimulator) {
         console.log('🍎 iOS Simulator detectado');
@@ -26,12 +21,9 @@ const getBaseURL = () => {
         return `http://${LOCAL_IP}:${PORT}`;
       }
     } else {
-      // Web u otras plataformas
       return `http://${LOCAL_IP}:${PORT}`;
     }
   }
-
-  // PRODUCCIÓN – cambia esta URL cuando subas el backend a un servidor público
   return 'https://tu-api-produccion.com';
 };
 
