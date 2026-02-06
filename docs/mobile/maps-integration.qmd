@@ -1,0 +1,22 @@
+---
+title: "Integración de Mapas"
+---
+
+# Integración de Mapas
+
+## Tecnología
+
+- react-native-maps 1.26.20
+- Google Maps API
+- Coordenadas GPS desde backend
+
+## Funcionalidades
+
+1. **Marcadores Personalizados**: Logos de equipos en estadios
+2. **Bottom Sheet**: Información del estadio al hacer clic
+3. **Navegación**: Botón "Cómo llegar" con Google Maps nativo
+4. **Zoom Automático**: Ajuste para mostrar todos los estadios
+
+## Endpoint
+
+`GET /inscripciones/campeonato/{id}` - Retorna coordenadas GPS

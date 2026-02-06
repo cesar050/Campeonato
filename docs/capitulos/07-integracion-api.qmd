@@ -1,0 +1,81 @@
+---
+title: "Integración API REST"
+---
+
+# Integración API REST
+
+## Endpoints Consumidos por App Móvil
+
+| Endpoint | Método | Descripción | Tiempo Promedio |
+|----------|--------|-------------|-----------------|
+| `/campeonatos` | GET | Lista de campeonatos activos | ~150ms |
+| `/campeonatos/{id}` | GET | Detalle de campeonato | ~180ms |
+| `/estadisticas/tabla-posiciones` | GET | Tabla de posiciones | ~200ms |
+| `/partidos` | GET | Lista de partidos | ~170ms |
+| `/inscripciones/campeonato/{id}` | GET | Inscripciones con coordenadas GPS | ~250ms |
+
+## Ejemplos de Solicitud/Respuesta
+
+### Ejemplo 1: Listar Campeonatos
+
+**Request:**
+```http
+GET http://10.20.139.22:5000/campeonatos?estado=activo
+```
+
+**Response:**
+```json
+{
+  "campeonatos": [{
+    "id_campeonato": 4,
+    "nombre": "La liga negreira",
+    "descripcion": "Campeonato de fútbol profesional",
+    "tipo_deporte": "futbol",
+    "estado": "activo",
+    "fecha_inicio": "2025-01-01",
+    "fecha_fin": "2025-06-30",
+    "max_equipos": 16,
+    "inscripciones_abiertas": true
+  }]
+}
+```
+
+### Ejemplo 2: Tabla de Posiciones
+
+**Request:**
+```http
+GET http://10.20.139.22:5000/estadisticas/tabla-posiciones?id_campeonato=4
+```
+
+**Response:**
+```json
+{
+  "tabla": [{
+    "posicion": 1,
+    "equipo": "Sin Camiseta FC",
+    "partidos_jugados": 5,
+    "ganados": 4,
+    "empatados": 1,
+    "perdidos": 0,
+    "goles_favor": 12,
+    "goles_contra": 3,
+    "diferencia_goles": 9,
+    "puntos": 13
+  }]
+}
+```
+
+## Códigos HTTP Manejados
+
+| Código | Tipo | Manejo en App Móvil |
+|--------|------|---------------------|
+| 200 | OK | Procesar y mostrar datos |
+| 400 | Bad Request | Alert "Datos inválidos" |
+| 404 | Not Found | Alert "Recurso no encontrado" + navegar atrás |
+| 500 | Internal Server Error | Alert "Error del servidor" |
+| TIMEOUT | Network Error | Alert "Tiempo agotado" + botón reintentar |
+| NO RESPONSE | Network Error | Alert "Sin conexión" + botón reintentar |
+
+## Tiempos de Respuesta
+
+Todos los endpoints responden en menos de 300ms, lo cual es óptimo para una aplicación móvil. El endpoint más lento es `/inscripciones/campeonato/{id}` con ~250ms debido a que incluye coordenadas GPS y datos de equipos.

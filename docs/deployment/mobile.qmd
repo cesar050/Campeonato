@@ -1,0 +1,29 @@
+---
+title: "Despliegue Aplicación Móvil"
+---
+
+# Despliegue Aplicación Móvil
+
+## Instalación
+
+```bash
+cd CampeonatoMovil
+npm install
+```
+
+## Configurar Google Maps API Key
+
+Editar `android/app/src/main/AndroidManifest.xml`
+
+## Ejecutar
+
+```bash
+npm run android
+```
+
+## Generar APK
+
+```bash
+cd android
+./gradlew assembleRelease
+```

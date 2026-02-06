@@ -9,6 +9,8 @@ import {
   PermissionsAndroid,
   Animated,
   NativeModules,
+  Modal,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-community/voice';
@@ -270,12 +272,21 @@ export const VoiceSearchButton: React.FC<Props> = ({ onCommandReceived, disabled
       
       // Intentar con diferentes idiomas y configuraciones
       let lastError: any = null;
-      const languages = ['es-ES', 'es-MX', 'es-US', 'es'];
+      // Agregar más variantes de español y configuraciones
+      const languages = [
+        'es-ES', 'es-MX', 'es-US', 'es-AR', 'es-CO', 'es-EC', 'es-PE', 'es-CL',
+        'es', 'es-419', 'es-LA'
+      ];
       
       for (const lang of languages) {
         try {
           console.log(`🎤 Intentando iniciar reconocimiento con idioma: ${lang}`);
-          await Voice.start(lang);
+          // Configurar opciones adicionales para mejor reconocimiento
+          await Voice.start(lang, {
+            EXTRA_PARTIAL_RESULTS: true,
+            EXTRA_LANGUAGE_MODEL: 'free_form',
+            EXTRA_MAX_RESULTS: 5,
+          });
           console.log(`✅ Reconocimiento iniciado exitosamente con ${lang}`);
           return; // Si tiene éxito, salir de la función
         } catch (error: any) {
@@ -359,7 +370,49 @@ export const VoiceSearchButton: React.FC<Props> = ({ onCommandReceived, disabled
         </Animated.View>
       </TouchableOpacity>
 
-      {partialResults !== '' && (
+      {/* Modal de reconocimiento de voz */}
+      <Modal
+        visible={isListening}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={stopListening}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Animated.View style={[styles.microphoneContainer, { transform: [{ scale: scaleAnim }] }]}>
+              <Text style={styles.microphoneEmoji}>🎤</Text>
+            </Animated.View>
+            
+            <Text style={styles.modalTitle}>
+              {partialResults ? 'Escuchando...' : 'Habla ahora'}
+            </Text>
+            
+            {partialResults !== '' && (
+              <View style={styles.partialResultsModalContainer}>
+                <Text style={styles.partialResultsModalText}>
+                  "{partialResults}"
+                </Text>
+              </View>
+            )}
+            
+            {!partialResults && (
+              <Text style={styles.modalSubtitle}>
+                Di el comando que deseas buscar
+              </Text>
+            )}
+            
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={stopListening}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.modalCloseButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {partialResults !== '' && !isListening && (
         <View style={styles.partialResultsContainer}>
           <Text style={styles.partialResultsText}>
             "{partialResults}"
@@ -367,9 +420,6 @@ export const VoiceSearchButton: React.FC<Props> = ({ onCommandReceived, disabled
         </View>
       )}
 
-      {isListening && (
-        <Text style={styles.listeningText}>Escuchando...</Text>
-      )}
     </View>
   );
 };
@@ -417,5 +467,85 @@ const styles = StyleSheet.create({
     color: '#333',
     fontStyle: 'italic',
     textAlign: 'center',
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: Dimensions.get('window').width * 0.85,
+    maxWidth: 400,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  microphoneContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  microphoneEmoji: {
+    fontSize: 64,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#212121',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#757575',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  partialResultsModalContainer: {
+    marginTop: 16,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    minHeight: 50,
+    justifyContent: 'center',
+    width: '100%',
+  },
+  partialResultsModalText: {
+    fontSize: 18,
+    color: '#212121',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  modalCloseButton: {
+    marginTop: 24,
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 20,
+  },
+  modalCloseButtonText: {
+    fontSize: 16,
+    color: '#212121',
+    fontWeight: '600',
   },
 });

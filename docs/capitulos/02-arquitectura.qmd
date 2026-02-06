@@ -1,0 +1,75 @@
+---
+title: "Arquitectura del Sistema"
+---
+
+# Arquitectura del Sistema
+
+## Modelo C4 - Nivel 1: Contexto
+
+```{=html}
+<div class="figure">
+<img src="architecture/context-diagram.png" alt="Diagrama de Contexto C4" style="width:80%;"/>
+<p class="caption">Figura 1: Diagrama de Contexto - Sistema y Actores</p>
+</div>
+```
+
+El sistema interactúa con cuatro tipos de usuarios (Superadmin, Organizador, Líder, Espectador) y cuatro sistemas externos (Google Maps, Google Speech, SMTP Gmail, Sistema de Archivos). La aplicación web Angular atiende a administradores, mientras que la app móvil React Native sirve a espectadores.
+
+## Modelo C4 - Nivel 2: Contenedores
+
+```{=html}
+<div class="figure">
+<img src="architecture/container-diagram-v2.png" alt="Diagrama de Contenedores C4" style="width:80%;"/>
+<p class="caption">Figura 2: Diagrama de Contenedores - Componentes Principales</p>
+</div>
+```
+
+El sistema está compuesto por cinco contenedores principales: **Aplicación Web Angular** (puerto 4200) para administradores, **Aplicación Móvil React Native** para espectadores, **API Gateway Flask** (puerto 5000) como punto de entrada único, **Microservicio de Alineaciones** (puerto 5001) para gestión especializada, y **Base de Datos MySQL 8.0** con coordenadas GPS.
+
+La comunicación se realiza mediante HTTP/REST entre contenedores, con el API Gateway actuando como proxy hacia el microservicio y gestionando autenticación JWT centralizada.
+
+## Modelo C4 - Nivel 3: Componentes
+
+### Componentes Frontend Web
+
+```{=html}
+<div class="figure">
+<img src="architecture/component-frontend_1.png" alt="Componentes Frontend Web" style="width:80%;"/>
+<p class="caption">Figura 3: Componentes Frontend Web - SPA Angular</p>
+</div>
+```
+
+La aplicación web Angular está organizada en módulos por feature (Auth, Superadmin, Organizador, Líder) con una capa de seguridad (Guards, Interceptors) y comunicación HTTP centralizada mediante HttpClient.
+
+### Componentes Aplicación Móvil
+
+```{=html}
+<div class="figure">
+<img src="architecture/component-frontend_2.png" alt="Componentes App Móvil" style="width:80%;"/>
+<p class="caption">Figura 4: Componentes Aplicación Móvil - React Native</p>
+</div>
+```
+
+La app móvil incluye pantallas principales (Home, Campeonatos, Detalle, Mapa), servicios HTTP con manejo de errores, integración con Google Maps y reconocimiento de voz para búsqueda de partidos.
+
+### Componentes API Gateway
+
+```{=html}
+<div class="figure">
+<img src="architecture/component-frontend_3.png" alt="Componentes API Gateway" style="width:80%;"/>
+<p class="caption">Figura 5: Componentes API Gateway - Backend Principal</p>
+</div>
+```
+
+El API Gateway está estructurado en capas: Presentación (REST API, Proxy), Seguridad (Autenticación, Autorización, Rate Limiting), Negocio (Lógica de negocio), Integración (Email, Archivos) y Datos (ORM SQLAlchemy).
+
+## Decisiones Arquitectónicas
+
+| Decisión | Justificación | Alternativa Descartada |
+|----------|---------------|------------------------|
+| API Gateway Centralizado | Simplifica autenticación y seguridad | Autenticación distribuida |
+| JWT para Autenticación | Stateless, escalable | Sesiones tradicionales |
+| MySQL para Base de Datos | Soporte geográfico nativo | PostgreSQL, MongoDB |
+| React Native para Móvil | Multiplataforma, un solo código | Flutter, Nativas |
+| Microservicio de Alineaciones | Separación de responsabilidades | Monolito |
+| Angular 21 para Web | Madurez, ecosistema robusto | React, Vue |

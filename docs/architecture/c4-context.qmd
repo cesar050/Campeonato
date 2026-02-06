@@ -1,0 +1,201 @@
+---
+title: "Diagrama de Contexto C4 - Nivel 1"
+---
+
+# Diagrama de Contexto C4 - Nivel 1
+
+## Introducción
+
+El diagrama de contexto C4 muestra el sistema en su contexto más amplio, identificando las personas y sistemas externos que interactúan con él.
+
+## Diagrama de Contexto
+
+```{=html}
+<div class="figure">
+<img src="context-diagram.png" alt="Diagrama de Contexto C4 del Sistema Campeonato Libre" style="width:100%; max-width:800px;"/>
+<p class="caption">Figura 1: [Nivel 1] Diagrama de Contexto - Campeonato Libre (Multiplataforma)</p>
+</div>
+```
+
+## Actores del Sistema
+
+### Usuarios Humanos
+
+#### 1. Superadmin
+
+**Descripción:**
+Administrador del sistema con acceso completo. Puede gestionar todos los aspectos del sistema, incluyendo usuarios, campeonatos y configuraciones globales.
+
+**Interacciones:**
+- Accede al sistema a través del Frontend Web
+- Gestiona usuarios y roles
+- Configura parámetros globales del sistema
+- Supervisa el funcionamiento general
+
+**Tecnología de Acceso:**
+- Navegador web (Chrome, Firefox, Edge)
+- Frontend Web Angular (Puerto 4200)
+
+#### 2. Organizador
+
+**Descripción:**
+Crea y gestiona campeonatos, aprueba equipos y registra eventos.
+
+**Interacciones:**
+- Accede al sistema a través del Frontend Web
+- Crea y gestiona campeonatos
+- Aprueba/rechaza inscripciones de equipos
+- Programa partidos y registra resultados
+- Visualiza estadísticas y reportes
+
+**Tecnología de Acceso:**
+- Navegador web
+- Frontend Web Angular
+
+#### 3. Líder de Equipo
+
+**Descripción:**
+Gestiona equipos, jugadores y define alineaciones.
+
+**Interacciones:**
+- Accede al sistema a través del Frontend Web
+- Gestiona información de su equipo
+- Inscribe jugadores
+- Define alineaciones con posicionamiento
+- Visualiza estadísticas de su equipo
+- Solicita inscripción a campeonatos
+
+**Tecnología de Acceso:**
+- Navegador web
+- Frontend Web Angular
+
+#### 4. Espectador
+
+**Descripción:**
+Consulta información pública de campeonatos (solo móvil).
+
+**Interacciones:**
+- Accede al sistema a través de la App Móvil
+- Visualiza campeonatos activos
+- Consulta tabla de posiciones
+- Ve calendario de partidos
+- Usa mapa de estadios
+- Realiza búsquedas por voz
+
+**Tecnología de Acceso:**
+- Dispositivo móvil Android
+- App React Native
+
+### Sistemas Externos
+
+#### 1. Google Maps API
+
+**Descripción:**
+Proporciona mapas interactivos y geocodificación.
+
+**Interacciones:**
+- La App Móvil consume la API para mostrar mapas
+- Se utilizan marcadores personalizados para estadios
+- Integración con Google Maps nativo para navegación
+
+**Tecnología:**
+- API REST de Google Maps
+- react-native-maps como wrapper
+
+**Datos Intercambiados:**
+- Coordenadas GPS (latitud, longitud)
+- Marcadores personalizados
+- Rutas de navegación
+
+#### 2. Google Speech API
+
+**Descripción:**
+Reconocimiento de voz en español.
+
+**Interacciones:**
+- La App Móvil usa reconocimiento de voz local
+- Procesamiento de comandos en español
+
+**Tecnología:**
+- @react-native-community/voice
+- Reconocimiento local en dispositivo
+
+#### 3. Servidor SMTP Gmail
+
+**Descripción:**
+Envía correos de verificación, recuperación y notificaciones.
+
+**Interacciones:**
+- El API Gateway envía emails de notificaciones
+- Confirmaciones de registro
+- Notificaciones de eventos importantes
+- Códigos de desbloqueo de cuenta
+
+**Tecnología:**
+- SMTP (Gmail)
+- Flask-Mail
+
+#### 4. Sistema de Archivos
+
+**Descripción:**
+Almacena logos, documentos y fotos de estadios.
+
+**Interacciones:**
+- El API Gateway gestiona archivos subidos
+- Almacenamiento local en servidor
+
+## Flujos de Interacción Principales
+
+### Flujo 1: Administración de Campeonato
+
+```
+Superadministrador/Organizador
+    ↓
+Frontend Web (Angular)
+    ↓
+API Gateway (Flask)
+    ↓
+Base de Datos (MySQL)
+```
+
+### Flujo 2: Consulta de Información (Espectador)
+
+```
+Espectador
+    ↓
+App Móvil (React Native)
+    ↓
+API Gateway (Flask)
+    ↓
+Base de Datos (MySQL)
+```
+
+### Flujo 3: Visualización de Mapas
+
+```
+Espectador
+    ↓
+App Móvil (React Native)
+    ↓
+Google Maps API
+    ↓
+API Gateway (Flask) → Base de Datos (coordenadas GPS)
+```
+
+### Flujo 4: Búsqueda por Voz
+
+```
+Espectador
+    ↓
+App Móvil (React Native)
+    ↓
+Google Speech API (reconocimiento local)
+    ↓
+API Gateway (Flask) → Base de Datos (filtrado de partidos)
+```
+
+## Próximos Pasos
+
+Para ver cómo están organizados los contenedores dentro del sistema, consulte:
+
+- [Diagrama de Contenedores C4 - Nivel 2](c4-containers.qmd)

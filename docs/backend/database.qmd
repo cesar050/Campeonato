@@ -1,0 +1,45 @@
+---
+title: "Base de Datos"
+---
+
+# Base de Datos
+
+## Tecnología
+
+- MySQL 8.0
+- SQLAlchemy ORM
+- Coordenadas GPS (latitud/longitud)
+
+## Tablas Principales
+
+### `usuarios`
+- Información de usuarios del sistema
+- Roles: superadmin, admin, lider, espectador
+
+### `campeonatos`
+- Información de campeonatos
+- Estados: planificacion, en_curso, finalizado
+
+### `equipos`
+- Información de equipos
+- **Coordenadas GPS**: `estadio_latitud`, `estadio_longitud`
+- Estados: pendiente, aprobado, rechazado
+
+### `partidos`
+- Información de partidos
+- Estados: programado, en_juego, finalizado
+
+### `alineaciones`
+- Alineaciones de partidos
+- Posiciones: `posicion_x`, `posicion_y`
+- Formación del equipo
+
+## Coordenadas GPS
+
+Las coordenadas GPS se almacenan en `equipos`:
+- `estadio_latitud`: Decimal(10,8)
+- `estadio_longitud`: Decimal(11,8)
+
+Utilizadas en la App Móvil para:
+- Mostrar marcadores en Google Maps
+- Navegación a estadios

@@ -1,0 +1,225 @@
+---
+title: "Diagrama de Componentes Internos C4 - Nivel 4"
+---
+
+# Diagrama de Componentes Internos C4 - Nivel 4
+
+## Introducción
+
+El nivel 4 del modelo C4 muestra los detalles internos de los componentes principales, incluyendo clases, métodos y relaciones entre modelos de datos.
+
+## Modelos de Datos (Backend)
+
+### Modelo Usuario
+
+```python
+class Usuario(db.Model):
+    id_usuario: int (PK)
+    nombre: str
+    apellido: str
+    email: str (unique)
+    contrasena: str (hashed)
+    rol: enum('superadmin', 'admin', 'lider', 'espectador')
+    activo: bool
+    fecha_registro: datetime
+    
+    # Métodos
+    set_password(password)
+    check_password(password)
+    to_dict()
+```
+
+### Modelo Campeonato
+
+```python
+class Campeonato(db.Model):
+    id_campeonato: int (PK)
+    nombre: str (unique)
+    descripcion: text
+    max_equipos: int
+    tipo_deporte: enum('futbol', 'indoor')
+    tipo_competicion: enum('liga', 'eliminacion_directa', 'mixto')
+    fecha_inicio: date
+    fecha_fin: date
+    estado: str
+    creado_por: int (FK -> Usuario)
+    logo_url: str
+    codigo_inscripcion: str
+    es_publico: bool
+    
+    # Relaciones
+    creador: Usuario
+    partidos: List[Partido]
+    equipos_inscritos: List[CampeonatoEquipo]
+    
+    # Métodos
+    to_dict(include_equipos=False)
+```
+
+### Modelo Partido
+
+```python
+class Partido(db.Model):
+    id_partido: int (PK)
+    id_campeonato: int (FK -> Campeonato)
+    id_equipo_local: int (FK -> Equipo)
+    id_equipo_visitante: int (FK -> Equipo)
+    fecha_partido: datetime
+    lugar: str
+    jornada: int
+    goles_local: int
+    goles_visitante: int
+    estado: str
+    resultado_registrado: bool
+    registrado_por: int (FK -> Usuario)
+    
+    # Relaciones
+    campeonato: Campeonato
+    equipo_local: Equipo
+    equipo_visitante: Equipo
+    goles: List[Gol]
+    tarjetas: List[Tarjeta]
+    
+    # Métodos
+    to_dict()
+```
+
+### Modelo Equipo
+
+```python
+class Equipo(db.Model):
+    id_equipo: int (PK)
+    nombre: str (unique)
+    logo_url: str
+    id_lider: int (FK -> Usuario)
+    estadio: str
+    estadio_latitud: decimal(10,8)  # GPS
+    estadio_longitud: decimal(11,8)  # GPS
+    estadio_foto: str
+    estado: enum('pendiente', 'aprobado', 'rechazado')
+    
+    # Relaciones
+    lider: Usuario
+    jugadores: List[Jugador]
+    
+    # Métodos
+    to_dict()
+```
+
+### Modelo Alineacion
+
+```python
+class Alineacion(db.Model):
+    id_alineacion: int (PK)
+    id_partido: int (FK -> Partido)
+    id_equipo: int (FK -> Equipo)
+    id_jugador: int (FK -> Jugador)
+    titular: bool
+    minuto_entrada: int
+    minuto_salida: int
+    posicion_x: float
+    posicion_y: float
+    formacion: str
+    
+    # Métodos
+    to_dict()
+```
+
+## Diagrama UML Simplificado
+
+### Relaciones entre Modelos
+
+```
+Usuario
+  ├── 1:N → Campeonato (creado_por)
+  ├── 1:N → Equipo (id_lider)
+  └── 1:N → Partido (registrado_por)
+
+Campeonato
+  ├── 1:N → Partido
+  └── N:M → Equipo (a través de CampeonatoEquipo)
+
+Equipo
+  ├── 1:N → Jugador
+  ├── 1:N → Partido (equipo_local)
+  └── 1:N → Partido (equipo_visitante)
+
+Partido
+  ├── 1:N → Gol
+  ├── 1:N → Tarjeta
+  └── 1:N → Alineacion
+
+Jugador
+  ├── 1:N → Gol
+  ├── 1:N → Tarjeta
+  └── 1:N → Alineacion
+```
+
+## Componentes del Frontend (TypeScript)
+
+### AuthService
+
+```typescript
+class AuthService {
+  login(email: string, password: string): Observable<AuthResponse>
+  register(data: RegisterData): Observable<User>
+  logout(): void
+  getAccessToken(): string | null
+  refreshToken(): Observable<string>
+  isAuthenticated(): boolean
+  getCurrentUser(): Observable<User>
+}
+```
+
+### Componentes Angular
+
+```typescript
+// LoginComponent
+class LoginComponent {
+  form: FormGroup
+  onSubmit(): void
+  navigateToRegister(): void
+}
+
+// AlineacionesComponent
+class AlineacionesComponent {
+  alineacion: Alineacion[]
+  definirAlineacion(): void
+  hacerCambio(): void
+}
+```
+
+## Componentes del API Gateway
+
+### REST API Layer
+
+```python
+# campeonato_routes.py
+@campeonato_ns.route('')
+class CampeonatoList(Resource):
+    @jwt_required()
+    def get(self):  # Listar campeonatos
+    @jwt_required()
+    @role_required(['admin'])
+    def post(self):  # Crear campeonato
+```
+
+### Alineaciones Proxy
+
+```python
+# alineaciones_proxy_routes.py
+@alineaciones_proxy_bp.route('/lider/alineaciones/definir', methods=['POST'])
+def definir_alineacion():
+    # Validar usuario y equipo
+    # Enviar al microservicio
+    # Retornar respuesta
+```
+
+## Próximos Pasos
+
+Este nivel muestra los detalles de implementación. Para ver la arquitectura general, consulte:
+
+- [Visión General](overview.qmd)
+- [Diagrama de Contexto](c4-context.qmd)
+- [Diagrama de Contenedores](c4-containers.qmd)
+- [Diagrama de Componentes](c4-components.qmd)

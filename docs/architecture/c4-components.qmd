@@ -1,0 +1,222 @@
+---
+title: "Diagrama de Componentes C4 - Nivel 3"
+---
+
+# Diagrama de Componentes C4 - Nivel 3
+
+## Introducción
+
+El diagrama de componentes muestra los componentes principales dentro de cada contenedor y cómo interactúan entre sí.
+
+## Componentes del Frontend Web (Angular)
+
+### Diagrama de Componentes Frontend
+
+```{=html}
+<div class="figure">
+<img src="component-frontend_1.png" alt="Componentes del Frontend Web" style="width:100%; max-width:800px;"/>
+<p class="caption">Figura 3: [Nivel 3] Componentes Frontend Web - SPA Angular</p>
+</div>
+```
+
+### Componentes Principales
+
+#### 1. SPA Router
+**Responsabilidad**: Enrutamiento y navegación entre módulos  
+**Tecnología**: Angular Router
+
+#### 2. Módulo de Autenticación
+**Responsabilidad**: Login, registro, verificación y recuperación de contraseña  
+**Tecnología**: Angular Module
+
+#### 3. Módulo Superadmin
+**Responsabilidad**: Dashboard y gestión de organizadores  
+**Tecnología**: Angular Module
+
+#### 4. Módulo Organizador
+**Responsabilidad**: Gestión de campeonatos, fixtures y eventos  
+**Tecnología**: Angular Module
+
+#### 5. Módulo Líder
+**Responsabilidad**: Gestión de equipos, jugadores y alineaciones  
+**Tecnología**: Angular Module
+
+#### 6. Módulo Público
+**Responsabilidad**: Consulta de información pública  
+**Tecnología**: Angular Module
+
+#### 7. HTTP Client Layer
+**Responsabilidad**: Capa de comunicación con API REST  
+**Tecnología**: Angular HttpClient
+
+#### 8. Security Guards
+**Responsabilidad**: Protección de rutas por roles  
+**Tecnología**: Angular Guards
+
+#### 9. Auth Interceptor
+**Responsabilidad**: Inyección automática de JWT  
+**Tecnología**: Angular Interceptor
+
+## Componentes de la App Móvil (React Native)
+
+### Diagrama de Componentes Móvil
+
+```{=html}
+<div class="figure">
+<img src="component-frontend_2.png" alt="Componentes de la App Móvil" style="width:100%; max-width:800px;"/>
+<p class="caption">Figura 4: [Nivel 3] Componentes Aplicación Móvil - React Native</p>
+</div>
+```
+
+### Componentes Principales
+
+#### 1. Navigation Stack
+**Responsabilidad**: Navegación entre pantallas  
+**Tecnología**: React Navigation
+
+#### 2. Home Screen
+**Responsabilidad**: Pantalla principal de bienvenida  
+**Tecnología**: React Component
+
+#### 3. Campeonatos Screen
+**Responsabilidad**: Lista de campeonatos activos  
+**Tecnología**: React Component
+
+#### 4. Campeonato Detail Screen
+**Responsabilidad**: Detalle con tabs: Info, Posiciones, Partidos  
+**Tecnología**: React Component
+
+#### 5. Sedes Map Screen
+**Responsabilidad**: Mapa interactivo con ubicaciones de estadios  
+**Tecnología**: React Component
+
+#### 6. Voice Search Button
+**Responsabilidad**: Búsqueda de partidos por voz  
+**Tecnología**: React Component
+
+#### 7. HTTP Service
+**Responsabilidad**: Cliente HTTP con manejo de errores  
+**Tecnología**: Axios
+
+#### 8. Voice Command Processor
+**Responsabilidad**: Procesamiento de comandos de voz en español  
+**Tecnología**: JavaScript Service
+
+#### 9. Maps Integration
+**Responsabilidad**: Integración con Google Maps  
+**Tecnología**: react-native-maps
+
+#### 10. Voice Recognition
+**Responsabilidad**: Reconocimiento de voz  
+**Tecnología**: @react-native-community/voice
+
+## Componentes del API Gateway (Flask)
+
+### Diagrama de Componentes Gateway
+
+```{=html}
+<div class="figure">
+<img src="component-frontend_3.png" alt="Componentes del API Gateway" style="width:100%; max-width:800px;"/>
+<p class="caption">Figura 5: [Nivel 3] Componentes API Gateway - Backend Principal</p>
+</div>
+```
+
+### Componentes Principales
+
+#### Capa de Presentación
+
+1. **REST API Layer**
+   - Endpoints REST para todas las operaciones
+   - Tecnología: Flask-RESTX
+
+2. **Alineaciones Proxy**
+   - Gateway hacia el microservicio de alineaciones
+   - Tecnología: Flask Blueprint
+
+#### Capa de Seguridad
+
+3. **Authentication Layer**
+   - Autenticación JWT y gestión de tokens
+   - Tecnología: JWT Manager
+
+4. **Authorization Layer**
+   - Control de acceso basado en roles
+   - Tecnología: Auth Middleware
+
+5. **Security Layer**
+   - Rate limiting, bloqueo de cuentas y auditoría
+   - Tecnología: Security Services
+
+6. **CORS Layer**
+   - Configuración CORS para web y móvil
+   - Tecnología: Flask-CORS
+
+#### Capa de Negocio
+
+7. **Business Logic Layer**
+   - Lógica de negocio: fixtures, estadísticas, notificaciones
+   - Tecnología: Python Services
+
+#### Capa de Integración
+
+8. **Email Service**
+   - Envío de emails transaccionales
+   - Tecnología: Flask-Mail
+
+9. **File Service**
+   - Gestión de archivos (logos, fotos de estadios)
+   - Tecnología: Python Service
+
+#### Capa de Datos
+
+10. **Data Access Layer**
+    - Repositorios y modelos de dominio con coordenadas GPS
+    - Tecnología: SQLAlchemy ORM
+
+## Componentes del Microservicio de Alineaciones
+
+### Diagrama de Componentes Microservicio
+
+**Componentes Principales**:
+
+1. **Alineaciones API**
+   - CRUD de alineaciones y cambios
+   - Tecnología: Flask-RESTX
+
+2. **Validation Logic**
+   - Reglas de negocio de alineaciones
+   - Tecnología: Python Service
+
+3. **Gateway Client**
+   - Cliente para validaciones con el Gateway
+   - Tecnología: HTTP Client
+
+4. **Alineaciones Data**
+   - Acceso a datos de alineaciones
+   - Tecnología: SQLAlchemy ORM
+
+## Flujos de Datos entre Componentes
+
+### Flujo 1: Login de Usuario
+
+```
+LoginComponent → AuthService → HTTP Client → Auth Interceptor → API Gateway
+```
+
+### Flujo 2: Definir Alineación
+
+```
+AlineacionesComponent → HTTP Client → Auth Interceptor → API Gateway → Alineaciones Proxy → Microservicio
+```
+
+### Flujo 3: Consulta de Campeonatos (Móvil)
+
+```
+CampeonatosScreen → HTTP Service → API Gateway → REST API Layer → Data Access Layer → Base de Datos
+```
+
+## Próximos Pasos
+
+Para ver los detalles internos de los componentes (nivel 4), consulte:
+
+- [Diagrama de Componentes Internos C4 - Nivel 4](c4-level4.qmd)

@@ -1,0 +1,23 @@
+---
+title: "Campeonato Libre"
+subtitle: "Documentación Técnica del Sistema Multiplataforma"
+author: "Cesar Ramos"
+date: "Febrero 2026"
+format:
+  html:
+    toc: false
+  pdf:
+    toc: false
+---
+
+# Campeonato Libre
+
+## Documentación Técnica del Sistema Multiplataforma
+
+**Autor:** Cesar Ramos  
+**Universidad:** Universidad Nacional de Loja  
+**Fecha:** Febrero 2026
+
+---
+
+Sistema multiplataforma para la gestión integral de campeonatos de fútbol e indoor, desarrollado con tecnologías modernas y arquitectura de microservicios.

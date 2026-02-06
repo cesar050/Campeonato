@@ -1,0 +1,24 @@
+---
+title: "Despliegue Frontend Web"
+---
+
+# Despliegue Frontend Web
+
+## Instalación
+
+```bash
+cd frontend
+npm install
+```
+
+## Desarrollo
+
+```bash
+ng serve
+```
+
+## Producción
+
+```bash
+ng build --configuration production
+```

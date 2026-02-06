@@ -1,0 +1,54 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Campeonato Libre"
+  subtitle: "Documentación Técnica del Sistema Multiplataforma"
+  author: "Cesar Ramos"
+  date: "Febrero 2026"
+  chapters:
+    - index.qmd
+    - capitulos/01-introduccion.qmd
+    - capitulos/02-arquitectura.qmd
+    - capitulos/03-tecnologias.qmd
+    - capitulos/04-modulo-web.qmd
+    - capitulos/05-modulo-movil.qmd
+    - capitulos/06-backend.qmd
+    - capitulos/07-integracion-api.qmd
+    - capitulos/08-instalacion.qmd
+    - capitulos/09-manual-usuario.qmd
+    - capitulos/10-pruebas.qmd
+    - capitulos/11-conclusiones.qmd
+    - capitulos/12-referencias.qmd
+
+format:
+  pdf:
+    documentclass: report
+    classoption: [11pt, a4paper]
+    geometry:
+      - top=2cm
+      - bottom=2cm
+      - left=2cm
+      - right=2cm
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    fontsize: 10pt
+    linestretch: 1.15
+    fig-width: 6
+    fig-height: 4
+    keep-tex: false
+    include-in-header:
+      text: |
+        \usepackage{float}
+        \floatplacement{figure}{H}
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-tools: true
+
+lang: es

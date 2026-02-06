@@ -1,0 +1,23 @@
+---
+title: "API REST - Integración"
+---
+
+# API REST - Integración
+
+## Endpoints Consumidos por App Móvil
+
+- `GET /campeonatos` - Lista de campeonatos
+- `GET /campeonatos/{id}` - Detalle de campeonato
+- `GET /estadisticas/tabla-posiciones` - Tabla de posiciones
+- `GET /partidos` - Lista de partidos
+- `GET /inscripciones/campeonato/{id}` - Inscripciones con GPS
+
+## Tiempos de Respuesta
+
+| Endpoint | Tiempo Promedio |
+|----------|----------------|
+| GET /campeonatos | ~150ms |
+| GET /campeonatos/{id} | ~180ms |
+| GET /estadisticas/tabla-posiciones | ~200ms |
+| GET /partidos | ~170ms |
+| GET /inscripciones/campeonato/{id} | ~250ms |

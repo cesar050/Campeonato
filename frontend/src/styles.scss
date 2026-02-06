@@ -108,8 +108,8 @@ ol {
   --color-secondary-dark: #059669;
   
   /* Color de acento para acciones primarias */
-  --color-accent: #0891b2;
-  --color-accent-dark: #0e7490;
+  --color-accent: #B8E994;
+  --color-accent-dark: #95C97A;
   
   /* Colores de estado */
   --color-success: #16a34a;
@@ -428,24 +428,24 @@ ol {
 
 // Botones primarios con color de acento en modo oscuro
 [data-dark-mode="true"] .btn-primary {
-  background: #0891b2 !important;
+  background: #B8E994 !important;
   
   &:hover:not(:disabled) {
-    background: #0e7490 !important;
+    background: #95C97A !important;
   }
 }
 
 // Aplicar color de acento a botones con clases Tailwind inline que usan verde
 button[class*="bg-[#2E7D32]"] {
-  background-color: #0891b2 !important;
+  background-color: #B8E994 !important;
   
   &:hover:not(:disabled) {
-    background-color: #0e7490 !important;
+    background-color: #95C97A !important;
   }
 }
 
 button[class*="hover:bg-[#1B5E20]"]:hover:not(:disabled) {
-  background-color: #0e7490 !important;
+  background-color: #95C97A !important;
 }
 
 // Enlaces
