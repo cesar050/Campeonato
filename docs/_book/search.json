@@ -1,0 +1,632 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Campeonato Libre",
+    "section": "",
+    "text": "1 Campeonato Libre",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Campeonato Libre</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#documentación-técnica-del-sistema-multiplataforma",
+    "href": "index.html#documentación-técnica-del-sistema-multiplataforma",
+    "title": "Campeonato Libre",
+    "section": "1.1 Documentación Técnica del Sistema Multiplataforma",
+    "text": "1.1 Documentación Técnica del Sistema Multiplataforma\nAutor: Cesar Ramos\nUniversidad: Universidad Nacional de Loja\nFecha: Febrero 2026\n\nSistema multiplataforma para la gestión integral de campeonatos de fútbol e indoor, desarrollado con tecnologías modernas y arquitectura de microservicios.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>Campeonato Libre</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/01-introduccion.html",
+    "href": "capitulos/01-introduccion.html",
+    "title": "2  Introducción",
+    "section": "",
+    "text": "3 Introducción",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/01-introduccion.html#descripción-del-proyecto",
+    "href": "capitulos/01-introduccion.html#descripción-del-proyecto",
+    "title": "2  Introducción",
+    "section": "3.1 Descripción del Proyecto",
+    "text": "3.1 Descripción del Proyecto\nCampeonato Libre es un sistema multiplataforma completo diseñado para gestionar campeonatos de fútbol e indoor. El sistema permite a organizadores crear y administrar campeonatos, a líderes gestionar sus equipos y alineaciones, y a espectadores consultar información en tiempo real mediante una aplicación móvil.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/01-introduccion.html#problemática",
+    "href": "capitulos/01-introduccion.html#problemática",
+    "title": "2  Introducción",
+    "section": "3.2 Problemática",
+    "text": "3.2 Problemática\nEl sistema resuelve las siguientes problemáticas:\n\nGestión Descentralizada: Falta de un sistema centralizado para administrar múltiples campeonatos\nAcceso Limitado: Dificultad para que espectadores consulten información de campeonatos en tiempo real\nProcesos Manuales: Gestión manual de inscripciones, partidos y estadísticas propensa a errores\nFalta de Geolocalización: Ausencia de información sobre ubicación de estadios para espectadores",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/01-introduccion.html#objetivos",
+    "href": "capitulos/01-introduccion.html#objetivos",
+    "title": "2  Introducción",
+    "section": "3.3 Objetivos",
+    "text": "3.3 Objetivos\n\n3.3.1 Objetivo General\nDesarrollar un sistema multiplataforma que permita la gestión integral de campeonatos deportivos con acceso web para administradores y aplicación móvil para espectadores.\n\n\n3.3.2 Objetivos Específicos\n\nImplementar una aplicación web Angular para gestión administrativa con roles diferenciados\nDesarrollar una aplicación móvil React Native con funcionalidades avanzadas (mapas, voz)\nCrear un API Gateway Flask con autenticación JWT y microservicio de alineaciones\nIntegrar Google Maps para visualización de estadios con coordenadas GPS\nImplementar búsqueda por voz en español para consulta de partidos",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/01-introduccion.html#alcance-del-sistema",
+    "href": "capitulos/01-introduccion.html#alcance-del-sistema",
+    "title": "2  Introducción",
+    "section": "3.4 Alcance del Sistema",
+    "text": "3.4 Alcance del Sistema\nEl sistema cubre la gestión completa del ciclo de vida de un campeonato: creación, inscripción de equipos, programación de partidos, registro de resultados, cálculo de estadísticas y consulta pública. Incluye tres interfaces: web administrativa (Angular), aplicación móvil (React Native) y API REST (Flask).",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Introducción</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/02-arquitectura.html",
+    "href": "capitulos/02-arquitectura.html",
+    "title": "3  Arquitectura del Sistema",
+    "section": "",
+    "text": "4 Arquitectura del Sistema",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Arquitectura del Sistema</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/02-arquitectura.html#modelo-c4---nivel-1-contexto",
+    "href": "capitulos/02-arquitectura.html#modelo-c4---nivel-1-contexto",
+    "title": "3  Arquitectura del Sistema",
+    "section": "4.1 Modelo C4 - Nivel 1: Contexto",
+    "text": "4.1 Modelo C4 - Nivel 1: Contexto\n\n\nFigura 1: Diagrama de Contexto - Sistema y Actores\n\nEl sistema interactúa con cuatro tipos de usuarios (Superadmin, Organizador, Líder, Espectador) y cuatro sistemas externos (Google Maps, Google Speech, SMTP Gmail, Sistema de Archivos). La aplicación web Angular atiende a administradores, mientras que la app móvil React Native sirve a espectadores.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Arquitectura del Sistema</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/02-arquitectura.html#modelo-c4---nivel-2-contenedores",
+    "href": "capitulos/02-arquitectura.html#modelo-c4---nivel-2-contenedores",
+    "title": "3  Arquitectura del Sistema",
+    "section": "4.2 Modelo C4 - Nivel 2: Contenedores",
+    "text": "4.2 Modelo C4 - Nivel 2: Contenedores\n\n\nFigura 2: Diagrama de Contenedores - Componentes Principales\n\nEl sistema está compuesto por cinco contenedores principales: Aplicación Web Angular (puerto 4200) para administradores, Aplicación Móvil React Native para espectadores, API Gateway Flask (puerto 5000) como punto de entrada único, Microservicio de Alineaciones (puerto 5001) para gestión especializada, y Base de Datos MySQL 8.0 con coordenadas GPS.\nLa comunicación se realiza mediante HTTP/REST entre contenedores, con el API Gateway actuando como proxy hacia el microservicio y gestionando autenticación JWT centralizada.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Arquitectura del Sistema</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/02-arquitectura.html#modelo-c4---nivel-3-componentes",
+    "href": "capitulos/02-arquitectura.html#modelo-c4---nivel-3-componentes",
+    "title": "3  Arquitectura del Sistema",
+    "section": "4.3 Modelo C4 - Nivel 3: Componentes",
+    "text": "4.3 Modelo C4 - Nivel 3: Componentes\n\n4.3.1 Componentes Frontend Web\n\n\nFigura 3: Componentes Frontend Web - SPA Angular\n\nLa aplicación web Angular está organizada en módulos por feature (Auth, Superadmin, Organizador, Líder) con una capa de seguridad (Guards, Interceptors) y comunicación HTTP centralizada mediante HttpClient.\n\n\n4.3.2 Componentes Aplicación Móvil\n\n\nFigura 4: Componentes Aplicación Móvil - React Native\n\nLa app móvil incluye pantallas principales (Home, Campeonatos, Detalle, Mapa), servicios HTTP con manejo de errores, integración con Google Maps y reconocimiento de voz para búsqueda de partidos.\n\n\n4.3.3 Componentes API Gateway\n\n\nFigura 5: Componentes API Gateway - Backend Principal\n\nEl API Gateway está estructurado en capas: Presentación (REST API, Proxy), Seguridad (Autenticación, Autorización, Rate Limiting), Negocio (Lógica de negocio), Integración (Email, Archivos) y Datos (ORM SQLAlchemy).",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Arquitectura del Sistema</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/02-arquitectura.html#decisiones-arquitectónicas",
+    "href": "capitulos/02-arquitectura.html#decisiones-arquitectónicas",
+    "title": "3  Arquitectura del Sistema",
+    "section": "4.4 Decisiones Arquitectónicas",
+    "text": "4.4 Decisiones Arquitectónicas\n\n\n\n\n\n\n\n\nDecisión\nJustificación\nAlternativa Descartada\n\n\n\n\nAPI Gateway Centralizado\nSimplifica autenticación y seguridad\nAutenticación distribuida\n\n\nJWT para Autenticación\nStateless, escalable\nSesiones tradicionales\n\n\nMySQL para Base de Datos\nSoporte geográfico nativo\nPostgreSQL, MongoDB\n\n\nReact Native para Móvil\nMultiplataforma, un solo código\nFlutter, Nativas\n\n\nMicroservicio de Alineaciones\nSeparación de responsabilidades\nMonolito\n\n\nAngular 21 para Web\nMadurez, ecosistema robusto\nReact, Vue",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Arquitectura del Sistema</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/03-tecnologias.html",
+    "href": "capitulos/03-tecnologias.html",
+    "title": "4  Tecnologías Utilizadas",
+    "section": "",
+    "text": "5 Tecnologías Utilizadas",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Tecnologías Utilizadas</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/03-tecnologias.html#stack-tecnológico",
+    "href": "capitulos/03-tecnologias.html#stack-tecnológico",
+    "title": "4  Tecnologías Utilizadas",
+    "section": "5.1 Stack Tecnológico",
+    "text": "5.1 Stack Tecnológico\n\n\n\n\n\n\n\n\n\nComponente\nTecnología\nVersión\nJustificación\n\n\n\n\nFrontend Web\nAngular\n21.0.0\nFramework maduro, TypeScript, ecosistema robusto\n\n\n\nTypeScript\n5.9.2\nTipado estático, mejor mantenibilidad\n\n\n\nAngular Material\n21.0.2\nComponentes UI profesionales\n\n\nFrontend Móvil\nReact Native\n0.83.1\nMultiplataforma, código compartido\n\n\n\nreact-native-maps\n1.26.20\nIntegración Google Maps nativa\n\n\n\n@react-native-community/voice\n1.1.9\nReconocimiento de voz en español\n\n\nBackend\nFlask\n3.0.0\nFramework ligero, Python, rápido desarrollo\n\n\n\nPython\n3.12\nLenguaje versátil, amplia comunidad\n\n\n\nFlask-RESTx\n1.3.0\nDocumentación Swagger automática\n\n\n\nFlask-JWT-Extended\n4.6.0\nAutenticación JWT robusta\n\n\nBase de Datos\nMySQL\n8.0\nSoporte geográfico, coordenadas GPS\n\n\n\nSQLAlchemy\n3.1.1\nORM potente, migraciones\n\n\nIntegraciones\nGoogle Maps API\n-\nMapas interactivos, geocodificación\n\n\n\nGoogle Speech API\n-\nReconocimiento de voz\n\n\n\nSMTP Gmail\n-\nEnvío de emails transaccionales",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Tecnologías Utilizadas</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/03-tecnologias.html#justificación-de-elección",
+    "href": "capitulos/03-tecnologias.html#justificación-de-elección",
+    "title": "4  Tecnologías Utilizadas",
+    "section": "5.2 Justificación de Elección",
+    "text": "5.2 Justificación de Elección\nAngular 21 fue seleccionado por su arquitectura modular, sistema de inyección de dependencias y soporte nativo para TypeScript, facilitando el desarrollo de aplicaciones empresariales complejas con múltiples roles.\nReact Native 0.83.1 permite desarrollar una sola aplicación para Android e iOS, reduciendo tiempo de desarrollo y mantenimiento, mientras mantiene rendimiento nativo para operaciones críticas como mapas y reconocimiento de voz.\nFlask 3.0 ofrece flexibilidad y simplicidad para construir APIs REST rápidamente, con extensibilidad mediante extensiones como Flask-RESTx para documentación automática y Flask-JWT-Extended para autenticación segura.\nMySQL 8.0 proporciona soporte nativo para coordenadas geográficas (latitud/longitud) necesario para la funcionalidad de mapas, además de ser una base de datos relacional madura y confiable.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Tecnologías Utilizadas</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/04-modulo-web.html",
+    "href": "capitulos/04-modulo-web.html",
+    "title": "5  Módulo Web (Angular)",
+    "section": "",
+    "text": "6 Módulo Web (Angular)",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Módulo Web (Angular)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/04-modulo-web.html#estructura-de-módulos",
+    "href": "capitulos/04-modulo-web.html#estructura-de-módulos",
+    "title": "5  Módulo Web (Angular)",
+    "section": "6.1 Estructura de Módulos",
+    "text": "6.1 Estructura de Módulos\nLa aplicación Angular está organizada en módulos por feature con lazy loading:\nfeatures/\n├── auth/              # Autenticación (login, registro)\n├── superadmin/        # Dashboard y gestión de organizadores\n├── organizador/       # Gestión de campeonatos, equipos, partidos\n├── lider-equipo/      # Gestión de equipos, jugadores, alineaciones\n└── dashboard/         # Dashboard principal",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Módulo Web (Angular)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/04-modulo-web.html#autenticación-y-seguridad",
+    "href": "capitulos/04-modulo-web.html#autenticación-y-seguridad",
+    "title": "5  Módulo Web (Angular)",
+    "section": "6.2 Autenticación y Seguridad",
+    "text": "6.2 Autenticación y Seguridad\nEl sistema implementa autenticación JWT con guards e interceptors:\n// Auth Interceptor - Inyección automática de token\nexport const authInterceptor: HttpInterceptorFn = (req, next) =&gt; {\n  const token = authService.getAccessToken();\n  if (token) {\n    req = req.clone({\n      setHeaders: { Authorization: `Bearer ${token}` }\n    });\n  }\n  return next(req);\n};\nGuards implementados: - AuthGuard: Verifica autenticación - SuperadminGuard: Valida rol superadmin - OrganizadorGuard: Valida rol admin/superadmin - LiderGuard: Valida rol lider",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Módulo Web (Angular)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/04-modulo-web.html#módulos-por-rol",
+    "href": "capitulos/04-modulo-web.html#módulos-por-rol",
+    "title": "5  Módulo Web (Angular)",
+    "section": "6.3 Módulos por Rol",
+    "text": "6.3 Módulos por Rol\n\n\n\n\n\n\n\n\nRol\nMódulo\nFuncionalidades Principales\n\n\n\n\nSuperadmin\nsuperadmin/\nGestión de usuarios, supervisión global, configuración\n\n\nOrganizador\norganizador/\nCrear campeonatos, aprobar equipos, programar partidos, registrar resultados\n\n\nLíder\nlider-equipo/\nGestionar equipo, definir alineaciones con drag & drop, ver estadísticas",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Módulo Web (Angular)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/04-modulo-web.html#características-principales",
+    "href": "capitulos/04-modulo-web.html#características-principales",
+    "title": "5  Módulo Web (Angular)",
+    "section": "6.4 Características Principales",
+    "text": "6.4 Características Principales\n\nLazy Loading: Módulos cargados bajo demanda\nGuards de Seguridad: Protección de rutas por rol\nInterceptors HTTP: Inyección automática de tokens JWT\nComponentes Reutilizables: Shared components para UI común\nFormularios Reactivos: Validación en tiempo real con Angular Forms",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Módulo Web (Angular)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html",
+    "href": "capitulos/05-modulo-movil.html",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "",
+    "text": "7 Módulo Móvil (React Native)",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html#arquitectura-de-componentes",
+    "href": "capitulos/05-modulo-movil.html#arquitectura-de-componentes",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "7.1 Arquitectura de Componentes",
+    "text": "7.1 Arquitectura de Componentes\nLa aplicación móvil sigue una arquitectura basada en componentes con separación clara:\nsrc/\n├── screens/          # Pantallas principales\n├── components/      # Componentes reutilizables\n├── navigation/      # Configuración de navegación\n└── utils/           # Utilidades (constants, voice processor)",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html#pantallas-principales",
+    "href": "capitulos/05-modulo-movil.html#pantallas-principales",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "7.2 Pantallas Principales",
+    "text": "7.2 Pantallas Principales\n\n\n\n\n\n\n\n\nPantalla\nDescripción\nFuncionalidad\n\n\n\n\nHomeScreen\nPantalla de inicio\nLogo, botón para ver campeonatos, partidos destacados\n\n\nCampeonatosScreen\nLista de campeonatos\nCards informativos, filtros, pull-to-refresh\n\n\nCampeonatoDetailScreen\nDetalle con tabs\nInfo, Posiciones, Partidos (con búsqueda por voz)\n\n\nSedesMapScreen\nMapa interactivo\nMarcadores de estadios, bottom sheet, navegación",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html#integración-google-maps",
+    "href": "capitulos/05-modulo-movil.html#integración-google-maps",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "7.3 Integración Google Maps",
+    "text": "7.3 Integración Google Maps\nLa app integra Google Maps mediante react-native-maps para mostrar estadios con coordenadas GPS obtenidas del backend:\n&lt;MapView provider={PROVIDER_GOOGLE}&gt;\n  {sedes.map(sede =&gt; (\n    &lt;Marker coordinate={{latitude: sede.latitud, longitude: sede.longitud}}&gt;\n      &lt;CustomMarker logo={sede.logo_url} /&gt;\n    &lt;/Marker&gt;\n  ))}\n&lt;/MapView&gt;\nCaracterísticas: - Marcadores personalizados con logos de equipos - Bottom sheet con información del estadio - Botón “Cómo llegar” que abre Google Maps nativo - Zoom automático para mostrar todos los estadios",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html#búsqueda-por-voz",
+    "href": "capitulos/05-modulo-movil.html#búsqueda-por-voz",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "7.4 Búsqueda por Voz",
+    "text": "7.4 Búsqueda por Voz\nImplementada con @react-native-community/voice para reconocimiento en español:\n// Comandos soportados\nconst commands = [\n  \"Partidos de hoy\",\n  \"Partidos de mañana\",\n  \"Partidos de [equipo]\",\n  \"Mostrar todos los partidos\"\n];\nEl componente VoiceSearchButton captura el audio, lo procesa localmente y filtra los partidos según el comando reconocido.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html#manejo-de-errores",
+    "href": "capitulos/05-modulo-movil.html#manejo-de-errores",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "7.5 Manejo de Errores",
+    "text": "7.5 Manejo de Errores\n\n\n\n\n\n\n\n\nTipo de Error\nCódigo\nManejo en App\n\n\n\n\nSin conexión\nNO RESPONSE\nAlert “Sin conexión” + botón reintentar\n\n\nTimeout\nTIMEOUT\nAlert “Tiempo agotado” + botón reintentar\n\n\nRecurso no encontrado\n404\nAlert “No encontrado” + navegación atrás\n\n\nError del servidor\n500\nAlert “Error del servidor”\n\n\nDatos inválidos\n400\nAlert “Datos inválidos”",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/05-modulo-movil.html#estados-de-la-aplicación",
+    "href": "capitulos/05-modulo-movil.html#estados-de-la-aplicación",
+    "title": "6  Módulo Móvil (React Native)",
+    "section": "7.6 Estados de la Aplicación",
+    "text": "7.6 Estados de la Aplicación\n\nLoading: ActivityIndicator durante peticiones\nEmpty State: Mensajes informativos cuando no hay datos\nError State: Alertas con opción de reintentar",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Módulo Móvil (React Native)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/06-backend.html",
+    "href": "capitulos/06-backend.html",
+    "title": "7  Backend (API Gateway + Microservicio)",
+    "section": "",
+    "text": "8 Backend (API Gateway + Microservicio)",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Backend (API Gateway + Microservicio)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/06-backend.html#endpoints-rest-principales",
+    "href": "capitulos/06-backend.html#endpoints-rest-principales",
+    "title": "7  Backend (API Gateway + Microservicio)",
+    "section": "8.1 Endpoints REST Principales",
+    "text": "8.1 Endpoints REST Principales\n\n\n\n\n\n\n\n\n\nMétodo\nURL\nDescripción\nAutenticación\n\n\n\n\nPOST\n/auth/login\nIniciar sesión\nNo\n\n\nPOST\n/auth/register\nRegistrar usuario\nNo\n\n\nGET\n/campeonatos\nListar campeonatos\nOpcional\n\n\nGET\n/campeonatos/{id}\nDetalle de campeonato\nNo\n\n\nPOST\n/campeonatos\nCrear campeonato\nAdmin\n\n\nGET\n/partidos\nListar partidos\nNo\n\n\nGET\n/estadisticas/tabla-posiciones\nTabla de posiciones\nNo\n\n\nGET\n/inscripciones/campeonato/{id}\nInscripciones con GPS\nNo\n\n\nPOST\n/lider/alineaciones/definir\nDefinir alineación\nLíder\n\n\nGET\n/organizador/partidos/{id}/alineaciones\nVer alineaciones\nOrganizador\n\n\nPOST\n/partidos/{id}/resultado\nRegistrar resultado\nOrganizador",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Backend (API Gateway + Microservicio)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/06-backend.html#autenticación-jwt",
+    "href": "capitulos/06-backend.html#autenticación-jwt",
+    "title": "7  Backend (API Gateway + Microservicio)",
+    "section": "8.2 Autenticación JWT",
+    "text": "8.2 Autenticación JWT\nEl sistema utiliza JWT tokens con refresh tokens:\nFlujo de Autenticación: 1. Cliente envía credenciales a POST /auth/login 2. API Gateway valida y retorna access_token (15min) + refresh_token (30días) 3. Cliente usa access_token en header Authorization: Bearer {token} 4. Si access_token expira, cliente usa refresh_token en POST /auth/refresh 5. API Gateway retorna nuevo access_token\nCaracterísticas: - Access token válido 15 minutos - Refresh token válido 30 días - Tokens almacenados en memoria (móvil) o localStorage (web)",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Backend (API Gateway + Microservicio)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/06-backend.html#microservicio-de-alineaciones",
+    "href": "capitulos/06-backend.html#microservicio-de-alineaciones",
+    "title": "7  Backend (API Gateway + Microservicio)",
+    "section": "8.3 Microservicio de Alineaciones",
+    "text": "8.3 Microservicio de Alineaciones\nEl API Gateway actúa como proxy hacia el microservicio:\nFlujo:\nFrontend → API Gateway Proxy → Validaciones → Microservicio → Respuesta\nValidaciones del Proxy: 1. Autenticación JWT 2. Validación de rol (lider/organizador) 3. Validación de que el equipo participa en el partido 4. Validación de que el usuario es líder del equipo\nEndpoints del Proxy: - POST /lider/alineaciones/definir - Definir alineación completa - GET /lider/alineaciones - Obtener alineaciones - GET /organizador/partidos/{id}/alineaciones - Ver alineaciones de ambos equipos",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Backend (API Gateway + Microservicio)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/06-backend.html#modelos-de-base-de-datos",
+    "href": "capitulos/06-backend.html#modelos-de-base-de-datos",
+    "title": "7  Backend (API Gateway + Microservicio)",
+    "section": "8.4 Modelos de Base de Datos",
+    "text": "8.4 Modelos de Base de Datos\nModelos principales:\n\nUsuario: id_usuario, email, contrasena (hashed), rol\nCampeonato: id_campeonato, nombre, estado, fechas, creado_por\nEquipo: id_equipo, nombre, estadio_latitud, estadio_longitud, id_lider\nPartido: id_partido, id_campeonato, equipos, fecha, estado, goles\nAlineacion: id_alineacion, id_partido, id_jugador, titular, posicion_x, posicion_y\n\nRelaciones: - Usuario 1:N Campeonato (creado_por) - Campeonato 1:N Partido - Equipo 1:N Jugador - Partido 1:N Alineacion",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Backend (API Gateway + Microservicio)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/06-backend.html#ejemplos-requestresponse",
+    "href": "capitulos/06-backend.html#ejemplos-requestresponse",
+    "title": "7  Backend (API Gateway + Microservicio)",
+    "section": "8.5 Ejemplos Request/Response",
+    "text": "8.5 Ejemplos Request/Response\n\n\n\n\n\n\nNotaEjemplo: Obtener Campeonatos\n\n\n\nRequest:\nGET /campeonatos?estado=activo\nResponse:\n{\n  \"campeonatos\": [{\n    \"id_campeonato\": 4,\n    \"nombre\": \"La liga negreira\",\n    \"estado\": \"activo\",\n    \"total_equipos_inscritos\": 4\n  }]\n}\n\n\n\n\n\n\n\n\nNotaEjemplo: Inscripciones con GPS\n\n\n\nRequest:\nGET /inscripciones/campeonato/4?estado=aprobado\nResponse:\n{\n  \"inscripciones\": [{\n    \"equipo\": {\n      \"nombre\": \"Sin Camiseta FC\",\n      \"estadio_latitud\": -4.0076,\n      \"estadio_longitud\": -79.2047\n    }\n  }]\n}",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Backend (API Gateway + Microservicio)</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/07-integracion-api.html",
+    "href": "capitulos/07-integracion-api.html",
+    "title": "8  Integración API REST",
+    "section": "",
+    "text": "9 Integración API REST",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Integración API REST</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/07-integracion-api.html#endpoints-consumidos-por-app-móvil",
+    "href": "capitulos/07-integracion-api.html#endpoints-consumidos-por-app-móvil",
+    "title": "8  Integración API REST",
+    "section": "9.1 Endpoints Consumidos por App Móvil",
+    "text": "9.1 Endpoints Consumidos por App Móvil\n\n\n\n\n\n\n\n\n\nEndpoint\nMétodo\nDescripción\nTiempo Promedio\n\n\n\n\n/campeonatos\nGET\nLista de campeonatos activos\n~150ms\n\n\n/campeonatos/{id}\nGET\nDetalle de campeonato\n~180ms\n\n\n/estadisticas/tabla-posiciones\nGET\nTabla de posiciones\n~200ms\n\n\n/partidos\nGET\nLista de partidos\n~170ms\n\n\n/inscripciones/campeonato/{id}\nGET\nInscripciones con coordenadas GPS\n~250ms",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Integración API REST</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/07-integracion-api.html#ejemplos-de-solicitudrespuesta",
+    "href": "capitulos/07-integracion-api.html#ejemplos-de-solicitudrespuesta",
+    "title": "8  Integración API REST",
+    "section": "9.2 Ejemplos de Solicitud/Respuesta",
+    "text": "9.2 Ejemplos de Solicitud/Respuesta\n\n9.2.1 Ejemplo 1: Listar Campeonatos\nRequest:\nGET http://10.20.139.22:5000/campeonatos?estado=activo\nResponse:\n{\n  \"campeonatos\": [{\n    \"id_campeonato\": 4,\n    \"nombre\": \"La liga negreira\",\n    \"descripcion\": \"Campeonato de fútbol profesional\",\n    \"tipo_deporte\": \"futbol\",\n    \"estado\": \"activo\",\n    \"fecha_inicio\": \"2025-01-01\",\n    \"fecha_fin\": \"2025-06-30\",\n    \"max_equipos\": 16,\n    \"inscripciones_abiertas\": true\n  }]\n}\n\n\n9.2.2 Ejemplo 2: Tabla de Posiciones\nRequest:\nGET http://10.20.139.22:5000/estadisticas/tabla-posiciones?id_campeonato=4\nResponse:\n{\n  \"tabla\": [{\n    \"posicion\": 1,\n    \"equipo\": \"Sin Camiseta FC\",\n    \"partidos_jugados\": 5,\n    \"ganados\": 4,\n    \"empatados\": 1,\n    \"perdidos\": 0,\n    \"goles_favor\": 12,\n    \"goles_contra\": 3,\n    \"diferencia_goles\": 9,\n    \"puntos\": 13\n  }]\n}",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Integración API REST</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/07-integracion-api.html#códigos-http-manejados",
+    "href": "capitulos/07-integracion-api.html#códigos-http-manejados",
+    "title": "8  Integración API REST",
+    "section": "9.3 Códigos HTTP Manejados",
+    "text": "9.3 Códigos HTTP Manejados\n\n\n\n\n\n\n\n\nCódigo\nTipo\nManejo en App Móvil\n\n\n\n\n200\nOK\nProcesar y mostrar datos\n\n\n400\nBad Request\nAlert “Datos inválidos”\n\n\n404\nNot Found\nAlert “Recurso no encontrado” + navegar atrás\n\n\n500\nInternal Server Error\nAlert “Error del servidor”\n\n\nTIMEOUT\nNetwork Error\nAlert “Tiempo agotado” + botón reintentar\n\n\nNO RESPONSE\nNetwork Error\nAlert “Sin conexión” + botón reintentar",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Integración API REST</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/07-integracion-api.html#tiempos-de-respuesta",
+    "href": "capitulos/07-integracion-api.html#tiempos-de-respuesta",
+    "title": "8  Integración API REST",
+    "section": "9.4 Tiempos de Respuesta",
+    "text": "9.4 Tiempos de Respuesta\nTodos los endpoints responden en menos de 300ms, lo cual es óptimo para una aplicación móvil. El endpoint más lento es /inscripciones/campeonato/{id} con ~250ms debido a que incluye coordenadas GPS y datos de equipos.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Integración API REST</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html",
+    "href": "capitulos/08-instalacion.html",
+    "title": "9  Guía de Instalación",
+    "section": "",
+    "text": "10 Guía de Instalación",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html#requisitos-del-sistema",
+    "href": "capitulos/08-instalacion.html#requisitos-del-sistema",
+    "title": "9  Guía de Instalación",
+    "section": "10.1 Requisitos del Sistema",
+    "text": "10.1 Requisitos del Sistema\n\nBackend: Python 3.12, MySQL 8.0, pip\nFrontend Web: Node.js 20+, npm\nApp Móvil: Node.js 20+, React Native CLI, Android Studio, Java JDK 11+",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html#instalación-backend",
+    "href": "capitulos/08-instalacion.html#instalación-backend",
+    "title": "9  Guía de Instalación",
+    "section": "10.2 Instalación Backend",
+    "text": "10.2 Instalación Backend\n\nClonar repositorio y entrar a backend:\ncd backend\nCrear entorno virtual:\npython3 -m venv venv\nsource venv/bin/activate  # Linux/macOS\nInstalar dependencias:\npip install -r requirements.txt\nConfigurar base de datos:\nmysql -u root -p\nCREATE DATABASE gestion_campeonato;\nmysql -u root -p gestion_campeonato &lt; ../database/campeonato.sql\nConfigurar variables de entorno (.env):\nDATABASE_URL=mysql+pymysql://usuario:password@localhost:3306/gestion_campeonato\nJWT_SECRET_KEY=tu-secret-key-segura\nMAIL_SERVER=smtp.gmail.com\nMAIL_PORT=587\nMAIL_USERNAME=tu-email@gmail.com\nMAIL_PASSWORD=tu-password\nEjecutar servidor:\npython run.py",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html#instalación-frontend-web",
+    "href": "capitulos/08-instalacion.html#instalación-frontend-web",
+    "title": "9  Guía de Instalación",
+    "section": "10.3 Instalación Frontend Web",
+    "text": "10.3 Instalación Frontend Web\n\nEntrar a frontend:\ncd frontend\nInstalar dependencias:\nnpm install\nConfigurar URL del backend en src/environments/environment.ts:\napiUrl: 'http://10.20.139.22:5000'\nEjecutar servidor de desarrollo:\nng serve",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html#instalación-app-móvil",
+    "href": "capitulos/08-instalacion.html#instalación-app-móvil",
+    "title": "9  Guía de Instalación",
+    "section": "10.4 Instalación App Móvil",
+    "text": "10.4 Instalación App Móvil\n\nEntrar a CampeonatoMovil:\ncd CampeonatoMovil\nInstalar dependencias:\nnpm install\nConfigurar Google Maps API Key en android/app/src/main/AndroidManifest.xml:\n&lt;meta-data\n    android:name=\"com.google.android.geo.API_KEY\"\n    android:value=\"TU_API_KEY_AQUI\"/&gt;\nConfigurar URL del backend en src/utils/constants.ts:\nexport const API_BASE_URL = 'http://10.20.139.22:5000';\nEjecutar en Android:\nnpm run android\nGenerar APK:\ncd android\n./gradlew assembleRelease",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html#variables-de-entorno",
+    "href": "capitulos/08-instalacion.html#variables-de-entorno",
+    "title": "9  Guía de Instalación",
+    "section": "10.5 Variables de Entorno",
+    "text": "10.5 Variables de Entorno\n\n\n\n\n\n\n\n\nVariable\nDescripción\nEjemplo\n\n\n\n\nDATABASE_URL\nURL de conexión MySQL\nmysql+pymysql://user:pass@localhost:3306/db\n\n\nJWT_SECRET_KEY\nClave secreta para JWT\ntu-secret-key-segura\n\n\nMAIL_SERVER\nServidor SMTP\nsmtp.gmail.com\n\n\nMAIL_USERNAME\nEmail para envío\ntu-email@gmail.com\n\n\nMAIL_PASSWORD\nPassword del email\ntu-password",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/08-instalacion.html#configuración-google-maps-api-key",
+    "href": "capitulos/08-instalacion.html#configuración-google-maps-api-key",
+    "title": "9  Guía de Instalación",
+    "section": "10.6 Configuración Google Maps API Key",
+    "text": "10.6 Configuración Google Maps API Key\n\nObtener API Key de Google Cloud Console\nConfigurar restricciones: Nombre del paquete y SHA-1 fingerprint\nAgregar en AndroidManifest.xml como se muestra arriba",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Guía de Instalación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/09-manual-usuario.html",
+    "href": "capitulos/09-manual-usuario.html",
+    "title": "10  Manual de Usuario",
+    "section": "",
+    "text": "11 Manual de Usuario",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Manual de Usuario</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/09-manual-usuario.html#manual-web-para-administradores",
+    "href": "capitulos/09-manual-usuario.html#manual-web-para-administradores",
+    "title": "10  Manual de Usuario",
+    "section": "11.1 Manual Web para Administradores",
+    "text": "11.1 Manual Web para Administradores\n\n11.1.1 Acceso al Sistema\n\nAbrir navegador en http://localhost:4200\nHacer clic en “Iniciar Sesión”\nIngresar email y contraseña de administrador\nHacer clic en “Entrar”\n\n\n\n11.1.2 Funcionalidades Principales\n\nGestión de Campeonatos: Crear, editar, cambiar estado, generar partidos\nGestión de Equipos: Aprobar/rechazar equipos, gestionar líderes\nGestión de Partidos: Programar partidos, registrar resultados\nEstadísticas: Ver tabla de posiciones, goleadores, tarjetas",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Manual de Usuario</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/09-manual-usuario.html#manual-web-para-organizadores",
+    "href": "capitulos/09-manual-usuario.html#manual-web-para-organizadores",
+    "title": "10  Manual de Usuario",
+    "section": "11.2 Manual Web para Organizadores",
+    "text": "11.2 Manual Web para Organizadores\n\n11.2.1 Crear Campeonato\n\nIr a “Campeonatos” → “Nuevo”\nCompletar formulario (nombre, fechas, tipo de deporte)\nGuardar campeonato\n\n\n\n11.2.2 Gestionar Inscripciones\n\nIr a “Inscripciones”\nVer solicitudes pendientes\nAprobar o rechazar con observaciones\n\n\n\n11.2.3 Programar Partidos\n\nIr a “Partidos” → “Generar”\nConfigurar fechas y horarios\nGenerar fixtures automáticamente\n\n\n\n11.2.4 Registrar Resultados\n\nIr a “Partidos” → Seleccionar partido\nIngresar goles local y visitante\nGuardar resultado",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Manual de Usuario</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/09-manual-usuario.html#manual-móvil-para-espectadores",
+    "href": "capitulos/09-manual-usuario.html#manual-móvil-para-espectadores",
+    "title": "10  Manual de Usuario",
+    "section": "11.3 Manual Móvil para Espectadores",
+    "text": "11.3 Manual Móvil para Espectadores\n\n11.3.1 Ver Campeonatos\n\nAbrir la aplicación\nHacer clic en “Ver Campeonatos”\nSeleccionar un campeonato de la lista\n\n\n\n11.3.2 Consultar Tabla de Posiciones\n\nAbrir detalle de campeonato\nIr a tab “Posiciones”\nVer tabla ordenada por puntos\n\n\n\n11.3.3 Ver Calendario de Partidos\n\nEn detalle de campeonato, ir a tab “Partidos”\nVer lista cronológica de partidos\nUsar búsqueda por voz: hacer clic en micrófono y decir “Partidos de hoy”\n\n\n\n11.3.4 Usar Mapa de Estadios\n\nEn detalle de campeonato, hacer clic en “Ver Mapa de Sedes”\nVer marcadores de estadios en el mapa\nHacer clic en marcador para ver información\nUsar “Cómo llegar” para navegación\n\n\n\n11.3.5 Búsqueda por Voz\n\nEn tab “Partidos”, hacer clic en icono de micrófono\nDecir comando (ej: “Partidos de hoy”, “Partidos de Barcelona”)\nVer resultados filtrados",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Manual de Usuario</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/10-pruebas.html",
+    "href": "capitulos/10-pruebas.html",
+    "title": "11  Pruebas y Validación",
+    "section": "",
+    "text": "12 Pruebas y Validación",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Pruebas y Validación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/10-pruebas.html#pruebas-de-integración-móvil-backend",
+    "href": "capitulos/10-pruebas.html#pruebas-de-integración-móvil-backend",
+    "title": "11  Pruebas y Validación",
+    "section": "12.1 Pruebas de Integración Móvil-Backend",
+    "text": "12.1 Pruebas de Integración Móvil-Backend\n\n\n\n\n\n\n\n\nTipo de Prueba\nProcedimiento\nResultado\n\n\n\n\nCarga de campeonatos\nAbrir app, navegar a lista\nLista visible, tiempo &lt; 200ms\n\n\nManejo de error de red\nApagar backend, intentar cargar\nAlert “Sin conexión” + botón reintentar\n\n\nMapa de estadios\nAbrir mapa, verificar marcadores\nMarcadores visibles, bottom sheet funcional\n\n\nBúsqueda por voz\nActivar voz, decir “Partidos de hoy”\nReconocimiento correcto, filtrado aplicado\n\n\nTabla de posiciones\nAbrir tab Posiciones\nTabla ordenada, estadísticas correctas\n\n\nNavegación a estadio\nClic en “Cómo llegar”\nGoogle Maps abre con ruta",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Pruebas y Validación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/10-pruebas.html#evidencias-de-manejo-de-errores",
+    "href": "capitulos/10-pruebas.html#evidencias-de-manejo-de-errores",
+    "title": "11  Pruebas y Validación",
+    "section": "12.2 Evidencias de Manejo de Errores",
+    "text": "12.2 Evidencias de Manejo de Errores\nEl sistema maneja correctamente los siguientes errores:\n\nSin conexión: Alert informativo con botón de reintento\nTimeout: Alert “Tiempo agotado” con opción de reintentar\n404 Not Found: Alert “Recurso no encontrado” con navegación atrás\n500 Server Error: Alert “Error del servidor” con mensaje claro\nEstado vacío: Mensaje informativo con icono descriptivo",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Pruebas y Validación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/10-pruebas.html#métricas-de-rendimiento",
+    "href": "capitulos/10-pruebas.html#métricas-de-rendimiento",
+    "title": "11  Pruebas y Validación",
+    "section": "12.3 Métricas de Rendimiento",
+    "text": "12.3 Métricas de Rendimiento\n\n\n\nEndpoint\nTiempo Promedio\nEvaluación\n\n\n\n\nGET /campeonatos\n~150ms\nExcelente\n\n\nGET /campeonatos/{id}\n~180ms\nExcelente\n\n\nGET /estadisticas/tabla-posiciones\n~200ms\nExcelente\n\n\nGET /partidos\n~170ms\nExcelente\n\n\nGET /inscripciones/campeonato/{id}\n~250ms\nBueno\n\n\n\nConclusión: Todos los endpoints responden en menos de 300ms, lo cual es óptimo para una aplicación móvil.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Pruebas y Validación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/10-pruebas.html#comandos-de-voz-validados",
+    "href": "capitulos/10-pruebas.html#comandos-de-voz-validados",
+    "title": "11  Pruebas y Validación",
+    "section": "12.4 Comandos de Voz Validados",
+    "text": "12.4 Comandos de Voz Validados\nLos siguientes comandos fueron probados y funcionan correctamente:\n\n“Partidos de hoy”\n“Partidos de mañana”\n“Partidos de [nombre equipo]”\n“Mostrar todos los partidos”\n“Próxima fecha”\n“Última fecha”\n“Últimos X partidos de [equipo]”",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Pruebas y Validación</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/11-conclusiones.html",
+    "href": "capitulos/11-conclusiones.html",
+    "title": "12  Conclusiones",
+    "section": "",
+    "text": "13 Conclusiones",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Conclusiones</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/11-conclusiones.html#logros-alcanzados",
+    "href": "capitulos/11-conclusiones.html#logros-alcanzados",
+    "title": "12  Conclusiones",
+    "section": "13.1 Logros Alcanzados",
+    "text": "13.1 Logros Alcanzados\n\nSistema Multiplataforma Completo: Se desarrolló exitosamente un sistema con tres interfaces (web Angular, app móvil React Native, API REST Flask) que cubre todas las necesidades del dominio.\nArquitectura de Microservicios: Se implementó una arquitectura escalable con API Gateway y microservicio de alineaciones, permitiendo separación de responsabilidades y escalabilidad independiente.\nFuncionalidades Avanzadas: Se integraron funcionalidades modernas como Google Maps con coordenadas GPS, búsqueda por voz en español, y manejo robusto de errores en la aplicación móvil.\nSeguridad Implementada: Se implementó autenticación JWT con refresh tokens, rate limiting, account lockout, y validación de entrada en todas las capas.\nRendimiento Óptimo: Todos los endpoints responden en menos de 300ms, proporcionando una experiencia de usuario fluida.\nDocumentación Técnica Completa: Se generó documentación técnica profesional con modelo C4 completo (4 niveles) y guías de instalación y uso.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Conclusiones</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/11-conclusiones.html#lecciones-aprendidas",
+    "href": "capitulos/11-conclusiones.html#lecciones-aprendidas",
+    "title": "12  Conclusiones",
+    "section": "13.2 Lecciones Aprendidas",
+    "text": "13.2 Lecciones Aprendidas\n\nImportancia de la Arquitectura: Una arquitectura bien diseñada desde el inicio facilita el desarrollo y mantenimiento del sistema.\nSeparación de Responsabilidades: El uso de microservicios y proxy permite escalar componentes independientemente y mantener código más limpio.\nExperiencia de Usuario: El manejo robusto de errores y estados vacíos mejora significativamente la experiencia del usuario en aplicaciones móviles.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Conclusiones</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/11-conclusiones.html#trabajo-futuro",
+    "href": "capitulos/11-conclusiones.html#trabajo-futuro",
+    "title": "12  Conclusiones",
+    "section": "13.3 Trabajo Futuro",
+    "text": "13.3 Trabajo Futuro\n\nCaché Offline: Implementar caché con AsyncStorage para permitir consulta sin conexión.\nNotificaciones Push: Agregar notificaciones push para resultados de partidos y eventos importantes.\nOptimización de Imágenes: Implementar compresión y CDN para logos y fotos de estadios.\nPruebas Automatizadas: Agregar suite de pruebas unitarias y de integración automatizadas.\nDashboard de Métricas: Implementar dashboard de monitoreo con métricas en tiempo real.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Conclusiones</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/12-referencias.html",
+    "href": "capitulos/12-referencias.html",
+    "title": "13  Referencias",
+    "section": "",
+    "text": "14 Referencias",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Referencias</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/12-referencias.html#documentación-oficial",
+    "href": "capitulos/12-referencias.html#documentación-oficial",
+    "title": "13  Referencias",
+    "section": "14.1 Documentación Oficial",
+    "text": "14.1 Documentación Oficial\n\nAngular: https://angular.dev\nReact Native: https://reactnative.dev\nFlask: https://flask.palletsprojects.com\nMySQL: https://dev.mysql.com/doc/\nGoogle Maps API: https://developers.google.com/maps\nQuarto: https://quarto.org",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Referencias</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/12-referencias.html#repositorio-del-proyecto",
+    "href": "capitulos/12-referencias.html#repositorio-del-proyecto",
+    "title": "13  Referencias",
+    "section": "14.2 Repositorio del Proyecto",
+    "text": "14.2 Repositorio del Proyecto\n\nGitHub: https://github.com/cesar050/Campeonato",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Referencias</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/12-referencias.html#tecnologías-utilizadas",
+    "href": "capitulos/12-referencias.html#tecnologías-utilizadas",
+    "title": "13  Referencias",
+    "section": "14.3 Tecnologías Utilizadas",
+    "text": "14.3 Tecnologías Utilizadas\n\nAngular 21.0.0 - Framework web\nReact Native 0.83.1 - Framework móvil\nFlask 3.0.0 - Framework backend\nPython 3.12 - Lenguaje backend\nMySQL 8.0 - Base de datos\nTypeScript 5.9.2 - Lenguaje frontend\nSQLAlchemy 3.1.1 - ORM\nFlask-JWT-Extended 4.6.0 - Autenticación JWT\nreact-native-maps 1.26.20 - Integración Google Maps\n@react-native-community/voice 1.1.9 - Reconocimiento de voz",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Referencias</span>"
+    ]
+  },
+  {
+    "objectID": "capitulos/12-referencias.html#modelo-c4",
+    "href": "capitulos/12-referencias.html#modelo-c4",
+    "title": "13  Referencias",
+    "section": "14.4 Modelo C4",
+    "text": "14.4 Modelo C4\n\nStructurizr: https://structurizr.com\nDocumentación C4 Model: https://c4model.com",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Referencias</span>"
+    ]
+  }
+]

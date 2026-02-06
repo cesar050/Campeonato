@@ -27,10 +27,10 @@ class EmailService:
                 <style>
                     body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }}
                     .container {{ max-width: 600px; margin: 20px auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
-                    .header {{ background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; padding: 40px 30px; text-align: center; }}
+                    .header {{ background: linear-gradient(135deg, #B8E994 0%, #95C97A 100%); color: #2e7d32; padding: 40px 30px; text-align: center; }}
                     .header h1 {{ margin: 0; font-size: 28px; }}
                     .content {{ padding: 40px 30px; }}
-                    .btn {{ display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }}
+                    .btn {{ display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #B8E994 0%, #95C97A 100%); color: #2e7d32; text-decoration: none; border-radius: 5px; font-weight: bold; margin: 20px 0; }}
                     .footer {{ background-color: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; font-size: 14px; }}
                 </style>
             </head>
@@ -138,7 +138,7 @@ class EmailService:
                     .header {{ background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; padding: 40px 30px; text-align: center; }}
                     .header h1 {{ margin: 0; font-size: 28px; }}
                     .content {{ padding: 40px 30px; }}
-                    .credentials-box {{ background-color: #f5f5f5; border-left: 4px solid #4caf50; padding: 20px; margin: 20px 0; border-radius: 4px; }}
+                    .credentials-box {{ background-color: #f5f5f5; border-left: 4px solid #B8E994; padding: 20px; margin: 20px 0; border-radius: 4px; }}
                     .credential {{ margin: 10px 0; }}
                     .credential-label {{ font-weight: bold; color: #666; }}
                     .credential-value {{ font-family: monospace; font-size: 16px; color: #333; background: #fff; padding: 5px 10px; border-radius: 4px; display: inline-block; margin-top: 5px; }}

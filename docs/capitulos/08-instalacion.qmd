@@ -1,0 +1,124 @@
+---
+title: "Guía de Instalación"
+---
+
+# Guía de Instalación
+
+## Requisitos del Sistema
+
+- **Backend**: Python 3.12, MySQL 8.0, pip
+- **Frontend Web**: Node.js 20+, npm
+- **App Móvil**: Node.js 20+, React Native CLI, Android Studio, Java JDK 11+
+
+## Instalación Backend
+
+1. **Clonar repositorio y entrar a backend:**
+   ```bash
+   cd backend
+   ```
+
+2. **Crear entorno virtual:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   ```
+
+3. **Instalar dependencias:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configurar base de datos:**
+   ```bash
+   mysql -u root -p
+   CREATE DATABASE gestion_campeonato;
+   mysql -u root -p gestion_campeonato < ../database/campeonato.sql
+   ```
+
+5. **Configurar variables de entorno (.env):**
+   ```
+   DATABASE_URL=mysql+pymysql://usuario:password@localhost:3306/gestion_campeonato
+   JWT_SECRET_KEY=tu-secret-key-segura
+   MAIL_SERVER=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USERNAME=tu-email@gmail.com
+   MAIL_PASSWORD=tu-password
+   ```
+
+6. **Ejecutar servidor:**
+   ```bash
+   python run.py
+   ```
+
+## Instalación Frontend Web
+
+1. **Entrar a frontend:**
+   ```bash
+   cd frontend
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar URL del backend** en `src/environments/environment.ts`:
+   ```typescript
+   apiUrl: 'http://10.20.139.22:5000'
+   ```
+
+4. **Ejecutar servidor de desarrollo:**
+   ```bash
+   ng serve
+   ```
+
+## Instalación App Móvil
+
+1. **Entrar a CampeonatoMovil:**
+   ```bash
+   cd CampeonatoMovil
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar Google Maps API Key** en `android/app/src/main/AndroidManifest.xml`:
+   ```xml
+   <meta-data
+       android:name="com.google.android.geo.API_KEY"
+       android:value="TU_API_KEY_AQUI"/>
+   ```
+
+4. **Configurar URL del backend** en `src/utils/constants.ts`:
+   ```typescript
+   export const API_BASE_URL = 'http://10.20.139.22:5000';
+   ```
+
+5. **Ejecutar en Android:**
+   ```bash
+   npm run android
+   ```
+
+6. **Generar APK:**
+   ```bash
+   cd android
+   ./gradlew assembleRelease
+   ```
+
+## Variables de Entorno
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `DATABASE_URL` | URL de conexión MySQL | `mysql+pymysql://user:pass@localhost:3306/db` |
+| `JWT_SECRET_KEY` | Clave secreta para JWT | `tu-secret-key-segura` |
+| `MAIL_SERVER` | Servidor SMTP | `smtp.gmail.com` |
+| `MAIL_USERNAME` | Email para envío | `tu-email@gmail.com` |
+| `MAIL_PASSWORD` | Password del email | `tu-password` |
+
+## Configuración Google Maps API Key
+
+1. Obtener API Key de Google Cloud Console
+2. Configurar restricciones: Nombre del paquete y SHA-1 fingerprint
+3. Agregar en `AndroidManifest.xml` como se muestra arriba

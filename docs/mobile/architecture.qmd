@@ -1,0 +1,27 @@
+---
+title: "Arquitectura de la Aplicación Móvil"
+---
+
+# Arquitectura de la Aplicación Móvil
+
+## Estructura
+
+```
+src/
+├── components/     # Componentes reutilizables
+├── screens/        # Pantallas principales
+├── navigation/     # Configuración de navegación
+├── theme/          # Tema y estilos
+└── utils/          # Utilidades
+```
+
+## Patrones
+
+- **Component-Based**: Cada pantalla es un componente independiente
+- **State Management**: useState para estado local
+- **HTTP Client**: Axios con manejo de errores
+
+## Navegación
+
+Stack Navigation con React Navigation:
+- Home → Campeonatos → Detalle → Mapa

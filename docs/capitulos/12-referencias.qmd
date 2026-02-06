@@ -1,0 +1,36 @@
+---
+title: "Referencias"
+---
+
+# Referencias
+
+## Documentación Oficial
+
+- **Angular**: https://angular.dev
+- **React Native**: https://reactnative.dev
+- **Flask**: https://flask.palletsprojects.com
+- **MySQL**: https://dev.mysql.com/doc/
+- **Google Maps API**: https://developers.google.com/maps
+- **Quarto**: https://quarto.org
+
+## Repositorio del Proyecto
+
+- **GitHub**: https://github.com/cesar050/Campeonato
+
+## Tecnologías Utilizadas
+
+- Angular 21.0.0 - Framework web
+- React Native 0.83.1 - Framework móvil
+- Flask 3.0.0 - Framework backend
+- Python 3.12 - Lenguaje backend
+- MySQL 8.0 - Base de datos
+- TypeScript 5.9.2 - Lenguaje frontend
+- SQLAlchemy 3.1.1 - ORM
+- Flask-JWT-Extended 4.6.0 - Autenticación JWT
+- react-native-maps 1.26.20 - Integración Google Maps
+- @react-native-community/voice 1.1.9 - Reconocimiento de voz
+
+## Modelo C4
+
+- **Structurizr**: https://structurizr.com
+- **Documentación C4 Model**: https://c4model.com

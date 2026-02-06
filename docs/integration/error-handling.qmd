@@ -1,0 +1,20 @@
+---
+title: "Manejo de Errores"
+---
+
+# Manejo de Errores
+
+## Códigos HTTP
+
+| Código | Manejo |
+|--------|--------|
+| 200 | Procesar datos |
+| 400 | "Datos inválidos" |
+| 404 | "Recurso no encontrado" + navegar atrás |
+| 500 | "Error del servidor" |
+| TIMEOUT | "Tiempo agotado" + botón reintentar |
+| NO RESPONSE | "Sin conexión" + botón reintentar |
+
+## Estados Vacíos
+
+Mensajes informativos cuando no hay datos.

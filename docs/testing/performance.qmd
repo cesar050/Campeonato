@@ -1,0 +1,17 @@
+---
+title: "Rendimiento"
+---
+
+# Rendimiento
+
+## Métricas
+
+| Endpoint | Tiempo Promedio |
+|----------|----------------|
+| GET /campeonatos | ~150ms |
+| GET /campeonatos/{id} | ~180ms |
+| GET /estadisticas/tabla-posiciones | ~200ms |
+| GET /partidos | ~170ms |
+| GET /inscripciones/campeonato/{id} | ~250ms |
+
+Todos los endpoints responden en menos de 300ms.

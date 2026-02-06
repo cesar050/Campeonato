@@ -15,8 +15,10 @@ export interface VoiceCommand {
     
     console.log('🎤 Procesando comando:', lowerText);
   
-    // 1. Detectar "mañana"
-    if (lowerText.includes('manana') || lowerText.includes('mañana')) {
+    // 1. Detectar "mañana" y variaciones
+    if (lowerText.includes('manana') || lowerText.includes('mañana') || 
+        lowerText.includes('pasado manana') || lowerText.includes('pasado mañana') ||
+        lowerText.includes('el manana') || lowerText.includes('el mañana')) {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       return {
@@ -26,8 +28,11 @@ export interface VoiceCommand {
       };
     }
   
-    // 2. Detectar "hoy"
-    if (lowerText.includes('hoy')) {
+    // 2. Detectar "hoy" y variaciones
+    if (lowerText.includes('hoy') || lowerText.includes('este dia') || 
+        lowerText.includes('este día') || lowerText.includes('el dia de hoy') ||
+        lowerText.includes('el día de hoy') || lowerText.includes('partidos de hoy') ||
+        lowerText.includes('juegos de hoy') || lowerText.includes('encuentros de hoy')) {
       return {
         action: 'filter_by_date',
         params: { date: new Date(), dateRange: 'today' },
@@ -35,10 +40,14 @@ export interface VoiceCommand {
       };
     }
   
-    // 3. Detectar "próxima fecha" o "siguiente fecha"
-    if (lowerText.includes('proxima fecha') || 
-        lowerText.includes('siguiente fecha') ||
-        lowerText.includes('proxima jornada')) {
+    // 3. Detectar "próxima fecha" o "siguiente fecha" y variaciones
+    if (lowerText.includes('proxima fecha') || lowerText.includes('próxima fecha') ||
+        lowerText.includes('siguiente fecha') || lowerText.includes('proxima jornada') ||
+        lowerText.includes('próxima jornada') || lowerText.includes('siguiente jornada') ||
+        lowerText.includes('proximo partido') || lowerText.includes('próximo partido') ||
+        lowerText.includes('siguiente partido') || lowerText.includes('proximos partidos') ||
+        lowerText.includes('próximos partidos') || lowerText.includes('siguientes partidos') ||
+        lowerText.includes('proximo encuentro') || lowerText.includes('próximo encuentro')) {
       return {
         action: 'filter_by_date',
         params: { dateRange: 'next' },
@@ -46,10 +55,14 @@ export interface VoiceCommand {
       };
     }
   
-    // 4. Detectar "última fecha" o "fecha anterior"
-    if (lowerText.includes('ultima fecha') || 
-        lowerText.includes('fecha anterior') ||
-        lowerText.includes('ultima jornada')) {
+    // 4. Detectar "última fecha" o "fecha anterior" y variaciones
+    if (lowerText.includes('ultima fecha') || lowerText.includes('última fecha') ||
+        lowerText.includes('fecha anterior') || lowerText.includes('ultima jornada') ||
+        lowerText.includes('última jornada') || lowerText.includes('jornada anterior') ||
+        lowerText.includes('ultimo partido') || lowerText.includes('último partido') ||
+        lowerText.includes('partido anterior') || lowerText.includes('ultimos partidos') ||
+        lowerText.includes('últimos partidos') || lowerText.includes('partidos anteriores') ||
+        lowerText.includes('ultimo encuentro') || lowerText.includes('último encuentro')) {
       return {
         action: 'filter_by_date',
         params: { dateRange: 'previous' },
@@ -57,7 +70,7 @@ export interface VoiceCommand {
       };
     }
   
-    // 5. Detectar "últimos X partidos de [equipo]"
+    // 5. Detectar "últimos X partidos de [equipo]" y variaciones
     const lastMatchesRegex = /ultimos?\s+(\d+)\s+partidos?\s+de\s+(.+)/i;
     const lastMatchesMatch = lowerText.match(lastMatchesRegex);
     if (lastMatchesMatch) {
@@ -70,27 +83,98 @@ export interface VoiceCommand {
       };
     }
   
-    // 6. Detectar "partidos de [equipo]"
-    const teamRegex = /partidos?\s+de\s+(.+)/i;
+    // 6. Detectar "partidos de [equipo]" y variaciones
+    const teamRegex = /(?:partidos?|juegos?|encuentros?|equipo)\s+(?:de|del|de la|del equipo)\s+(.+)/i;
     const teamMatch = lowerText.match(teamRegex);
     if (teamMatch) {
       const teamName = teamMatch[1].trim();
+      // Limpiar palabras comunes al final
+      const cleanedName = teamName.replace(/\s+(partidos?|juegos?|encuentros?)$/i, '').trim();
       return {
         action: 'filter_by_team',
-        params: { teamName },
+        params: { teamName: cleanedName },
         originalText: text,
       };
     }
+    
+    // 6b. Detectar solo nombre de equipo (sin "partidos de")
+    // Buscar palabras que puedan ser nombres de equipos (más de 2 caracteres)
+    const words = lowerText.split(/\s+/).filter(w => w.length > 2);
+    if (words.length > 0) {
+      // Si no coincide con ninguna palabra clave, podría ser un nombre de equipo
+      const keywords = ['hoy', 'manana', 'mañana', 'proxima', 'próxima', 'siguiente', 
+                       'ultima', 'última', 'anterior', 'todos', 'todo', 'mostrar', 'ver',
+                       'partidos', 'juegos', 'encuentros', 'equipo', 'equipos'];
+      const isKeyword = words.some(w => keywords.some(k => w.includes(k) || k.includes(w)));
+      if (!isKeyword && words.length <= 3) {
+        // Podría ser un nombre de equipo
+        const possibleTeamName = words.join(' ');
+        return {
+          action: 'filter_by_team',
+          params: { teamName: possibleTeamName },
+          originalText: text,
+        };
+      }
+    }
   
-    // 7. Detectar "mostrar todos" o "todos los partidos"
-    if (lowerText.includes('todos') || 
-        lowerText.includes('mostrar todo') ||
-        lowerText.includes('ver todo')) {
+    // 7. Detectar "mostrar todos" o "todos los partidos" y variaciones
+    if (lowerText.includes('todos') || lowerText.includes('todo') ||
+        lowerText.includes('mostrar todo') || lowerText.includes('ver todo') ||
+        lowerText.includes('todos los partidos') || lowerText.includes('todos los juegos') ||
+        lowerText.includes('todos los encuentros') || lowerText.includes('mostrar todos') ||
+        lowerText.includes('ver todos') || lowerText.includes('sin filtro') ||
+        lowerText.includes('quitar filtro') || lowerText.includes('limpiar filtro') ||
+        lowerText.includes('resetear') || lowerText.includes('reiniciar')) {
       return {
         action: 'show_all',
         params: {},
         originalText: text,
       };
+    }
+    
+    // 8. Detectar "en vivo" o "partidos en vivo"
+    if (lowerText.includes('en vivo') || lowerText.includes('partidos en vivo') ||
+        lowerText.includes('juegos en vivo') || lowerText.includes('encuentros en vivo') ||
+        lowerText.includes('ahora') || lowerText.includes('jugando ahora') ||
+        lowerText.includes('en este momento')) {
+      return {
+        action: 'filter_by_date',
+        params: { dateRange: 'today' },
+        originalText: text,
+      };
+    }
+    
+    // 9. Detectar "finalizados" o "partidos finalizados"
+    if (lowerText.includes('finalizados') || lowerText.includes('terminados') ||
+        lowerText.includes('partidos finalizados') || lowerText.includes('juegos finalizados') ||
+        lowerText.includes('ya jugados') || lowerText.includes('completados')) {
+      return {
+        action: 'filter_by_date',
+        params: { dateRange: 'previous' },
+        originalText: text,
+      };
+    }
+    
+    // 10. Detectar días de la semana
+    const daysOfWeek: { [key: string]: number } = {
+      'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3, 'jueves': 4,
+      'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0
+    };
+    
+    for (const [dayName, dayOffset] of Object.entries(daysOfWeek)) {
+      if (lowerText.includes(dayName)) {
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        let daysToAdd = dayOffset - dayOfWeek;
+        if (daysToAdd < 0) daysToAdd += 7; // Si ya pasó, buscar el próximo
+        const targetDate = new Date(today);
+        targetDate.setDate(today.getDate() + daysToAdd);
+        return {
+          action: 'filter_by_date',
+          params: { date: targetDate, dateRange: 'today' },
+          originalText: text,
+        };
+      }
     }
   
     // Si no se detecta ningún patrón conocido

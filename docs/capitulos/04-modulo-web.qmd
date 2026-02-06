@@ -1,0 +1,57 @@
+---
+title: "Módulo Web (Angular)"
+---
+
+# Módulo Web (Angular)
+
+## Estructura de Módulos
+
+La aplicación Angular está organizada en módulos por feature con lazy loading:
+
+```
+features/
+├── auth/              # Autenticación (login, registro)
+├── superadmin/        # Dashboard y gestión de organizadores
+├── organizador/       # Gestión de campeonatos, equipos, partidos
+├── lider-equipo/      # Gestión de equipos, jugadores, alineaciones
+└── dashboard/         # Dashboard principal
+```
+
+## Autenticación y Seguridad
+
+El sistema implementa autenticación JWT con guards e interceptors:
+
+```typescript
+// Auth Interceptor - Inyección automática de token
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = authService.getAccessToken();
+  if (token) {
+    req = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+  }
+  return next(req);
+};
+```
+
+**Guards implementados:**
+- `AuthGuard`: Verifica autenticación
+- `SuperadminGuard`: Valida rol superadmin
+- `OrganizadorGuard`: Valida rol admin/superadmin
+- `LiderGuard`: Valida rol lider
+
+## Módulos por Rol
+
+| Rol | Módulo | Funcionalidades Principales |
+|-----|--------|----------------------------|
+| **Superadmin** | `superadmin/` | Gestión de usuarios, supervisión global, configuración |
+| **Organizador** | `organizador/` | Crear campeonatos, aprobar equipos, programar partidos, registrar resultados |
+| **Líder** | `lider-equipo/` | Gestionar equipo, definir alineaciones con drag & drop, ver estadísticas |
+
+## Características Principales
+
+- **Lazy Loading**: Módulos cargados bajo demanda
+- **Guards de Seguridad**: Protección de rutas por rol
+- **Interceptors HTTP**: Inyección automática de tokens JWT
+- **Componentes Reutilizables**: Shared components para UI común
+- **Formularios Reactivos**: Validación en tiempo real con Angular Forms

@@ -1,0 +1,12 @@
+---
+title: "Pruebas de Integración"
+---
+
+# Pruebas de Integración
+
+## Pruebas App Móvil - Backend
+
+- Carga de campeonatos: < 200ms
+- Manejo de errores: Alertas informativas
+- Mapa de estadios: Marcadores visibles
+- Búsqueda por voz: Reconocimiento correcto

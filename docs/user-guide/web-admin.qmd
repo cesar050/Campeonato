@@ -1,0 +1,17 @@
+---
+title: "Guía de Usuario - Administrador Web"
+---
+
+# Guía de Usuario - Administrador Web
+
+## Acceso
+
+1. Abrir: http://localhost:4200
+2. Iniciar sesión con credenciales de admin
+
+## Funcionalidades
+
+- Gestión de campeonatos
+- Gestión de equipos
+- Gestión de partidos
+- Visualización de estadísticas

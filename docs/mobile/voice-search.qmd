@@ -1,0 +1,25 @@
+---
+title: "Búsqueda por Voz"
+---
+
+# Búsqueda por Voz
+
+## Tecnología
+
+- @react-native-community/voice 1.1.9
+- Idioma: Español (es-ES)
+- Reconocimiento local
+
+## Comandos Soportados
+
+- "Partidos de hoy"
+- "Partidos de mañana"
+- "Partidos de [equipo]"
+- "Mostrar todos los partidos"
+
+## Implementación
+
+Componente `VoiceSearchButton` que:
+1. Captura voz del usuario
+2. Procesa comando con `voiceCommandProcessor`
+3. Filtra partidos según comando

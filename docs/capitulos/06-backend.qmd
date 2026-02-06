@@ -1,0 +1,118 @@
+---
+title: "Backend (API Gateway + Microservicio)"
+---
+
+# Backend (API Gateway + Microservicio)
+
+## Endpoints REST Principales
+
+| Método | URL | Descripción | Autenticación |
+|--------|-----|-------------|---------------|
+| POST | `/auth/login` | Iniciar sesión | No |
+| POST | `/auth/register` | Registrar usuario | No |
+| GET | `/campeonatos` | Listar campeonatos | Opcional |
+| GET | `/campeonatos/{id}` | Detalle de campeonato | No |
+| POST | `/campeonatos` | Crear campeonato | Admin |
+| GET | `/partidos` | Listar partidos | No |
+| GET | `/estadisticas/tabla-posiciones` | Tabla de posiciones | No |
+| GET | `/inscripciones/campeonato/{id}` | Inscripciones con GPS | No |
+| POST | `/lider/alineaciones/definir` | Definir alineación | Líder |
+| GET | `/organizador/partidos/{id}/alineaciones` | Ver alineaciones | Organizador |
+| POST | `/partidos/{id}/resultado` | Registrar resultado | Organizador |
+
+## Autenticación JWT
+
+El sistema utiliza JWT tokens con refresh tokens:
+
+**Flujo de Autenticación:**
+1. Cliente envía credenciales a `POST /auth/login`
+2. API Gateway valida y retorna `access_token` (15min) + `refresh_token` (30días)
+3. Cliente usa `access_token` en header `Authorization: Bearer {token}`
+4. Si `access_token` expira, cliente usa `refresh_token` en `POST /auth/refresh`
+5. API Gateway retorna nuevo `access_token`
+
+**Características:**
+- Access token válido 15 minutos
+- Refresh token válido 30 días
+- Tokens almacenados en memoria (móvil) o localStorage (web)
+
+## Microservicio de Alineaciones
+
+El API Gateway actúa como **proxy** hacia el microservicio:
+
+**Flujo:**
+```
+Frontend → API Gateway Proxy → Validaciones → Microservicio → Respuesta
+```
+
+**Validaciones del Proxy:**
+1. Autenticación JWT
+2. Validación de rol (lider/organizador)
+3. Validación de que el equipo participa en el partido
+4. Validación de que el usuario es líder del equipo
+
+**Endpoints del Proxy:**
+- `POST /lider/alineaciones/definir` - Definir alineación completa
+- `GET /lider/alineaciones` - Obtener alineaciones
+- `GET /organizador/partidos/{id}/alineaciones` - Ver alineaciones de ambos equipos
+
+## Modelos de Base de Datos
+
+**Modelos principales:**
+
+- **Usuario**: id_usuario, email, contrasena (hashed), rol
+- **Campeonato**: id_campeonato, nombre, estado, fechas, creado_por
+- **Equipo**: id_equipo, nombre, estadio_latitud, estadio_longitud, id_lider
+- **Partido**: id_partido, id_campeonato, equipos, fecha, estado, goles
+- **Alineacion**: id_alineacion, id_partido, id_jugador, titular, posicion_x, posicion_y
+
+**Relaciones:**
+- Usuario 1:N Campeonato (creado_por)
+- Campeonato 1:N Partido
+- Equipo 1:N Jugador
+- Partido 1:N Alineacion
+
+## Ejemplos Request/Response
+
+::: {.callout-note}
+## Ejemplo: Obtener Campeonatos
+
+**Request:**
+```http
+GET /campeonatos?estado=activo
+```
+
+**Response:**
+```json
+{
+  "campeonatos": [{
+    "id_campeonato": 4,
+    "nombre": "La liga negreira",
+    "estado": "activo",
+    "total_equipos_inscritos": 4
+  }]
+}
+```
+:::
+
+::: {.callout-note}
+## Ejemplo: Inscripciones con GPS
+
+**Request:**
+```http
+GET /inscripciones/campeonato/4?estado=aprobado
+```
+
+**Response:**
+```json
+{
+  "inscripciones": [{
+    "equipo": {
+      "nombre": "Sin Camiseta FC",
+      "estadio_latitud": -4.0076,
+      "estadio_longitud": -79.2047
+    }
+  }]
+}
+```
+:::

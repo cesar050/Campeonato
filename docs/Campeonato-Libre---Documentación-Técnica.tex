@@ -1,0 +1,3182 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  spanish,
+  11pt,
+  letterpaper,
+]{book}
+\usepackage{xcolor}
+\usepackage[top=30mm,left=20mm,heightrounded]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{setspace}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\usepackage{float}
+\floatplacement{figure}{H}
+\makeatletter
+\@ifpackageloaded{bookmark}{}{\usepackage{bookmark}}
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Tabla de contenidos}
+\else
+  \newcommand\contentsname{Tabla de contenidos}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{Listado de Figuras}
+\else
+  \newcommand\listfigurename{Listado de Figuras}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{Listado de Tablas}
+\else
+  \newcommand\listtablename{Listado de Tablas}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figura}
+\else
+  \newcommand\figurename{Figura}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Tabla}
+\else
+  \newcommand\tablename{Tabla}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listado}
+\newcommand*\listoflistings{\listof{codelisting}{Listado de Listados}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Campeonato Libre - Documentación Técnica},
+  pdfauthor={Cesar Ramos},
+  pdflang={es},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Campeonato Libre - Documentación Técnica}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Sistema Multiplataforma de Gestión de Campeonatos}
+\author{Cesar Ramos}
+\date{2026-02-04}
+\begin{document}
+\frontmatter
+\maketitle
+
+
+\setstretch{1.2}
+\mainmatter
+\bookmarksetup{startatroot}
+
+\chapter{Campeonato Libre}\label{campeonato-libre}
+
+Sistema Multiplataforma de Gestión de Campeonatos de Fútbol
+
+\hfill\break
+
+\bookmarksetup{startatroot}
+
+\chapter{Bienvenido a la Documentación
+Técnica}\label{bienvenido-a-la-documentaciuxf3n-tuxe9cnica}
+
+\section{Resumen Ejecutivo}\label{resumen-ejecutivo}
+
+\textbf{Campeonato Libre} es un sistema multiplataforma completo para la
+gestión integral de campeonatos de fútbol, diseñado para satisfacer las
+necesidades de diferentes tipos de usuarios: administradores,
+organizadores, líderes de equipos y espectadores.
+
+\section{Componentes del Sistema}\label{componentes-del-sistema}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Frontend Web (Angular 21)}: Aplicación web administrativa con
+  roles diferenciados
+\item
+  \textbf{Backend API Gateway (Flask 3.0)}: API REST centralizada con
+  autenticación JWT
+\item
+  \textbf{Aplicación Móvil (React Native 0.83.1)}: App para espectadores
+  con funcionalidades avanzadas
+\item
+  \textbf{Microservicio de Alineaciones (Flask)}: Servicio especializado
+  para gestión de alineaciones
+\end{enumerate}
+
+\section{Tecnologías Utilizadas}\label{tecnologuxedas-utilizadas}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Backend}: Flask 3.0 + Python 3.12, MySQL 8.0
+\item
+  \textbf{Frontend Web}: Angular 21, TypeScript, Angular Material
+\item
+  \textbf{App Móvil}: React Native 0.83.1, TypeScript, Google Maps,
+  Voice Recognition
+\item
+  \textbf{Base de Datos}: MySQL 8.0 con coordenadas GPS
+\end{itemize}
+
+\section{Información del Proyecto}\label{informaciuxf3n-del-proyecto}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Repositorio}: https://github.com/cesar050/Campeonato
+\item
+  \textbf{URL Backend}: http://10.20.139.22:5000
+\item
+  \textbf{URL Frontend Web}: http://localhost:4200
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\textbf{Última actualización}: \texttt{r\ Sys.Date()}
+
+\part{Arquitectura}
+
+\chapter{Visión General de la
+Arquitectura}\label{visiuxf3n-general-de-la-arquitectura}
+
+\chapter{Visión General de la
+Arquitectura}\label{visiuxf3n-general-de-la-arquitectura-1}
+
+\section{Introducción}\label{introducciuxf3n}
+
+El sistema \textbf{Campeonato Libre} está diseñado siguiendo una
+arquitectura de microservicios con un API Gateway central. Esta
+arquitectura permite escalabilidad, mantenibilidad y separación de
+responsabilidades entre los diferentes componentes del sistema.
+
+\section{Principios
+Arquitectónicos}\label{principios-arquitectuxf3nicos}
+
+\subsection{1. Separación de
+Responsabilidades}\label{separaciuxf3n-de-responsabilidades}
+
+Cada componente del sistema tiene una responsabilidad específica y bien
+definida:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Frontend Web}: Interfaz de usuario para administradores y
+  organizadores
+\item
+  \textbf{API Gateway}: Punto de entrada único, autenticación y
+  enrutamiento
+\item
+  \textbf{Microservicio de Alineaciones}: Lógica especializada para
+  gestión de alineaciones
+\item
+  \textbf{Base de Datos}: Almacenamiento persistente de datos
+\item
+  \textbf{App Móvil}: Interfaz para espectadores con funcionalidades
+  específicas
+\end{itemize}
+
+\subsection{2. API-First Design}\label{api-first-design}
+
+El sistema está diseñado con un enfoque API-first, donde:
+
+\begin{itemize}
+\tightlist
+\item
+  Todos los componentes se comunican a través de APIs REST
+\item
+  La documentación de la API se genera automáticamente (Swagger)
+\item
+  Los contratos de API están bien definidos y versionados
+\end{itemize}
+
+\subsection{3. Seguridad por Capas}\label{seguridad-por-capas}
+
+La seguridad se implementa en múltiples capas:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Autenticación}: JWT tokens con refresh tokens
+\item
+  \textbf{Autorización}: Sistema de roles y permisos granular
+\item
+  \textbf{Rate Limiting}: Protección contra abuso de API
+\item
+  \textbf{Account Lockout}: Protección contra ataques de fuerza bruta
+\item
+  \textbf{Validación de Entrada}: Sanitización y validación de datos
+\end{itemize}
+
+\subsection{4. Escalabilidad Horizontal}\label{escalabilidad-horizontal}
+
+La arquitectura permite escalar componentes individuales según la
+demanda:
+
+\begin{itemize}
+\tightlist
+\item
+  El API Gateway puede escalarse independientemente
+\item
+  El microservicio de alineaciones puede escalarse por separado
+\item
+  La base de datos puede replicarse para lectura
+\end{itemize}
+
+\section{Componentes del Sistema}\label{componentes-del-sistema-1}
+
+\subsection{Frontend Web (Angular 21)}\label{frontend-web-angular-21}
+
+\textbf{Responsabilidades:} - Interfaz de usuario para administradores -
+Gestión de campeonatos, equipos y jugadores - Visualización de
+estadísticas y reportes - Sistema de notificaciones
+
+\textbf{Tecnologías:} - Angular 21 con TypeScript - Angular Material
+para componentes UI - RxJS para manejo de estado reactivo - Guards para
+protección de rutas
+
+\subsection{API Gateway (Flask)}\label{api-gateway-flask}
+
+\textbf{Responsabilidades:} - Punto de entrada único para todas las
+peticiones - Autenticación y autorización centralizada - Enrutamiento a
+servicios backend - Rate limiting y protección de seguridad - Manejo de
+archivos (logos, fotos)
+
+\textbf{Tecnologías:} - Flask 3.1.0 con Python 3.12 - Flask-RESTx para
+documentación API - Flask-JWT-Extended para autenticación - Flask-CORS
+para CORS - SQLAlchemy para ORM
+
+\subsection{Microservicio de
+Alineaciones}\label{microservicio-de-alineaciones}
+
+\textbf{Responsabilidades:} - Gestión especializada de alineaciones de
+partidos - Validación de reglas de negocio para alineaciones -
+Procesamiento de eventos de partidos
+
+\textbf{Tecnologías:} - Flask (microservicio independiente) -
+Comunicación REST con API Gateway
+
+\subsection{Base de Datos (MySQL 8.0)}\label{base-de-datos-mysql-8.0}
+
+\textbf{Responsabilidades:} - Almacenamiento persistente de datos -
+Coordenadas GPS para estadios - Relaciones entre entidades - Integridad
+referencial
+
+\textbf{Características:} - MySQL 8.0 - Coordenadas geográficas
+(latitud/longitud) - Índices optimizados para consultas frecuentes -
+Backup automático
+
+\subsection{Aplicación Móvil (React
+Native)}\label{aplicaciuxf3n-muxf3vil-react-native}
+
+\textbf{Responsabilidades:} - Interfaz para espectadores - Visualización
+de campeonatos y partidos - Integración con Google Maps - Búsqueda por
+voz - Consumo de API REST
+
+\textbf{Tecnologías:} - React Native 0.83.1 - TypeScript -
+react-native-maps para mapas - @react-native-community/voice para
+reconocimiento de voz - Axios para peticiones HTTP
+
+\section{Flujo de Datos}\label{flujo-de-datos}
+
+\subsection{Flujo de Autenticación}\label{flujo-de-autenticaciuxf3n}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sequenceDiagram}
+\NormalTok{    participant U as Usuario}
+\NormalTok{    participant F as Frontend Web}
+\NormalTok{    participant A as API Gateway}
+\NormalTok{    participant D as Base de Datos}
+    
+\NormalTok{    U{-}\textgreater{}\textgreater{}F: Login (email, password)}
+\NormalTok{    F{-}\textgreater{}\textgreater{}A: POST /auth/login}
+\NormalTok{    A{-}\textgreater{}\textgreater{}D: Validar credenciales}
+\NormalTok{    D{-}{-}\textgreater{}\textgreater{}A: Usuario válido}
+\NormalTok{    A{-}\textgreater{}\textgreater{}A: Generar JWT tokens}
+\NormalTok{    A{-}{-}\textgreater{}\textgreater{}F: Access token + Refresh token}
+\NormalTok{    F{-}{-}\textgreater{}\textgreater{}U: Guardar tokens}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Flujo de Consulta de
+Datos}\label{flujo-de-consulta-de-datos}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sequenceDiagram}
+\NormalTok{    participant M as App Móvil}
+\NormalTok{    participant A as API Gateway}
+\NormalTok{    participant D as Base de Datos}
+    
+\NormalTok{    M{-}\textgreater{}\textgreater{}A: GET /campeonatos (con JWT)}
+\NormalTok{    A{-}\textgreater{}\textgreater{}A: Validar token JWT}
+\NormalTok{    A{-}\textgreater{}\textgreater{}D: Consultar campeonatos}
+\NormalTok{    D{-}{-}\textgreater{}\textgreater{}A: Datos de campeonatos}
+\NormalTok{    A{-}{-}\textgreater{}\textgreater{}M: JSON response}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Flujo de Microservicio}\label{flujo-de-microservicio}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sequenceDiagram}
+\NormalTok{    participant F as Frontend Web}
+\NormalTok{    participant A as API Gateway}
+\NormalTok{    participant MS as Microservicio Alineaciones}
+\NormalTok{    participant D as Base de Datos}
+    
+\NormalTok{    F{-}\textgreater{}\textgreater{}A: POST /alineaciones}
+\NormalTok{    A{-}\textgreater{}\textgreater{}A: Validar autenticación}
+\NormalTok{    A{-}\textgreater{}\textgreater{}MS: Proxy request}
+\NormalTok{    MS{-}\textgreater{}\textgreater{}D: Consultar datos}
+\NormalTok{    D{-}{-}\textgreater{}\textgreater{}MS: Datos}
+\NormalTok{    MS{-}{-}\textgreater{}\textgreater{}A: Respuesta procesada}
+\NormalTok{    A{-}{-}\textgreater{}\textgreater{}F: JSON response}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Patrones Arquitectónicos}\label{patrones-arquitectuxf3nicos}
+
+\subsection{1. API Gateway Pattern}\label{api-gateway-pattern}
+
+El API Gateway actúa como punto de entrada único, proporcionando:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Unificación}: Un solo punto de acceso para todos los clientes
+\item
+  \textbf{Seguridad}: Autenticación y autorización centralizada
+\item
+  \textbf{Enrutamiento}: Distribución de peticiones a servicios backend
+\item
+  \textbf{Transformación}: Adaptación de respuestas según el cliente
+\end{itemize}
+
+\subsection{2. Microservicios}\label{microservicios}
+
+El microservicio de alineaciones demuestra:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Separación de Responsabilidades}: Lógica especializada aislada
+\item
+  \textbf{Escalabilidad Independiente}: Puede escalarse según demanda
+\item
+  \textbf{Tecnología Específica}: Puede usar tecnologías optimizadas
+\end{itemize}
+
+\subsection{3. Repository Pattern}\label{repository-pattern}
+
+En el backend se utiliza el patrón Repository para:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Abstracción de Datos}: Separar lógica de negocio de acceso a
+  datos
+\item
+  \textbf{Testabilidad}: Facilita pruebas unitarias
+\item
+  \textbf{Mantenibilidad}: Cambios en BD no afectan lógica de negocio
+\end{itemize}
+
+\subsection{4. MVC
+(Model-View-Controller)}\label{mvc-model-view-controller}
+
+En el frontend Angular:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Model}: Servicios y modelos de datos
+\item
+  \textbf{View}: Componentes y templates
+\item
+  \textbf{Controller}: Lógica de componentes y servicios
+\end{itemize}
+
+\section{Decisiones
+Arquitectónicas}\label{decisiones-arquitectuxf3nicas}
+
+\subsection{Decisión 1: API Gateway
+Centralizado}\label{decisiuxf3n-1-api-gateway-centralizado}
+
+\textbf{Justificación:} - Simplifica la gestión de autenticación -
+Centraliza políticas de seguridad - Facilita el monitoreo y logging
+
+\textbf{Alternativas Consideradas:} - Autenticación distribuida en cada
+servicio - Descartada por complejidad de gestión
+
+\subsection{Decisión 2: JWT para
+Autenticación}\label{decisiuxf3n-2-jwt-para-autenticaciuxf3n}
+
+\textbf{Justificación:} - Stateless: No requiere sesiones en servidor -
+Escalable: Funciona bien en arquitectura distribuida - Seguro: Firmado y
+con expiración
+
+\textbf{Alternativas Consideradas:} - Sesiones tradicionales - OAuth 2.0
+- Descartadas por complejidad o limitaciones
+
+\subsection{Decisión 3: MySQL para Base de
+Datos}\label{decisiuxf3n-3-mysql-para-base-de-datos}
+
+\textbf{Justificación:} - Relacional: Perfecto para datos estructurados
+- Maduro: Amplia comunidad y documentación - Soporte Geográfico:
+Coordenadas GPS nativas
+
+\textbf{Alternativas Consideradas:} - PostgreSQL - MongoDB - Descartadas
+por requerimientos específicos
+
+\subsection{Decisión 4: React Native para App
+Móvil}\label{decisiuxf3n-4-react-native-para-app-muxf3vil}
+
+\textbf{Justificación:} - Multiplataforma: Un solo código para Android e
+iOS - Performance: Código nativo para operaciones críticas - Ecosistema:
+Amplia comunidad y librerías
+
+\textbf{Alternativas Consideradas:} - Flutter - Nativas (Kotlin/Swift) -
+Descartadas por tiempo de desarrollo o curva de aprendizaje
+
+\section{Escalabilidad}\label{escalabilidad}
+
+\subsection{Escalabilidad Vertical}\label{escalabilidad-vertical}
+
+\begin{itemize}
+\tightlist
+\item
+  Aumentar recursos (CPU, RAM) de servidores existentes
+\item
+  Aplicable a: API Gateway, Base de Datos
+\end{itemize}
+
+\subsection{Escalabilidad Horizontal}\label{escalabilidad-horizontal-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Agregar más instancias de servicios
+\item
+  Aplicable a: API Gateway, Microservicio de Alineaciones
+\item
+  Requiere: Load balancer, sesiones stateless
+\end{itemize}
+
+\subsection{Estrategias de Caché}\label{estrategias-de-cachuxe9}
+
+\begin{itemize}
+\tightlist
+\item
+  Caché de consultas frecuentes (tabla de posiciones)
+\item
+  Caché de tokens JWT validados
+\item
+  CDN para archivos estáticos (logos, fotos)
+\end{itemize}
+
+\section{Seguridad}\label{seguridad}
+
+\subsection{Capas de Seguridad}\label{capas-de-seguridad}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Red}: Firewall, VPN (si aplica)
+\item
+  \textbf{Aplicación}: Autenticación, autorización, validación
+\item
+  \textbf{Datos}: Encriptación en tránsito (HTTPS), en reposo (opcional)
+\item
+  \textbf{Código}: Sanitización de entrada, protección SQL injection
+\end{enumerate}
+
+\subsection{Medidas Implementadas}\label{medidas-implementadas}
+
+\begin{itemize}
+\tightlist
+\item
+  ✅ Autenticación JWT con refresh tokens
+\item
+  ✅ Rate limiting por IP y usuario
+\item
+  ✅ Account lockout después de intentos fallidos
+\item
+  ✅ Validación y sanitización de entrada
+\item
+  ✅ CORS configurado correctamente
+\item
+  ✅ Passwords hasheados con bcrypt
+\end{itemize}
+
+\section{Monitoreo y Logging}\label{monitoreo-y-logging}
+
+\subsection{Logging}\label{logging}
+
+\begin{itemize}
+\tightlist
+\item
+  Logs de autenticación (éxitos y fallos)
+\item
+  Logs de operaciones críticas
+\item
+  Logs de errores con stack traces
+\item
+  Logs de seguridad (intentos de acceso no autorizado)
+\end{itemize}
+
+\subsection{Métricas}\label{muxe9tricas}
+
+\begin{itemize}
+\tightlist
+\item
+  Tiempo de respuesta de endpoints
+\item
+  Tasa de error por endpoint
+\item
+  Uso de recursos (CPU, memoria)
+\item
+  Número de usuarios activos
+\end{itemize}
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos}
+
+Para profundizar en la arquitectura, consulte:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{c4-context.qmd}{Diagrama de Contexto C4}
+\item
+  \href{c4-containers.qmd}{Diagrama de Contenedores C4}
+\item
+  \href{c4-components.qmd}{Diagrama de Componentes C4}
+\end{itemize}
+
+\chapter{Diagrama de Contexto C4 - Nivel
+1}\label{diagrama-de-contexto-c4---nivel-1}
+
+\chapter{Diagrama de Contexto C4 - Nivel
+1}\label{diagrama-de-contexto-c4---nivel-1-1}
+
+\section{Introducción}\label{introducciuxf3n-1}
+
+El diagrama de contexto C4 muestra el sistema en su contexto más amplio,
+identificando las personas y sistemas externos que interactúan con él.
+
+\section{Diagrama de Contexto}\label{diagrama-de-contexto}
+
+\section{Actores del Sistema}\label{actores-del-sistema}
+
+\subsection{Usuarios Humanos}\label{usuarios-humanos}
+
+\subsubsection{1. Superadmin}\label{superadmin}
+
+\textbf{Descripción:} Administrador del sistema con acceso completo.
+Puede gestionar todos los aspectos del sistema, incluyendo usuarios,
+campeonatos y configuraciones globales.
+
+\textbf{Interacciones:} - Accede al sistema a través del Frontend Web -
+Gestiona usuarios y roles - Configura parámetros globales del sistema -
+Supervisa el funcionamiento general
+
+\textbf{Tecnología de Acceso:} - Navegador web (Chrome, Firefox, Edge) -
+Frontend Web Angular (Puerto 4200)
+
+\subsubsection{2. Organizador}\label{organizador}
+
+\textbf{Descripción:} Crea y gestiona campeonatos, aprueba equipos y
+registra eventos.
+
+\textbf{Interacciones:} - Accede al sistema a través del Frontend Web -
+Crea y gestiona campeonatos - Aprueba/rechaza inscripciones de equipos -
+Programa partidos y registra resultados - Visualiza estadísticas y
+reportes
+
+\textbf{Tecnología de Acceso:} - Navegador web - Frontend Web Angular
+
+\subsubsection{3. Líder de Equipo}\label{luxedder-de-equipo}
+
+\textbf{Descripción:} Gestiona equipos, jugadores y define alineaciones.
+
+\textbf{Interacciones:} - Accede al sistema a través del Frontend Web -
+Gestiona información de su equipo - Inscribe jugadores - Define
+alineaciones con posicionamiento - Visualiza estadísticas de su equipo -
+Solicita inscripción a campeonatos
+
+\textbf{Tecnología de Acceso:} - Navegador web - Frontend Web Angular
+
+\subsubsection{4. Espectador}\label{espectador}
+
+\textbf{Descripción:} Consulta información pública de campeonatos (solo
+móvil).
+
+\textbf{Interacciones:} - Accede al sistema a través de la App Móvil -
+Visualiza campeonatos activos - Consulta tabla de posiciones - Ve
+calendario de partidos - Usa mapa de estadios - Realiza búsquedas por
+voz
+
+\textbf{Tecnología de Acceso:} - Dispositivo móvil Android - App React
+Native
+
+\subsection{Sistemas Externos}\label{sistemas-externos}
+
+\subsubsection{1. Google Maps API}\label{google-maps-api}
+
+\textbf{Descripción:} Proporciona mapas interactivos y geocodificación.
+
+\textbf{Interacciones:} - La App Móvil consume la API para mostrar mapas
+- Se utilizan marcadores personalizados para estadios - Integración con
+Google Maps nativo para navegación
+
+\textbf{Tecnología:} - API REST de Google Maps - react-native-maps como
+wrapper
+
+\textbf{Datos Intercambiados:} - Coordenadas GPS (latitud, longitud) -
+Marcadores personalizados - Rutas de navegación
+
+\subsubsection{2. Google Speech API}\label{google-speech-api}
+
+\textbf{Descripción:} Reconocimiento de voz en español.
+
+\textbf{Interacciones:} - La App Móvil usa reconocimiento de voz local -
+Procesamiento de comandos en español
+
+\textbf{Tecnología:} - @react-native-community/voice - Reconocimiento
+local en dispositivo
+
+\subsubsection{3. Servidor SMTP Gmail}\label{servidor-smtp-gmail}
+
+\textbf{Descripción:} Envía correos de verificación, recuperación y
+notificaciones.
+
+\textbf{Interacciones:} - El API Gateway envía emails de notificaciones
+- Confirmaciones de registro - Notificaciones de eventos importantes -
+Códigos de desbloqueo de cuenta
+
+\textbf{Tecnología:} - SMTP (Gmail) - Flask-Mail
+
+\subsubsection{4. Sistema de Archivos}\label{sistema-de-archivos}
+
+\textbf{Descripción:} Almacena logos, documentos y fotos de estadios.
+
+\textbf{Interacciones:} - El API Gateway gestiona archivos subidos -
+Almacenamiento local en servidor
+
+\section{Flujos de Interacción
+Principales}\label{flujos-de-interacciuxf3n-principales}
+
+\subsection{Flujo 1: Administración de
+Campeonato}\label{flujo-1-administraciuxf3n-de-campeonato}
+
+\begin{verbatim}
+Superadministrador/Organizador
+    ↓
+Frontend Web (Angular)
+    ↓
+API Gateway (Flask)
+    ↓
+Base de Datos (MySQL)
+\end{verbatim}
+
+\subsection{Flujo 2: Consulta de Información
+(Espectador)}\label{flujo-2-consulta-de-informaciuxf3n-espectador}
+
+\begin{verbatim}
+Espectador
+    ↓
+App Móvil (React Native)
+    ↓
+API Gateway (Flask)
+    ↓
+Base de Datos (MySQL)
+\end{verbatim}
+
+\subsection{Flujo 3: Visualización de
+Mapas}\label{flujo-3-visualizaciuxf3n-de-mapas}
+
+\begin{verbatim}
+Espectador
+    ↓
+App Móvil (React Native)
+    ↓
+Google Maps API
+    ↓
+API Gateway (Flask) → Base de Datos (coordenadas GPS)
+\end{verbatim}
+
+\subsection{Flujo 4: Búsqueda por
+Voz}\label{flujo-4-buxfasqueda-por-voz}
+
+\begin{verbatim}
+Espectador
+    ↓
+App Móvil (React Native)
+    ↓
+Google Speech API (reconocimiento local)
+    ↓
+API Gateway (Flask) → Base de Datos (filtrado de partidos)
+\end{verbatim}
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos-1}
+
+Para ver cómo están organizados los contenedores dentro del sistema,
+consulte:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{c4-containers.qmd}{Diagrama de Contenedores C4 - Nivel 2}
+\end{itemize}
+
+\chapter{Diagrama de Contenedores C4 - Nivel
+2}\label{diagrama-de-contenedores-c4---nivel-2}
+
+\chapter{Diagrama de Contenedores C4 - Nivel
+2}\label{diagrama-de-contenedores-c4---nivel-2-1}
+
+\section{Introducción}\label{introducciuxf3n-2}
+
+El diagrama de contenedores muestra los contenedores (aplicaciones,
+servicios, bases de datos) que conforman el sistema y cómo se comunican
+entre sí.
+
+\section{Diagrama de Contenedores}\label{diagrama-de-contenedores}
+
+\section{Contenedores del Sistema}\label{contenedores-del-sistema}
+
+\subsection{1. Aplicación Web (Angular
+SPA)}\label{aplicaciuxf3n-web-angular-spa}
+
+\textbf{Tecnología:} Angular 21, TypeScript, Angular Material
+
+\textbf{Responsabilidades:} - Interfaz de usuario para administradores,
+organizadores y líderes - Gestión de campeonatos, equipos, jugadores -
+Visualización de estadísticas y reportes - Sistema de notificaciones en
+tiempo real
+
+\textbf{Características:} - Single Page Application (SPA) - Routing con
+guards de autenticación - Estado reactivo con RxJS - Componentes
+reutilizables con Angular Material - Lazy loading de módulos
+
+\textbf{Comunicación:} - Se comunica con el API Gateway mediante
+HTTP/REST - Consume endpoints autenticados con JWT tokens
+
+\textbf{Puerto:} 4200 (desarrollo)
+
+\subsection{2. Aplicación Móvil Android (React
+Native)}\label{aplicaciuxf3n-muxf3vil-android-react-native}
+
+\textbf{Tecnología:} React Native 0.83.1, TypeScript
+
+\textbf{Responsabilidades:} - Interfaz para espectadores - Visualización
+de campeonatos activos - Tabla de posiciones en tiempo real - Calendario
+de partidos - Mapa interactivo de estadios - Búsqueda por voz de
+partidos
+
+\textbf{Características:} - Aplicación nativa multiplataforma -
+Integración con Google Maps - Reconocimiento de voz local - Manejo
+robusto de errores - Estados de carga y vacíos
+
+\textbf{Comunicación:} - Se comunica con API Gateway mediante HTTP/REST
+- Consume endpoints públicos (sin autenticación) - Integración con
+Google Maps API para mapas - Reconocimiento de voz local (no requiere
+servidor)
+
+\textbf{Plataforma:} Android (APK disponible)
+
+\subsection{3. API Gateway (Flask
+Application)}\label{api-gateway-flask-application}
+
+\textbf{Tecnología:} Flask 3.0, Python 3.12, Flask-RESTx
+
+\textbf{Responsabilidades:} - Punto de entrada único para todas las
+peticiones - Autenticación y autorización (JWT) - Enrutamiento a
+servicios backend - Rate limiting y protección de seguridad - Manejo de
+archivos (upload/download) - Proxy a microservicios
+
+\textbf{Características:} - API REST documentada con Swagger -
+Autenticación JWT con refresh tokens - Rate limiting por IP y usuario -
+Account lockout después de intentos fallidos - Validación y sanitización
+de entrada - CORS configurado - Proxy hacia microservicio de
+alineaciones
+
+\textbf{Comunicación:} - Recibe peticiones del Frontend Web y App Móvil
+- Se comunica con Base de Datos mediante SQLAlchemy - Se comunica con
+Microservicio de Alineaciones mediante HTTP/REST - Envía emails mediante
+SMTP
+
+\textbf{Puerto:} 5000
+
+\subsection{4. Microservicio de
+Alineaciones}\label{microservicio-de-alineaciones-1}
+
+\textbf{Tecnología:} Flask 3.0, Python
+
+\textbf{Responsabilidades:} - Gestión especializada de alineaciones de
+partidos - Validación de reglas de negocio para alineaciones -
+Procesamiento de eventos de partidos relacionados con alineaciones
+
+\textbf{Características:} - Servicio independiente y desacoplado - Puede
+escalarse independientemente - Comunicación REST con API Gateway -
+Validación de datos con Gateway
+
+\textbf{Comunicación:} - Recibe peticiones del API Gateway (proxy) -
+Consulta datos del API Gateway para validaciones - Accede a Base de
+Datos de alineaciones
+
+\textbf{Puerto:} 5001
+
+\subsection{5. Base de Datos Principal
+(MySQL)}\label{base-de-datos-principal-mysql}
+
+\textbf{Tecnología:} MySQL 8.0
+
+\textbf{Responsabilidades:} - Almacenamiento persistente de todos los
+datos del sistema - Coordenadas GPS para estadios - Relaciones entre
+entidades - Integridad referencial
+
+\textbf{Características:} - Base de datos relacional - Soporte para
+coordenadas geográficas (latitud/longitud) - Índices optimizados para
+consultas frecuentes - Backup automático configurado
+
+\textbf{Puerto:} 3306 (default)
+
+\subsection{6. Base de Datos Alineaciones
+(MySQL)}\label{base-de-datos-alineaciones-mysql}
+
+\textbf{Tecnología:} MySQL 8.0
+
+\textbf{Responsabilidades:} - Almacenamiento de alineaciones con
+posiciones - Datos de cambios durante partidos
+
+\textbf{Puerto:} 3306 (puede ser la misma instancia o separada)
+
+\section{Flujos de Comunicación}\label{flujos-de-comunicaciuxf3n}
+
+\subsection{Flujo 1: Login de Usuario
+Web}\label{flujo-1-login-de-usuario-web}
+
+\begin{verbatim}
+Usuario → Frontend Web → API Gateway → Base de Datos
+\end{verbatim}
+
+\subsection{Flujo 2: Consulta de Campeonatos (App
+Móvil)}\label{flujo-2-consulta-de-campeonatos-app-muxf3vil}
+
+\begin{verbatim}
+Espectador → App Móvil → API Gateway → Base de Datos
+\end{verbatim}
+
+\subsection{Flujo 3: Gestión de
+Alineaciones}\label{flujo-3-gestiuxf3n-de-alineaciones}
+
+\begin{verbatim}
+Líder → Frontend Web → API Gateway → Proxy → Microservicio → Base de Datos Alineaciones
+\end{verbatim}
+
+\subsection{Flujo 4: Visualización de Mapa de
+Estadios}\label{flujo-4-visualizaciuxf3n-de-mapa-de-estadios}
+
+\begin{verbatim}
+Espectador → App Móvil → API Gateway → Base de Datos (coordenadas) → Google Maps API
+\end{verbatim}
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos-2}
+
+Para ver los componentes internos de cada contenedor, consulte:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{c4-components.qmd}{Diagrama de Componentes C4 - Nivel 3}
+\end{itemize}
+
+\chapter{Diagrama de Componentes C4 - Nivel
+3}\label{diagrama-de-componentes-c4---nivel-3}
+
+\chapter{Diagrama de Componentes C4 - Nivel
+3}\label{diagrama-de-componentes-c4---nivel-3-1}
+
+\section{Introducción}\label{introducciuxf3n-3}
+
+El diagrama de componentes muestra los componentes principales dentro de
+cada contenedor y cómo interactúan entre sí.
+
+\section{Componentes del Frontend Web
+(Angular)}\label{componentes-del-frontend-web-angular}
+
+\subsection{Diagrama de Componentes
+Frontend}\label{diagrama-de-componentes-frontend}
+
+\subsection{Componentes Principales}\label{componentes-principales}
+
+\subsubsection{1. SPA Router}\label{spa-router}
+
+\textbf{Responsabilidad}: Enrutamiento y navegación entre módulos\\
+\textbf{Tecnología}: Angular Router
+
+\subsubsection{2. Módulo de
+Autenticación}\label{muxf3dulo-de-autenticaciuxf3n}
+
+\textbf{Responsabilidad}: Login, registro, verificación y recuperación
+de contraseña\\
+\textbf{Tecnología}: Angular Module
+
+\subsubsection{3. Módulo Superadmin}\label{muxf3dulo-superadmin}
+
+\textbf{Responsabilidad}: Dashboard y gestión de organizadores\\
+\textbf{Tecnología}: Angular Module
+
+\subsubsection{4. Módulo Organizador}\label{muxf3dulo-organizador}
+
+\textbf{Responsabilidad}: Gestión de campeonatos, fixtures y eventos\\
+\textbf{Tecnología}: Angular Module
+
+\subsubsection{5. Módulo Líder}\label{muxf3dulo-luxedder}
+
+\textbf{Responsabilidad}: Gestión de equipos, jugadores y alineaciones\\
+\textbf{Tecnología}: Angular Module
+
+\subsubsection{6. Módulo Público}\label{muxf3dulo-puxfablico}
+
+\textbf{Responsabilidad}: Consulta de información pública\\
+\textbf{Tecnología}: Angular Module
+
+\subsubsection{7. HTTP Client Layer}\label{http-client-layer}
+
+\textbf{Responsabilidad}: Capa de comunicación con API REST\\
+\textbf{Tecnología}: Angular HttpClient
+
+\subsubsection{8. Security Guards}\label{security-guards}
+
+\textbf{Responsabilidad}: Protección de rutas por roles\\
+\textbf{Tecnología}: Angular Guards
+
+\subsubsection{9. Auth Interceptor}\label{auth-interceptor}
+
+\textbf{Responsabilidad}: Inyección automática de JWT\\
+\textbf{Tecnología}: Angular Interceptor
+
+\section{Componentes de la App Móvil (React
+Native)}\label{componentes-de-la-app-muxf3vil-react-native}
+
+\subsection{Diagrama de Componentes
+Móvil}\label{diagrama-de-componentes-muxf3vil}
+
+\subsection{Componentes Principales}\label{componentes-principales-1}
+
+\subsubsection{1. Navigation Stack}\label{navigation-stack}
+
+\textbf{Responsabilidad}: Navegación entre pantallas\\
+\textbf{Tecnología}: React Navigation
+
+\subsubsection{2. Home Screen}\label{home-screen}
+
+\textbf{Responsabilidad}: Pantalla principal de bienvenida\\
+\textbf{Tecnología}: React Component
+
+\subsubsection{3. Campeonatos Screen}\label{campeonatos-screen}
+
+\textbf{Responsabilidad}: Lista de campeonatos activos\\
+\textbf{Tecnología}: React Component
+
+\subsubsection{4. Campeonato Detail
+Screen}\label{campeonato-detail-screen}
+
+\textbf{Responsabilidad}: Detalle con tabs: Info, Posiciones, Partidos\\
+\textbf{Tecnología}: React Component
+
+\subsubsection{5. Sedes Map Screen}\label{sedes-map-screen}
+
+\textbf{Responsabilidad}: Mapa interactivo con ubicaciones de estadios\\
+\textbf{Tecnología}: React Component
+
+\subsubsection{6. Voice Search Button}\label{voice-search-button}
+
+\textbf{Responsabilidad}: Búsqueda de partidos por voz\\
+\textbf{Tecnología}: React Component
+
+\subsubsection{7. HTTP Service}\label{http-service}
+
+\textbf{Responsabilidad}: Cliente HTTP con manejo de errores\\
+\textbf{Tecnología}: Axios
+
+\subsubsection{8. Voice Command
+Processor}\label{voice-command-processor}
+
+\textbf{Responsabilidad}: Procesamiento de comandos de voz en español\\
+\textbf{Tecnología}: JavaScript Service
+
+\subsubsection{9. Maps Integration}\label{maps-integration}
+
+\textbf{Responsabilidad}: Integración con Google Maps\\
+\textbf{Tecnología}: react-native-maps
+
+\subsubsection{10. Voice Recognition}\label{voice-recognition}
+
+\textbf{Responsabilidad}: Reconocimiento de voz\\
+\textbf{Tecnología}: @react-native-community/voice
+
+\section{Componentes del API Gateway
+(Flask)}\label{componentes-del-api-gateway-flask}
+
+\subsection{Diagrama de Componentes
+Gateway}\label{diagrama-de-componentes-gateway}
+
+\subsection{Componentes Principales}\label{componentes-principales-2}
+
+\subsubsection{Capa de Presentación}\label{capa-de-presentaciuxf3n}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{REST API Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Endpoints REST para todas las operaciones
+  \item
+    Tecnología: Flask-RESTX
+  \end{itemize}
+\item
+  \textbf{Alineaciones Proxy}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Gateway hacia el microservicio de alineaciones
+  \item
+    Tecnología: Flask Blueprint
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{Capa de Seguridad}\label{capa-de-seguridad}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  \textbf{Authentication Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Autenticación JWT y gestión de tokens
+  \item
+    Tecnología: JWT Manager
+  \end{itemize}
+\item
+  \textbf{Authorization Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Control de acceso basado en roles
+  \item
+    Tecnología: Auth Middleware
+  \end{itemize}
+\item
+  \textbf{Security Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Rate limiting, bloqueo de cuentas y auditoría
+  \item
+    Tecnología: Security Services
+  \end{itemize}
+\item
+  \textbf{CORS Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Configuración CORS para web y móvil
+  \item
+    Tecnología: Flask-CORS
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{Capa de Negocio}\label{capa-de-negocio}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\tightlist
+\item
+  \textbf{Business Logic Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Lógica de negocio: fixtures, estadísticas, notificaciones
+  \item
+    Tecnología: Python Services
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{Capa de Integración}\label{capa-de-integraciuxf3n}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{7}
+\tightlist
+\item
+  \textbf{Email Service}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Envío de emails transaccionales
+  \item
+    Tecnología: Flask-Mail
+  \end{itemize}
+\item
+  \textbf{File Service}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Gestión de archivos (logos, fotos de estadios)
+  \item
+    Tecnología: Python Service
+  \end{itemize}
+\end{enumerate}
+
+\subsubsection{Capa de Datos}\label{capa-de-datos}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{9}
+\tightlist
+\item
+  \textbf{Data Access Layer}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Repositorios y modelos de dominio con coordenadas GPS
+  \item
+    Tecnología: SQLAlchemy ORM
+  \end{itemize}
+\end{enumerate}
+
+\section{Componentes del Microservicio de
+Alineaciones}\label{componentes-del-microservicio-de-alineaciones}
+
+\subsection{Diagrama de Componentes
+Microservicio}\label{diagrama-de-componentes-microservicio}
+
+\textbf{Componentes Principales}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Alineaciones API}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    CRUD de alineaciones y cambios
+  \item
+    Tecnología: Flask-RESTX
+  \end{itemize}
+\item
+  \textbf{Validation Logic}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Reglas de negocio de alineaciones
+  \item
+    Tecnología: Python Service
+  \end{itemize}
+\item
+  \textbf{Gateway Client}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Cliente para validaciones con el Gateway
+  \item
+    Tecnología: HTTP Client
+  \end{itemize}
+\item
+  \textbf{Alineaciones Data}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Acceso a datos de alineaciones
+  \item
+    Tecnología: SQLAlchemy ORM
+  \end{itemize}
+\end{enumerate}
+
+\section{Flujos de Datos entre
+Componentes}\label{flujos-de-datos-entre-componentes}
+
+\subsection{Flujo 1: Login de Usuario}\label{flujo-1-login-de-usuario}
+
+\begin{verbatim}
+LoginComponent → AuthService → HTTP Client → Auth Interceptor → API Gateway
+\end{verbatim}
+
+\subsection{Flujo 2: Definir
+Alineación}\label{flujo-2-definir-alineaciuxf3n}
+
+\begin{verbatim}
+AlineacionesComponent → HTTP Client → Auth Interceptor → API Gateway → Alineaciones Proxy → Microservicio
+\end{verbatim}
+
+\subsection{Flujo 3: Consulta de Campeonatos
+(Móvil)}\label{flujo-3-consulta-de-campeonatos-muxf3vil}
+
+\begin{verbatim}
+CampeonatosScreen → HTTP Service → API Gateway → REST API Layer → Data Access Layer → Base de Datos
+\end{verbatim}
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos-3}
+
+Para ver los detalles internos de los componentes (nivel 4), consulte:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{c4-level4.qmd}{Diagrama de Componentes Internos C4 - Nivel 4}
+\end{itemize}
+
+\chapter{Diagrama de Componentes Internos C4 - Nivel
+4}\label{diagrama-de-componentes-internos-c4---nivel-4}
+
+\chapter{Diagrama de Componentes Internos C4 - Nivel
+4}\label{diagrama-de-componentes-internos-c4---nivel-4-1}
+
+\section{Introducción}\label{introducciuxf3n-4}
+
+El nivel 4 del modelo C4 muestra los detalles internos de los
+componentes principales, incluyendo clases, métodos y relaciones entre
+modelos de datos.
+
+\section{Modelos de Datos (Backend)}\label{modelos-de-datos-backend}
+
+\subsection{Modelo Usuario}\label{modelo-usuario}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Usuario(db.Model):}
+\NormalTok{    id\_usuario: }\BuiltInTok{int}\NormalTok{ (PK)}
+\NormalTok{    nombre: }\BuiltInTok{str}
+\NormalTok{    apellido: }\BuiltInTok{str}
+\NormalTok{    email: }\BuiltInTok{str}\NormalTok{ (unique)}
+\NormalTok{    contrasena: }\BuiltInTok{str}\NormalTok{ (hashed)}
+\NormalTok{    rol: enum(}\StringTok{\textquotesingle{}superadmin\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}admin\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}lider\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}espectador\textquotesingle{}}\NormalTok{)}
+\NormalTok{    activo: }\BuiltInTok{bool}
+\NormalTok{    fecha\_registro: datetime}
+    
+    \CommentTok{\# Métodos}
+\NormalTok{    set\_password(password)}
+\NormalTok{    check\_password(password)}
+\NormalTok{    to\_dict()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Modelo Campeonato}\label{modelo-campeonato}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Campeonato(db.Model):}
+\NormalTok{    id\_campeonato: }\BuiltInTok{int}\NormalTok{ (PK)}
+\NormalTok{    nombre: }\BuiltInTok{str}\NormalTok{ (unique)}
+\NormalTok{    descripcion: text}
+\NormalTok{    max\_equipos: }\BuiltInTok{int}
+\NormalTok{    tipo\_deporte: enum(}\StringTok{\textquotesingle{}futbol\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}indoor\textquotesingle{}}\NormalTok{)}
+\NormalTok{    tipo\_competicion: enum(}\StringTok{\textquotesingle{}liga\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}eliminacion\_directa\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}mixto\textquotesingle{}}\NormalTok{)}
+\NormalTok{    fecha\_inicio: date}
+\NormalTok{    fecha\_fin: date}
+\NormalTok{    estado: }\BuiltInTok{str}
+\NormalTok{    creado\_por: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Usuario)}
+\NormalTok{    logo\_url: }\BuiltInTok{str}
+\NormalTok{    codigo\_inscripcion: }\BuiltInTok{str}
+\NormalTok{    es\_publico: }\BuiltInTok{bool}
+    
+    \CommentTok{\# Relaciones}
+\NormalTok{    creador: Usuario}
+\NormalTok{    partidos: List[Partido]}
+\NormalTok{    equipos\_inscritos: List[CampeonatoEquipo]}
+    
+    \CommentTok{\# Métodos}
+\NormalTok{    to\_dict(include\_equipos}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Modelo Partido}\label{modelo-partido}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Partido(db.Model):}
+\NormalTok{    id\_partido: }\BuiltInTok{int}\NormalTok{ (PK)}
+\NormalTok{    id\_campeonato: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Campeonato)}
+\NormalTok{    id\_equipo\_local: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Equipo)}
+\NormalTok{    id\_equipo\_visitante: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Equipo)}
+\NormalTok{    fecha\_partido: datetime}
+\NormalTok{    lugar: }\BuiltInTok{str}
+\NormalTok{    jornada: }\BuiltInTok{int}
+\NormalTok{    goles\_local: }\BuiltInTok{int}
+\NormalTok{    goles\_visitante: }\BuiltInTok{int}
+\NormalTok{    estado: }\BuiltInTok{str}
+\NormalTok{    resultado\_registrado: }\BuiltInTok{bool}
+\NormalTok{    registrado\_por: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Usuario)}
+    
+    \CommentTok{\# Relaciones}
+\NormalTok{    campeonato: Campeonato}
+\NormalTok{    equipo\_local: Equipo}
+\NormalTok{    equipo\_visitante: Equipo}
+\NormalTok{    goles: List[Gol]}
+\NormalTok{    tarjetas: List[Tarjeta]}
+    
+    \CommentTok{\# Métodos}
+\NormalTok{    to\_dict()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Modelo Equipo}\label{modelo-equipo}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Equipo(db.Model):}
+\NormalTok{    id\_equipo: }\BuiltInTok{int}\NormalTok{ (PK)}
+\NormalTok{    nombre: }\BuiltInTok{str}\NormalTok{ (unique)}
+\NormalTok{    logo\_url: }\BuiltInTok{str}
+\NormalTok{    id\_lider: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Usuario)}
+\NormalTok{    estadio: }\BuiltInTok{str}
+\NormalTok{    estadio\_latitud: decimal(}\DecValTok{10}\NormalTok{,}\DecValTok{8}\NormalTok{)  }\CommentTok{\# GPS}
+\NormalTok{    estadio\_longitud: decimal(}\DecValTok{11}\NormalTok{,}\DecValTok{8}\NormalTok{)  }\CommentTok{\# GPS}
+\NormalTok{    estadio\_foto: }\BuiltInTok{str}
+\NormalTok{    estado: enum(}\StringTok{\textquotesingle{}pendiente\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}aprobado\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}rechazado\textquotesingle{}}\NormalTok{)}
+    
+    \CommentTok{\# Relaciones}
+\NormalTok{    lider: Usuario}
+\NormalTok{    jugadores: List[Jugador]}
+    
+    \CommentTok{\# Métodos}
+\NormalTok{    to\_dict()}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Modelo Alineacion}\label{modelo-alineacion}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ Alineacion(db.Model):}
+\NormalTok{    id\_alineacion: }\BuiltInTok{int}\NormalTok{ (PK)}
+\NormalTok{    id\_partido: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Partido)}
+\NormalTok{    id\_equipo: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Equipo)}
+\NormalTok{    id\_jugador: }\BuiltInTok{int}\NormalTok{ (FK }\OperatorTok{{-}\textgreater{}}\NormalTok{ Jugador)}
+\NormalTok{    titular: }\BuiltInTok{bool}
+\NormalTok{    minuto\_entrada: }\BuiltInTok{int}
+\NormalTok{    minuto\_salida: }\BuiltInTok{int}
+\NormalTok{    posicion\_x: }\BuiltInTok{float}
+\NormalTok{    posicion\_y: }\BuiltInTok{float}
+\NormalTok{    formacion: }\BuiltInTok{str}
+    
+    \CommentTok{\# Métodos}
+\NormalTok{    to\_dict()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Diagrama UML Simplificado}\label{diagrama-uml-simplificado}
+
+\subsection{Relaciones entre Modelos}\label{relaciones-entre-modelos}
+
+\begin{verbatim}
+Usuario
+  ├── 1:N → Campeonato (creado_por)
+  ├── 1:N → Equipo (id_lider)
+  └── 1:N → Partido (registrado_por)
+
+Campeonato
+  ├── 1:N → Partido
+  └── N:M → Equipo (a través de CampeonatoEquipo)
+
+Equipo
+  ├── 1:N → Jugador
+  ├── 1:N → Partido (equipo_local)
+  └── 1:N → Partido (equipo_visitante)
+
+Partido
+  ├── 1:N → Gol
+  ├── 1:N → Tarjeta
+  └── 1:N → Alineacion
+
+Jugador
+  ├── 1:N → Gol
+  ├── 1:N → Tarjeta
+  └── 1:N → Alineacion
+\end{verbatim}
+
+\section{Componentes del Frontend
+(TypeScript)}\label{componentes-del-frontend-typescript}
+
+\subsection{AuthService}\label{authservice}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{class}\NormalTok{ AuthService \{}
+  \FunctionTok{login}\NormalTok{(email}\OperatorTok{:} \DataTypeTok{string}\OperatorTok{,}\NormalTok{ password}\OperatorTok{:} \DataTypeTok{string}\NormalTok{)}\OperatorTok{:}\NormalTok{ Observable}\OperatorTok{\textless{}}\NormalTok{AuthResponse}\OperatorTok{\textgreater{}}
+  \FunctionTok{register}\NormalTok{(data}\OperatorTok{:}\NormalTok{ RegisterData)}\OperatorTok{:}\NormalTok{ Observable}\OperatorTok{\textless{}}\NormalTok{User}\OperatorTok{\textgreater{}}
+  \FunctionTok{logout}\NormalTok{()}\OperatorTok{:} \DataTypeTok{void}
+  \FunctionTok{getAccessToken}\NormalTok{()}\OperatorTok{:} \DataTypeTok{string} \OperatorTok{|} \DataTypeTok{null}
+  \FunctionTok{refreshToken}\NormalTok{()}\OperatorTok{:}\NormalTok{ Observable}\OperatorTok{\textless{}}\DataTypeTok{string}\OperatorTok{\textgreater{}}
+  \FunctionTok{isAuthenticated}\NormalTok{()}\OperatorTok{:} \DataTypeTok{boolean}
+  \FunctionTok{getCurrentUser}\NormalTok{()}\OperatorTok{:}\NormalTok{ Observable}\OperatorTok{\textless{}}\NormalTok{User}\OperatorTok{\textgreater{}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Componentes Angular}\label{componentes-angular}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{// LoginComponent}
+\KeywordTok{class}\NormalTok{ LoginComponent \{}
+\NormalTok{  form}\OperatorTok{:}\NormalTok{ FormGroup}
+  \FunctionTok{onSubmit}\NormalTok{()}\OperatorTok{:} \DataTypeTok{void}
+  \FunctionTok{navigateToRegister}\NormalTok{()}\OperatorTok{:} \DataTypeTok{void}
+\NormalTok{\}}
+
+\CommentTok{// AlineacionesComponent}
+\KeywordTok{class}\NormalTok{ AlineacionesComponent \{}
+\NormalTok{  alineacion}\OperatorTok{:}\NormalTok{ Alineacion[]}
+  \FunctionTok{definirAlineacion}\NormalTok{()}\OperatorTok{:} \DataTypeTok{void}
+  \FunctionTok{hacerCambio}\NormalTok{()}\OperatorTok{:} \DataTypeTok{void}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Componentes del API Gateway}\label{componentes-del-api-gateway}
+
+\subsection{REST API Layer}\label{rest-api-layer}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# campeonato\_routes.py}
+\AttributeTok{@campeonato\_ns.route}\NormalTok{(}\StringTok{\textquotesingle{}\textquotesingle{}}\NormalTok{)}
+\KeywordTok{class}\NormalTok{ CampeonatoList(Resource):}
+    \AttributeTok{@jwt\_required}\NormalTok{()}
+    \KeywordTok{def}\NormalTok{ get(}\VariableTok{self}\NormalTok{):  }\CommentTok{\# Listar campeonatos}
+    \AttributeTok{@jwt\_required}\NormalTok{()}
+    \AttributeTok{@role\_required}\NormalTok{([}\StringTok{\textquotesingle{}admin\textquotesingle{}}\NormalTok{])}
+    \KeywordTok{def}\NormalTok{ post(}\VariableTok{self}\NormalTok{):  }\CommentTok{\# Crear campeonato}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Alineaciones Proxy}\label{alineaciones-proxy}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# alineaciones\_proxy\_routes.py}
+\AttributeTok{@alineaciones\_proxy\_bp.route}\NormalTok{(}\StringTok{\textquotesingle{}/lider/alineaciones/definir\textquotesingle{}}\NormalTok{, methods}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}POST\textquotesingle{}}\NormalTok{])}
+\KeywordTok{def}\NormalTok{ definir\_alineacion():}
+    \CommentTok{\# Validar usuario y equipo}
+    \CommentTok{\# Enviar al microservicio}
+    \CommentTok{\# Retornar respuesta}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos-4}
+
+Este nivel muestra los detalles de implementación. Para ver la
+arquitectura general, consulte:
+
+\begin{itemize}
+\tightlist
+\item
+  \hyperref[visiuxf3n-general-de-la-arquitectura]{Visión General}
+\item
+  \hyperref[diagrama-de-contexto-c4---nivel-1]{Diagrama de Contexto}
+\item
+  \hyperref[diagrama-de-contenedores-c4---nivel-2]{Diagrama de
+  Contenedores}
+\item
+  \hyperref[diagrama-de-componentes-c4---nivel-3]{Diagrama de
+  Componentes}
+\end{itemize}
+
+\part{Backend}
+
+\chapter{API Gateway}\label{api-gateway}
+
+\chapter{API Gateway}\label{api-gateway-1}
+
+\section{Introducción}\label{introducciuxf3n-5}
+
+El API Gateway es el componente central del sistema. Actúa como punto de
+entrada único, proporcionando autenticación, autorización, enrutamiento
+y seguridad.
+
+\section{Tecnologías}\label{tecnologuxedas}
+
+\begin{itemize}
+\tightlist
+\item
+  Flask 3.0, Python 3.12
+\item
+  Flask-RESTx 1.3.0
+\item
+  Flask-JWT-Extended 4.6.0
+\item
+  SQLAlchemy 3.1.1
+\end{itemize}
+
+\section{URL Base}\label{url-base}
+
+\begin{verbatim}
+http://10.20.139.22:5000
+\end{verbatim}
+
+\section{Endpoints Principales}\label{endpoints-principales}
+
+\subsection{\texorpdfstring{Autenticación
+(\texttt{/auth})}{Autenticación (/auth)}}\label{autenticaciuxf3n-auth}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{POST\ /auth/register} - Registrar usuario
+\item
+  \texttt{POST\ /auth/login} - Iniciar sesión
+\item
+  \texttt{POST\ /auth/refresh} - Renovar token
+\end{itemize}
+
+\subsection{\texorpdfstring{Campeonatos
+(\texttt{/campeonatos})}{Campeonatos (/campeonatos)}}\label{campeonatos-campeonatos}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{GET\ /campeonatos} - Listar campeonatos
+\item
+  \texttt{GET\ /campeonatos/\{id\}} - Detalle de campeonato
+\item
+  \texttt{POST\ /campeonatos} - Crear campeonato (requiere admin)
+\end{itemize}
+
+\subsection{\texorpdfstring{Partidos
+(\texttt{/partidos})}{Partidos (/partidos)}}\label{partidos-partidos}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{GET\ /partidos} - Listar partidos
+\item
+  \texttt{POST\ /partidos} - Crear partido
+\end{itemize}
+
+\subsection{\texorpdfstring{Estadísticas
+(\texttt{/estadisticas})}{Estadísticas (/estadisticas)}}\label{estaduxedsticas-estadisticas}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{GET\ /estadisticas/tabla-posiciones} - Tabla de posiciones
+\end{itemize}
+
+\subsection{\texorpdfstring{Inscripciones
+(\texttt{/inscripciones})}{Inscripciones (/inscripciones)}}\label{inscripciones-inscripciones}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{GET\ /inscripciones/campeonato/\{id\}} - Inscripciones con
+  coordenadas GPS
+\end{itemize}
+
+\section{Autenticación JWT}\label{autenticaciuxf3n-jwt}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Access Token}: Válido 15 minutos
+\item
+  \textbf{Refresh Token}: Válido 30 días
+\item
+  Header: \texttt{Authorization:\ Bearer\ \{token\}}
+\end{itemize}
+
+\section{Seguridad}\label{seguridad-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Rate limiting: 100 peticiones/15min
+\item
+  Account lockout: 5 intentos fallidos
+\item
+  Validación y sanitización de entrada
+\end{itemize}
+
+\section{Documentación Swagger}\label{documentaciuxf3n-swagger}
+
+Disponible en: \texttt{http://10.20.139.22:5000/}
+
+\chapter{Microservicio de
+Alineaciones}\label{microservicio-de-alineaciones-2}
+
+\chapter{Microservicio de
+Alineaciones}\label{microservicio-de-alineaciones-3}
+
+\section{Introducción}\label{introducciuxf3n-6}
+
+El microservicio de alineaciones es un servicio especializado e
+independiente que gestiona las alineaciones de partidos. Se comunica con
+el API Gateway mediante HTTP/REST a través de un \textbf{proxy}
+implementado en el Gateway.
+
+\section{Arquitectura del Proxy}\label{arquitectura-del-proxy}
+
+El API Gateway actúa como \textbf{proxy} hacia el microservicio,
+proporcionando:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Autenticación y Autorización}: Valida JWT tokens antes de
+  enrutar
+\item
+  \textbf{Validaciones de Negocio}: Verifica que el usuario tiene
+  permisos
+\item
+  \textbf{Transformación de Datos}: Adapta requests/responses si es
+  necesario
+\item
+  \textbf{Manejo de Errores}: Centraliza el manejo de errores
+\end{enumerate}
+
+\section{Implementación del Proxy}\label{implementaciuxf3n-del-proxy}
+
+\subsection{\texorpdfstring{Archivo:
+\texttt{backend/app/routes/alineaciones\_proxy\_routes.py}}{Archivo: backend/app/routes/alineaciones\_proxy\_routes.py}}\label{archivo-backendapproutesalineaciones_proxy_routes.py}
+
+El proxy está implementado como un \textbf{Flask Blueprint} que enruta
+las peticiones al microservicio.
+
+\subsection{Endpoints del Proxy}\label{endpoints-del-proxy}
+
+\subsubsection{1. Definir Alineación
+(Líder)}\label{definir-alineaciuxf3n-luxedder}
+
+\textbf{Ruta}: \texttt{POST\ /lider/alineaciones/definir}
+
+\textbf{Flujo}:
+
+\begin{verbatim}
+Frontend Web → API Gateway Proxy → Validaciones → Microservicio → Respuesta
+\end{verbatim}
+
+\textbf{Código}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@alineaciones\_proxy\_bp.route}\NormalTok{(}\StringTok{\textquotesingle{}/lider/alineaciones/definir\textquotesingle{}}\NormalTok{, methods}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}POST\textquotesingle{}}\NormalTok{])}
+\AttributeTok{@jwt\_required}\NormalTok{()}
+\KeywordTok{def}\NormalTok{ definir\_alineacion():}
+    \CommentTok{\# 1. Validar autenticación (JWT)}
+\NormalTok{    identity }\OperatorTok{=}\NormalTok{ get\_jwt\_identity()}
+\NormalTok{    usuario }\OperatorTok{=}\NormalTok{ Usuario.query.get(identity)}
+    
+    \CommentTok{\# 2. Validar rol}
+    \ControlFlowTok{if}\NormalTok{ usuario.rol }\OperatorTok{!=} \StringTok{\textquotesingle{}lider\textquotesingle{}}\NormalTok{:}
+        \ControlFlowTok{return}\NormalTok{ jsonify(\{}\StringTok{\textquotesingle{}error\textquotesingle{}}\NormalTok{: }\StringTok{\textquotesingle{}No autorizado\textquotesingle{}}\NormalTok{\}), }\DecValTok{403}
+    
+    \CommentTok{\# 3. Validar que el partido existe}
+\NormalTok{    partido }\OperatorTok{=}\NormalTok{ Partido.query.get(data.get(}\StringTok{\textquotesingle{}id\_partido\textquotesingle{}}\NormalTok{))}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ partido:}
+        \ControlFlowTok{return}\NormalTok{ jsonify(\{}\StringTok{\textquotesingle{}error\textquotesingle{}}\NormalTok{: }\StringTok{\textquotesingle{}Partido no encontrado\textquotesingle{}}\NormalTok{\}), }\DecValTok{404}
+    
+    \CommentTok{\# 4. Validar que el equipo participa en el partido}
+\NormalTok{    id\_equipo }\OperatorTok{=}\NormalTok{ data.get(}\StringTok{\textquotesingle{}id\_equipo\textquotesingle{}}\NormalTok{)}
+    \ControlFlowTok{if}\NormalTok{ id\_equipo }\KeywordTok{not} \KeywordTok{in}\NormalTok{ [partido.id\_equipo\_local, partido.id\_equipo\_visitante]:}
+        \ControlFlowTok{return}\NormalTok{ jsonify(\{}\StringTok{\textquotesingle{}error\textquotesingle{}}\NormalTok{: }\StringTok{\textquotesingle{}El equipo no participa en este partido\textquotesingle{}}\NormalTok{\}), }\DecValTok{400}
+    
+    \CommentTok{\# 5. Validar que el usuario es líder del equipo}
+\NormalTok{    equipo }\OperatorTok{=}\NormalTok{ Equipo.query.get(id\_equipo)}
+    \ControlFlowTok{if}\NormalTok{ equipo.id\_lider }\OperatorTok{!=}\NormalTok{ usuario.id\_usuario:}
+        \ControlFlowTok{return}\NormalTok{ jsonify(\{}\StringTok{\textquotesingle{}error\textquotesingle{}}\NormalTok{: }\StringTok{\textquotesingle{}No eres líder de este equipo\textquotesingle{}}\NormalTok{\}), }\DecValTok{403}
+    
+    \CommentTok{\# 6. Enviar al microservicio}
+\NormalTok{    response }\OperatorTok{=}\NormalTok{ requests.post(}
+        \SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{MICROSERVICIO\_URL}\SpecialCharTok{\}}\SpecialStringTok{/alineaciones/definir{-}alineacion"}\NormalTok{,}
+\NormalTok{        json}\OperatorTok{=}\NormalTok{data,}
+\NormalTok{        headers}\OperatorTok{=}\NormalTok{\{}\StringTok{\textquotesingle{}Authorization\textquotesingle{}}\NormalTok{: request.headers.get(}\StringTok{\textquotesingle{}Authorization\textquotesingle{}}\NormalTok{)\},}
+\NormalTok{        timeout}\OperatorTok{=}\DecValTok{10}
+\NormalTok{    )}
+    
+    \ControlFlowTok{return}\NormalTok{ jsonify(response.json()), response.status\_code}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{2. Obtener Alineaciones
+(Líder)}\label{obtener-alineaciones-luxedder}
+
+\textbf{Ruta}: \texttt{GET\ /lider/alineaciones}
+
+\textbf{Flujo}:
+
+\begin{verbatim}
+Frontend Web → API Gateway Proxy → Validaciones → Microservicio → Respuesta
+\end{verbatim}
+
+\textbf{Código}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@alineaciones\_proxy\_bp.route}\NormalTok{(}\StringTok{\textquotesingle{}/lider/alineaciones\textquotesingle{}}\NormalTok{, methods}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}GET\textquotesingle{}}\NormalTok{])}
+\AttributeTok{@jwt\_required}\NormalTok{()}
+\KeywordTok{def}\NormalTok{ obtener\_alineaciones():}
+    \CommentTok{\# Validar autenticación y permisos}
+    \CommentTok{\# Obtener del microservicio}
+\NormalTok{    response }\OperatorTok{=}\NormalTok{ requests.get(}
+        \SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{MICROSERVICIO\_URL}\SpecialCharTok{\}}\SpecialStringTok{/alineaciones"}\NormalTok{,}
+\NormalTok{        params}\OperatorTok{=}\NormalTok{\{}\StringTok{\textquotesingle{}id\_partido\textquotesingle{}}\NormalTok{: id\_partido, }\StringTok{\textquotesingle{}id\_equipo\textquotesingle{}}\NormalTok{: id\_equipo\},}
+\NormalTok{        timeout}\OperatorTok{=}\DecValTok{5}
+\NormalTok{    )}
+    \ControlFlowTok{return}\NormalTok{ jsonify(response.json()), }\DecValTok{200}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{3. Obtener Alineaciones
+(Organizador)}\label{obtener-alineaciones-organizador}
+
+\textbf{Ruta}:
+\texttt{GET\ /organizador/partidos/\textless{}id\textgreater{}/alineaciones}
+
+\textbf{Flujo}:
+
+\begin{verbatim}
+Frontend Web → API Gateway Proxy → Microservicio (ambos equipos) → Respuesta combinada
+\end{verbatim}
+
+\textbf{Código}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\AttributeTok{@alineaciones\_proxy\_bp.route}\NormalTok{(}\StringTok{\textquotesingle{}/organizador/partidos/\textless{}int:id\_partido\textgreater{}/alineaciones\textquotesingle{}}\NormalTok{, methods}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}GET\textquotesingle{}}\NormalTok{])}
+\AttributeTok{@jwt\_required}\NormalTok{()}
+\KeywordTok{def}\NormalTok{ obtener\_alineaciones\_partido(id\_partido):}
+    \CommentTok{\# Obtener alineaciones del equipo local}
+\NormalTok{    response\_local }\OperatorTok{=}\NormalTok{ requests.get(}
+        \SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{MICROSERVICIO\_URL}\SpecialCharTok{\}}\SpecialStringTok{/alineaciones"}\NormalTok{,}
+\NormalTok{        params}\OperatorTok{=}\NormalTok{\{}\StringTok{\textquotesingle{}id\_partido\textquotesingle{}}\NormalTok{: id\_partido, }\StringTok{\textquotesingle{}id\_equipo\textquotesingle{}}\NormalTok{: partido.id\_equipo\_local\}}
+\NormalTok{    )}
+    
+    \CommentTok{\# Obtener alineaciones del equipo visitante}
+\NormalTok{    response\_visitante }\OperatorTok{=}\NormalTok{ requests.get(}
+        \SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{MICROSERVICIO\_URL}\SpecialCharTok{\}}\SpecialStringTok{/alineaciones"}\NormalTok{,}
+\NormalTok{        params}\OperatorTok{=}\NormalTok{\{}\StringTok{\textquotesingle{}id\_partido\textquotesingle{}}\NormalTok{: id\_partido, }\StringTok{\textquotesingle{}id\_equipo\textquotesingle{}}\NormalTok{: partido.id\_equipo\_visitante\}}
+\NormalTok{    )}
+    
+    \CommentTok{\# Combinar respuestas}
+    \ControlFlowTok{return}\NormalTok{ jsonify(\{}
+        \StringTok{\textquotesingle{}alineacion\_local\textquotesingle{}}\NormalTok{: alineacion\_local,}
+        \StringTok{\textquotesingle{}alineacion\_visitante\textquotesingle{}}\NormalTok{: alineacion\_visitante}
+\NormalTok{    \}), }\DecValTok{200}
+\end{Highlighting}
+\end{Shaded}
+
+\subsubsection{4. Validar Alineaciones
+(Organizador)}\label{validar-alineaciones-organizador}
+
+\textbf{Ruta}:
+\texttt{GET\ /organizador/partidos/\textless{}id\textgreater{}/validar-alineaciones}
+
+\textbf{Funcionalidad}: Valida que ambos equipos hayan subido alineación
+antes de iniciar el partido.
+
+\section{Ventajas del Proxy}\label{ventajas-del-proxy}
+
+\subsection{1. Seguridad Centralizada}\label{seguridad-centralizada}
+
+\begin{itemize}
+\tightlist
+\item
+  Todas las validaciones de autenticación y autorización en un solo
+  lugar
+\item
+  No expone el microservicio directamente a los clientes
+\end{itemize}
+
+\subsection{2. Validaciones de Negocio}\label{validaciones-de-negocio}
+
+\begin{itemize}
+\tightlist
+\item
+  Verifica que el usuario tiene permisos sobre el recurso
+\item
+  Valida que el equipo participa en el partido
+\item
+  Valida que el usuario es líder del equipo
+\end{itemize}
+
+\subsection{3. Transformación de
+Datos}\label{transformaciuxf3n-de-datos}
+
+\begin{itemize}
+\tightlist
+\item
+  Puede combinar respuestas de múltiples llamadas al microservicio
+\item
+  Adapta el formato de respuesta según el cliente
+\end{itemize}
+
+\subsection{4. Manejo de Errores}\label{manejo-de-errores}
+
+\begin{itemize}
+\tightlist
+\item
+  Manejo centralizado de errores de comunicación
+\item
+  Fallback graceful si el microservicio no está disponible
+\end{itemize}
+
+\section{Configuración}\label{configuraciuxf3n}
+
+\subsection{URL del Microservicio}\label{url-del-microservicio}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MICROSERVICIO\_URL }\OperatorTok{=} \StringTok{"http://localhost:5001"}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Registro del Blueprint}\label{registro-del-blueprint}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# En app/\_\_init\_\_.py}
+\ImportTok{from}\NormalTok{ app.routes.alineaciones\_proxy\_routes }\ImportTok{import}\NormalTok{ alineaciones\_proxy\_bp}
+\NormalTok{app.register\_blueprint(alineaciones\_proxy\_bp)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Endpoints del Microservicio}\label{endpoints-del-microservicio}
+
+\subsection{\texorpdfstring{POST
+\texttt{/alineaciones/definir-alineacion}}{POST /alineaciones/definir-alineacion}}\label{post-alineacionesdefinir-alineacion}
+
+Definir alineación completa con posiciones drag \& drop.
+
+\textbf{Request}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{\{}
+  \DataTypeTok{"id\_partido"}\FunctionTok{:} \DecValTok{1}\FunctionTok{,}
+  \DataTypeTok{"id\_equipo"}\FunctionTok{:} \DecValTok{1}\FunctionTok{,}
+  \DataTypeTok{"formacion"}\FunctionTok{:} \StringTok{"4{-}4{-}2"}\FunctionTok{,}
+  \DataTypeTok{"titulares"}\FunctionTok{:} \OtherTok{[}
+    \FunctionTok{\{}
+      \DataTypeTok{"id\_jugador"}\FunctionTok{:} \DecValTok{5}\FunctionTok{,}
+      \DataTypeTok{"posicion\_x"}\FunctionTok{:} \FloatTok{25.0}\FunctionTok{,}
+      \DataTypeTok{"posicion\_y"}\FunctionTok{:} \FloatTok{50.0}
+    \FunctionTok{\}}
+  \OtherTok{]}\FunctionTok{,}
+  \DataTypeTok{"suplentes"}\FunctionTok{:} \OtherTok{[}\ErrorTok{...}\OtherTok{]}
+\FunctionTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{GET
+\texttt{/alineaciones}}{GET /alineaciones}}\label{get-alineaciones}
+
+Obtener alineaciones con datos enriquecidos.
+
+\textbf{Query Parameters}: - \texttt{id\_partido} (opcional) -
+\texttt{id\_equipo} (opcional)
+
+\subsection{\texorpdfstring{POST
+\texttt{/alineaciones/cambio}}{POST /alineaciones/cambio}}\label{post-alineacionescambio}
+
+Realizar cambio durante el partido.
+
+\section{Comunicación con API
+Gateway}\label{comunicaciuxf3n-con-api-gateway}
+
+El microservicio se comunica con el API Gateway mediante:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{BackendAPIClient}: Cliente HTTP para consultar datos del API
+  Gateway
+\item
+  \textbf{Validaciones}: Verifica existencia de partidos y equipos
+\item
+  \textbf{Enriquecimiento}: Obtiene datos adicionales (nombres de
+  jugadores, equipos)
+\end{enumerate}
+
+\section{Modelo de Datos}\label{modelo-de-datos}
+
+\subsection{\texorpdfstring{Tabla
+\texttt{alineaciones}}{Tabla alineaciones}}\label{tabla-alineaciones}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{CREATE} \KeywordTok{TABLE}\NormalTok{ \textasciigrave{}alineaciones\textasciigrave{} (}
+\NormalTok{  \textasciigrave{}id\_alineacion\textasciigrave{} }\DataTypeTok{int} \KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{ AUTO\_INCREMENT,}
+\NormalTok{  \textasciigrave{}id\_partido\textasciigrave{} }\DataTypeTok{int} \KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  \textasciigrave{}id\_equipo\textasciigrave{} }\DataTypeTok{int} \KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  \textasciigrave{}id\_jugador\textasciigrave{} }\DataTypeTok{int} \KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  \textasciigrave{}titular\textasciigrave{} tinyint(}\DecValTok{1}\NormalTok{) }\KeywordTok{DEFAULT} \StringTok{\textquotesingle{}1\textquotesingle{}}\NormalTok{,}
+\NormalTok{  \textasciigrave{}minuto\_entrada\textasciigrave{} }\DataTypeTok{int} \KeywordTok{DEFAULT} \StringTok{\textquotesingle{}0\textquotesingle{}}\NormalTok{,}
+\NormalTok{  \textasciigrave{}minuto\_salida\textasciigrave{} }\DataTypeTok{int} \KeywordTok{DEFAULT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  \textasciigrave{}posicion\_x\textasciigrave{} }\DataTypeTok{float} \KeywordTok{DEFAULT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  \textasciigrave{}posicion\_y\textasciigrave{} }\DataTypeTok{float} \KeywordTok{DEFAULT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{  \textasciigrave{}formacion\textasciigrave{} }\DataTypeTok{varchar}\NormalTok{(}\DecValTok{20}\NormalTok{) }\KeywordTok{DEFAULT} \KeywordTok{NULL}\NormalTok{,}
+  \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{ (\textasciigrave{}id\_alineacion\textasciigrave{}),}
+  \KeywordTok{UNIQUE} \KeywordTok{KEY}\NormalTok{ \textasciigrave{}unique\_jugador\_partido\textasciigrave{} (\textasciigrave{}id\_partido\textasciigrave{},\textasciigrave{}id\_jugador\textasciigrave{})}
+\NormalTok{) ENGINE}\OperatorTok{=}\NormalTok{InnoDB;}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Validaciones}\label{validaciones}
+
+El microservicio valida:
+
+\begin{itemize}
+\tightlist
+\item
+  Partido existe y está en estado válido
+\item
+  Equipo participa en el partido
+\item
+  Jugador pertenece al equipo
+\item
+  No hay duplicados en la alineación
+\item
+  Cambios solo en partidos en juego
+\end{itemize}
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos-5}
+
+Para más detalles sobre: - API Gateway: \hyperref[api-gateway]{API
+Gateway} - Base de Datos: \href{database.qmd}{Database}
+
+\chapter{Base de Datos}\label{base-de-datos}
+
+\chapter{Base de Datos}\label{base-de-datos-1}
+
+\section{Tecnología}\label{tecnologuxeda}
+
+\begin{itemize}
+\tightlist
+\item
+  MySQL 8.0
+\item
+  SQLAlchemy ORM
+\item
+  Coordenadas GPS (latitud/longitud)
+\end{itemize}
+
+\section{Tablas Principales}\label{tablas-principales}
+
+\subsection{\texorpdfstring{\texttt{usuarios}}{usuarios}}\label{usuarios}
+
+\begin{itemize}
+\tightlist
+\item
+  Información de usuarios del sistema
+\item
+  Roles: superadmin, admin, lider, espectador
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{campeonatos}}{campeonatos}}\label{campeonatos}
+
+\begin{itemize}
+\tightlist
+\item
+  Información de campeonatos
+\item
+  Estados: planificacion, en\_curso, finalizado
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{equipos}}{equipos}}\label{equipos}
+
+\begin{itemize}
+\tightlist
+\item
+  Información de equipos
+\item
+  \textbf{Coordenadas GPS}: \texttt{estadio\_latitud},
+  \texttt{estadio\_longitud}
+\item
+  Estados: pendiente, aprobado, rechazado
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{partidos}}{partidos}}\label{partidos}
+
+\begin{itemize}
+\tightlist
+\item
+  Información de partidos
+\item
+  Estados: programado, en\_juego, finalizado
+\end{itemize}
+
+\subsection{\texorpdfstring{\texttt{alineaciones}}{alineaciones}}\label{alineaciones}
+
+\begin{itemize}
+\tightlist
+\item
+  Alineaciones de partidos
+\item
+  Posiciones: \texttt{posicion\_x}, \texttt{posicion\_y}
+\item
+  Formación del equipo
+\end{itemize}
+
+\section{Coordenadas GPS}\label{coordenadas-gps}
+
+Las coordenadas GPS se almacenan en \texttt{equipos}: -
+\texttt{estadio\_latitud}: Decimal(10,8) - \texttt{estadio\_longitud}:
+Decimal(11,8)
+
+Utilizadas en la App Móvil para: - Mostrar marcadores en Google Maps -
+Navegación a estadios
+
+\part{Frontend Web}
+
+\chapter{Aplicación Web Angular}\label{aplicaciuxf3n-web-angular}
+
+\chapter{Aplicación Web Angular}\label{aplicaciuxf3n-web-angular-1}
+
+\section{Introducción}\label{introducciuxf3n-7}
+
+La aplicación web \textbf{Campeonato Libre} está construida con Angular
+21 y proporciona una interfaz administrativa completa para gestionar
+campeonatos, equipos, jugadores y partidos.
+
+\section{Tecnologías}\label{tecnologuxedas-1}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Framework}: Angular 21.0.0
+\item
+  \textbf{Lenguaje}: TypeScript 5.9.2
+\item
+  \textbf{UI Framework}: Angular Material 21.0.2
+\item
+  \textbf{Estado}: RxJS 7.8.0
+\item
+  \textbf{Routing}: Angular Router 21.0.0
+\item
+  \textbf{HTTP}: HttpClient con interceptors
+\end{itemize}
+
+\section{Estructura del Proyecto}\label{estructura-del-proyecto}
+
+\begin{verbatim}
+frontend/src/app/
+├── app.ts                    # Componente raíz
+├── app.routes.ts            # Configuración de rutas
+├── app.config.ts            # Configuración de la aplicación
+├── core/                    # Módulos core
+│   ├── guards/              # Route guards
+│   │   ├── auth.guard.ts
+│   │   ├── organizador.guard.ts
+│   │   └── lider.guard.ts
+│   ├── interceptors/        # HTTP interceptors
+│   │   └── auth.interceptor.ts
+│   ├── services/            # Servicios core
+│   │   ├── auth.service.ts
+│   │   └── perfil.service.ts
+│   └── models/              # Modelos de datos
+│       └── usuario.model.ts
+├── features/                # Módulos por feature
+│   ├── auth/                # Autenticación
+│   │   └── components/
+│   │       ├── login/
+│   │       ├── register/
+│   │       └── unlock-account/
+│   ├── superadmin/          # Módulo Superadmin
+│   │   ├── components/
+│   │   │   ├── dashboard/
+│   │   │   └── sidebar/
+│   │   └── services/
+│   ├── organizador/         # Módulo Organizador
+│   │   ├── components/
+│   │   │   ├── campeonatos/
+│   │   │   ├── equipos/
+│   │   │   ├── partidos/
+│   │   │   └── sidebar/
+│   │   └── services/
+│   ├── lider-equipo/        # Módulo Líder
+│   │   ├── components/
+│   │   │   ├── alineaciones/
+│   │   │   ├── equipos/
+│   │   │   └── jugadores/
+│   │   └── services/
+│   ├── dashboard/           # Dashboard principal
+│   ├── landing/             # Landing page
+│   └── perfil/              # Perfil de usuario
+└── shared/                   # Componentes compartidos
+    └── components/
+\end{verbatim}
+
+\section{Arquitectura de Componentes}\label{arquitectura-de-componentes}
+
+\subsection{1. SPA Router (Angular
+Router)}\label{spa-router-angular-router}
+
+\textbf{Responsabilidad}: Enrutamiento y navegación entre módulos.
+
+\textbf{Configuración}: \texttt{app.routes.ts}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{export} \KeywordTok{const}\NormalTok{ routes}\OperatorTok{:}\NormalTok{ Routes }\OperatorTok{=}\NormalTok{ [}
+\NormalTok{  \{ path}\OperatorTok{:} \StringTok{\textquotesingle{}\textquotesingle{}}\OperatorTok{,}\NormalTok{ loadComponent}\OperatorTok{:}\NormalTok{ () }\KeywordTok{=\textgreater{}} \ImportTok{import}\NormalTok{(}\StringTok{\textquotesingle{}./features/landing/landing.component\textquotesingle{}}\NormalTok{) \}}\OperatorTok{,}
+\NormalTok{  \{ path}\OperatorTok{:} \StringTok{\textquotesingle{}auth/login\textquotesingle{}}\OperatorTok{,}\NormalTok{ loadComponent}\OperatorTok{:}\NormalTok{ () }\KeywordTok{=\textgreater{}} \ImportTok{import}\NormalTok{(}\StringTok{\textquotesingle{}./features/auth/components/login/login.component\textquotesingle{}}\NormalTok{) \}}\OperatorTok{,}
+\NormalTok{  \{ path}\OperatorTok{:} \StringTok{\textquotesingle{}superadmin\textquotesingle{}}\OperatorTok{,}\NormalTok{ loadComponent}\OperatorTok{:}\NormalTok{ () }\KeywordTok{=\textgreater{}} \ImportTok{import}\NormalTok{(}\StringTok{\textquotesingle{}./features/superadmin/superadmin.component\textquotesingle{}}\NormalTok{)}\OperatorTok{,}\NormalTok{ canActivate}\OperatorTok{:}\NormalTok{ [superadminGuard] \}}\OperatorTok{,}
+\NormalTok{  \{ path}\OperatorTok{:} \StringTok{\textquotesingle{}organizador\textquotesingle{}}\OperatorTok{,}\NormalTok{ loadComponent}\OperatorTok{:}\NormalTok{ () }\KeywordTok{=\textgreater{}} \ImportTok{import}\NormalTok{(}\StringTok{\textquotesingle{}./features/organizador/organizador.component\textquotesingle{}}\NormalTok{)}\OperatorTok{,}\NormalTok{ canActivate}\OperatorTok{:}\NormalTok{ [organizadorGuard] \}}\OperatorTok{,}
+\NormalTok{  \{ path}\OperatorTok{:} \StringTok{\textquotesingle{}lider\textquotesingle{}}\OperatorTok{,}\NormalTok{ loadComponent}\OperatorTok{:}\NormalTok{ () }\KeywordTok{=\textgreater{}} \ImportTok{import}\NormalTok{(}\StringTok{\textquotesingle{}./features/lider{-}equipo/lider{-}equipo.component\textquotesingle{}}\NormalTok{)}\OperatorTok{,}\NormalTok{ canActivate}\OperatorTok{:}\NormalTok{ [liderGuard] \}}\OperatorTok{,}
+\NormalTok{]}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Características}: - Lazy loading de componentes - Guards de
+autenticación y autorización - Rutas protegidas por rol
+
+\subsection{2. Módulo de
+Autenticación}\label{muxf3dulo-de-autenticaciuxf3n-1}
+
+\textbf{Componentes}: - \texttt{LoginComponent}: Inicio de sesión -
+\texttt{RegisterComponent}: Registro de usuarios -
+\texttt{UnlockAccountComponent}: Desbloqueo de cuenta
+
+\textbf{Funcionalidades}: - Login con email y contraseña - Registro con
+validación de email - Recuperación de contraseña - Desbloqueo de cuenta
+con código
+
+\subsection{3. Módulo Superadmin}\label{muxf3dulo-superadmin-1}
+
+\textbf{Componentes}: - \texttt{DashboardComponent}: Dashboard con
+estadísticas - \texttt{SidebarComponent}: Navegación lateral
+
+\textbf{Funcionalidades}: - Gestión de organizadores - Supervisión de
+campeonatos - Configuración global del sistema
+
+\subsection{4. Módulo Organizador}\label{muxf3dulo-organizador-1}
+
+\textbf{Componentes}: - Gestión de campeonatos (crear, editar, listar) -
+Gestión de equipos (aprobar/rechazar) - Gestión de partidos (programar,
+registrar resultados) - Gestión de alineaciones (ver, validar)
+
+\textbf{Funcionalidades}: - Crear y gestionar campeonatos -
+Aprobar/rechazar inscripciones de equipos - Generar fixtures
+automáticamente - Registrar resultados de partidos - Validar
+alineaciones antes de iniciar partidos
+
+\subsection{5. Módulo Líder}\label{muxf3dulo-luxedder-1}
+
+\textbf{Componentes}: - \texttt{AlineacionesComponent}: Gestión de
+alineaciones con drag \& drop - Gestión de equipos - Gestión de
+jugadores
+
+\textbf{Funcionalidades}: - Definir alineaciones con posicionamiento -
+Gestionar jugadores del equipo - Ver estadísticas del equipo - Solicitar
+inscripción a campeonatos
+
+\subsection{6. Módulo Público}\label{muxf3dulo-puxfablico-1}
+
+\textbf{Componentes}: - \texttt{LandingComponent}: Página de inicio -
+\texttt{BienvenidoComponent}: Página de bienvenida -
+\texttt{SobreNosotrosComponent}: Información del sistema -
+\texttt{PreciosComponent}: Planes y precios
+
+\section{Capa de Comunicación HTTP}\label{capa-de-comunicaciuxf3n-http}
+
+\subsection{HTTP Client Layer}\label{http-client-layer-1}
+
+\textbf{Implementación}: \texttt{HttpClient} de Angular con
+interceptors.
+
+\textbf{Configuración}: \texttt{app.config.ts}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{export} \KeywordTok{const}\NormalTok{ appConfig}\OperatorTok{:}\NormalTok{ ApplicationConfig }\OperatorTok{=}\NormalTok{ \{}
+\NormalTok{  providers}\OperatorTok{:}\NormalTok{ [}
+    \FunctionTok{provideHttpClient}\NormalTok{(}\FunctionTok{withInterceptors}\NormalTok{([authInterceptor]))}
+\NormalTok{  ]}
+\NormalTok{\}}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Auth Interceptor}\label{auth-interceptor-1}
+
+\textbf{Archivo}: \texttt{core/interceptors/auth.interceptor.ts}
+
+\textbf{Funcionalidad}: - Inyección automática de JWT token en todas las
+peticiones - Manejo de errores 401 (redirige a login) - Refresh token
+automático
+
+\textbf{Implementación}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{export} \KeywordTok{const}\NormalTok{ authInterceptor}\OperatorTok{:}\NormalTok{ HttpInterceptorFn }\OperatorTok{=}\NormalTok{ (req}\OperatorTok{,}\NormalTok{ next) }\KeywordTok{=\textgreater{}}\NormalTok{ \{}
+  \KeywordTok{const}\NormalTok{ authService }\OperatorTok{=} \FunctionTok{inject}\NormalTok{(AuthService)}\OperatorTok{;}
+  \KeywordTok{const}\NormalTok{ token }\OperatorTok{=}\NormalTok{ authService}\OperatorTok{.}\FunctionTok{getAccessToken}\NormalTok{()}\OperatorTok{;}
+  
+  \ControlFlowTok{if}\NormalTok{ (token) \{}
+\NormalTok{    req }\OperatorTok{=}\NormalTok{ req}\OperatorTok{.}\FunctionTok{clone}\NormalTok{(\{}
+\NormalTok{      setHeaders}\OperatorTok{:}\NormalTok{ \{}
+\NormalTok{        Authorization}\OperatorTok{:} \VerbatimStringTok{\textasciigrave{}Bearer }\SpecialCharTok{$\{}\NormalTok{token}\SpecialCharTok{\}}\VerbatimStringTok{\textasciigrave{}}
+\NormalTok{      \}}
+\NormalTok{    \})}\OperatorTok{;}
+\NormalTok{  \}}
+  
+  \ControlFlowTok{return} \FunctionTok{next}\NormalTok{(req)}\OperatorTok{;}
+\NormalTok{\}}\OperatorTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Capa de Seguridad}\label{capa-de-seguridad-1}
+
+\subsection{Security Guards}\label{security-guards-1}
+
+\textbf{Guards Implementados}:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{AuthGuard} (\texttt{auth.guard.ts}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Verifica autenticación
+  \item
+    Redirige a login si no está autenticado
+  \end{itemize}
+\item
+  \textbf{SuperadminGuard} (\texttt{auth.guard.ts}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Verifica rol \texttt{superadmin}
+  \item
+    Redirige si no tiene permisos
+  \end{itemize}
+\item
+  \textbf{OrganizadorGuard} (\texttt{organizador.guard.ts}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Verifica rol \texttt{admin} o \texttt{superadmin}
+  \item
+    Protege rutas de organizador
+  \end{itemize}
+\item
+  \textbf{LiderGuard} (\texttt{lider.guard.ts}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Verifica rol \texttt{lider}
+  \item
+    Protege rutas de líder
+  \end{itemize}
+\end{enumerate}
+
+\textbf{Uso en Rutas}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\{}
+\NormalTok{  path}\OperatorTok{:} \StringTok{\textquotesingle{}organizador\textquotesingle{}}\OperatorTok{,}
+\NormalTok{  loadComponent}\OperatorTok{:}\NormalTok{ () }\KeywordTok{=\textgreater{}} \ImportTok{import}\NormalTok{(}\StringTok{\textquotesingle{}./features/organizador/organizador.component\textquotesingle{}}\NormalTok{)}\OperatorTok{,}
+\NormalTok{  canActivate}\OperatorTok{:}\NormalTok{ [organizadorGuard]}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Servicios Principales}\label{servicios-principales}
+
+\subsection{AuthService}\label{authservice-1}
+
+\textbf{Archivo}: \texttt{core/services/auth.service.ts}
+
+\textbf{Métodos}: - \texttt{login(email,\ password)}: Iniciar sesión -
+\texttt{register(data)}: Registrar usuario - \texttt{logout()}: Cerrar
+sesión - \texttt{getAccessToken()}: Obtener token JWT -
+\texttt{refreshToken()}: Renovar token - \texttt{isAuthenticated()}:
+Verificar autenticación - \texttt{getCurrentUser()}: Obtener usuario
+actual
+
+\subsection{PerfilService}\label{perfilservice}
+
+\textbf{Archivo}: \texttt{core/services/perfil.service.ts}
+
+\textbf{Funcionalidad}: Gestión del perfil de usuario
+
+\section{Flujo de Autenticación}\label{flujo-de-autenticaciuxf3n-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sequenceDiagram}
+\NormalTok{    participant U as Usuario}
+\NormalTok{    participant L as LoginComponent}
+\NormalTok{    participant AS as AuthService}
+\NormalTok{    participant API as API Gateway}
+    
+\NormalTok{    U{-}\textgreater{}\textgreater{}L: Ingresa credenciales}
+\NormalTok{    L{-}\textgreater{}\textgreater{}AS: login(email, password)}
+\NormalTok{    AS{-}\textgreater{}\textgreater{}API: POST /auth/login}
+\NormalTok{    API{-}{-}\textgreater{}\textgreater{}AS: JWT tokens}
+\NormalTok{    AS{-}\textgreater{}\textgreater{}AS: Guardar tokens}
+\NormalTok{    AS{-}{-}\textgreater{}\textgreater{}L: Usuario autenticado}
+\NormalTok{    L{-}\textgreater{}\textgreater{}L: Redirigir según rol}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Flujo de Petición HTTP}\label{flujo-de-peticiuxf3n-http}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sequenceDiagram}
+\NormalTok{    participant C as Component}
+\NormalTok{    participant IC as AuthInterceptor}
+\NormalTok{    participant HC as HttpClient}
+\NormalTok{    participant API as API Gateway}
+    
+\NormalTok{    C{-}\textgreater{}\textgreater{}HC: HTTP Request}
+\NormalTok{    HC{-}\textgreater{}\textgreater{}IC: Intercepta request}
+\NormalTok{    IC{-}\textgreater{}\textgreater{}IC: Agrega JWT token}
+\NormalTok{    IC{-}\textgreater{}\textgreater{}API: Request con Authorization header}
+\NormalTok{    API{-}{-}\textgreater{}\textgreater{}IC: Response}
+\NormalTok{    IC{-}{-}\textgreater{}\textgreater{}HC: Response}
+\NormalTok{    HC{-}{-}\textgreater{}\textgreater{}C: Datos}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Características
+Principales}\label{caracteruxedsticas-principales}
+
+\subsection{1. Lazy Loading}\label{lazy-loading}
+
+Todos los módulos se cargan bajo demanda: - Mejora el tiempo de carga
+inicial - Reduce el tamaño del bundle inicial - Mejor experiencia de
+usuario
+
+\subsection{2. Guards de Seguridad}\label{guards-de-seguridad}
+
+Protección de rutas por rol: - Autenticación requerida - Autorización
+basada en roles - Redirección automática
+
+\subsection{3. Interceptors HTTP}\label{interceptors-http}
+
+\begin{itemize}
+\tightlist
+\item
+  Inyección automática de tokens
+\item
+  Manejo centralizado de errores
+\item
+  Refresh token automático
+\end{itemize}
+
+\subsection{4. Componentes
+Reutilizables}\label{componentes-reutilizables}
+
+En \texttt{shared/components/}: - Componentes UI compartidos -
+Directivas personalizadas - Pipes personalizados
+
+\section{Próximos Pasos}\label{pruxf3ximos-pasos-6}
+
+Para más detalles sobre: - Funcionalidades:
+\href{features.qmd}{Features}
+
+\chapter{Funcionalidades Frontend
+Web}\label{funcionalidades-frontend-web}
+
+\chapter{Funcionalidades Frontend
+Web}\label{funcionalidades-frontend-web-1}
+
+\section{Por Rol}\label{por-rol}
+
+\subsection{Superadministrador}\label{superadministrador}
+
+\begin{itemize}
+\tightlist
+\item
+  Gestión completa de usuarios
+\item
+  Configuración global
+\end{itemize}
+
+\subsection{Organizador}\label{organizador-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Crear y gestionar campeonatos
+\item
+  Aprobar/rechazar inscripciones
+\item
+  Programar partidos
+\item
+  Registrar resultados
+\end{itemize}
+
+\subsection{Líder}\label{luxedder}
+
+\begin{itemize}
+\tightlist
+\item
+  Gestionar equipo y jugadores
+\item
+  Definir alineaciones
+\item
+  Ver estadísticas
+\end{itemize}
+
+\part{Aplicación Móvil}
+
+\chapter{Aplicación Móvil - Visión
+General}\label{aplicaciuxf3n-muxf3vil---visiuxf3n-general}
+
+\chapter{Aplicación Móvil - Visión
+General}\label{aplicaciuxf3n-muxf3vil---visiuxf3n-general-1}
+
+\section{Tecnologías}\label{tecnologuxedas-2}
+
+\begin{itemize}
+\tightlist
+\item
+  React Native 0.83.1, TypeScript
+\item
+  react-native-maps 1.26.20
+\item
+  @react-native-community/voice 1.1.9
+\item
+  Axios 1.13.2
+\end{itemize}
+
+\section{Características
+Principales}\label{caracteruxedsticas-principales-1}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Visualización de Campeonatos}: Lista de campeonatos activos
+\item
+  \textbf{Tabla de Posiciones}: Actualización en tiempo real
+\item
+  \textbf{Calendario de Partidos}: Con búsqueda por voz
+\item
+  \textbf{Mapa Interactivo}: Google Maps con marcadores de estadios
+\item
+  \textbf{Búsqueda por Voz}: Comandos en español
+\end{enumerate}
+
+\section{Pantallas Principales}\label{pantallas-principales}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{HomeScreen}: Pantalla de inicio
+\item
+  \textbf{CampeonatosScreen}: Lista de campeonatos
+\item
+  \textbf{CampeonatoDetailScreen}: Detalle con tabs (Info, Posiciones,
+  Partidos)
+\item
+  \textbf{SedesMapScreen}: Mapa de estadios
+\end{itemize}
+
+\section{Configuración}\label{configuraciuxf3n-1}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{URL Backend}: \texttt{http://10.20.139.22:5000}
+\item
+  \textbf{Timeout}: 15 segundos
+\item
+  \textbf{Google Maps API Key}: Configurada en AndroidManifest.xml
+\end{itemize}
+
+\chapter{Arquitectura de la Aplicación
+Móvil}\label{arquitectura-de-la-aplicaciuxf3n-muxf3vil}
+
+\chapter{Arquitectura de la Aplicación
+Móvil}\label{arquitectura-de-la-aplicaciuxf3n-muxf3vil-1}
+
+\section{Estructura}\label{estructura}
+
+\begin{verbatim}
+src/
+├── components/     # Componentes reutilizables
+├── screens/        # Pantallas principales
+├── navigation/     # Configuración de navegación
+├── theme/          # Tema y estilos
+└── utils/          # Utilidades
+\end{verbatim}
+
+\section{Patrones}\label{patrones}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Component-Based}: Cada pantalla es un componente independiente
+\item
+  \textbf{State Management}: useState para estado local
+\item
+  \textbf{HTTP Client}: Axios con manejo de errores
+\end{itemize}
+
+\section{Navegación}\label{navegaciuxf3n}
+
+Stack Navigation con React Navigation: - Home → Campeonatos → Detalle →
+Mapa
+
+\chapter{Funcionalidades de la Aplicación
+Móvil}\label{funcionalidades-de-la-aplicaciuxf3n-muxf3vil}
+
+\chapter{Funcionalidades de la Aplicación
+Móvil}\label{funcionalidades-de-la-aplicaciuxf3n-muxf3vil-1}
+
+\section{Funcionalidades Principales}\label{funcionalidades-principales}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Visualización de Campeonatos}: Lista de campeonatos activos
+\item
+  \textbf{Tabla de Posiciones}: Actualización en tiempo real
+\item
+  \textbf{Calendario de Partidos}: Con búsqueda por voz
+\item
+  \textbf{Mapa de Estadios}: Google Maps con marcadores
+\item
+  \textbf{Búsqueda por Voz}: Comandos en español
+\end{enumerate}
+
+\section{Estados}\label{estados}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Loading}: Indicadores de carga
+\item
+  \textbf{Empty State}: Mensajes cuando no hay datos
+\item
+  \textbf{Error State}: Manejo de errores con reintento
+\end{itemize}
+
+\chapter{Integración de Mapas}\label{integraciuxf3n-de-mapas}
+
+\chapter{Integración de Mapas}\label{integraciuxf3n-de-mapas-1}
+
+\section{Tecnología}\label{tecnologuxeda-1}
+
+\begin{itemize}
+\tightlist
+\item
+  react-native-maps 1.26.20
+\item
+  Google Maps API
+\item
+  Coordenadas GPS desde backend
+\end{itemize}
+
+\section{Funcionalidades}\label{funcionalidades}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Marcadores Personalizados}: Logos de equipos en estadios
+\item
+  \textbf{Bottom Sheet}: Información del estadio al hacer clic
+\item
+  \textbf{Navegación}: Botón ``Cómo llegar'' con Google Maps nativo
+\item
+  \textbf{Zoom Automático}: Ajuste para mostrar todos los estadios
+\end{enumerate}
+
+\section{Endpoint}\label{endpoint}
+
+\texttt{GET\ /inscripciones/campeonato/\{id\}} - Retorna coordenadas GPS
+
+\chapter{Búsqueda por Voz}\label{buxfasqueda-por-voz}
+
+\chapter{Búsqueda por Voz}\label{buxfasqueda-por-voz-1}
+
+\section{Tecnología}\label{tecnologuxeda-2}
+
+\begin{itemize}
+\tightlist
+\item
+  @react-native-community/voice 1.1.9
+\item
+  Idioma: Español (es-ES)
+\item
+  Reconocimiento local
+\end{itemize}
+
+\section{Comandos Soportados}\label{comandos-soportados}
+
+\begin{itemize}
+\tightlist
+\item
+  ``Partidos de hoy''
+\item
+  ``Partidos de mañana''
+\item
+  ``Partidos de {[}equipo{]}''
+\item
+  ``Mostrar todos los partidos''
+\end{itemize}
+
+\section{Implementación}\label{implementaciuxf3n}
+
+Componente \texttt{VoiceSearchButton} que: 1. Captura voz del usuario 2.
+Procesa comando con \texttt{voiceCommandProcessor} 3. Filtra partidos
+según comando
+
+\part{Integración}
+
+\chapter{API REST - Integración}\label{api-rest---integraciuxf3n}
+
+\chapter{API REST - Integración}\label{api-rest---integraciuxf3n-1}
+
+\section{Endpoints Consumidos por App
+Móvil}\label{endpoints-consumidos-por-app-muxf3vil}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{GET\ /campeonatos} - Lista de campeonatos
+\item
+  \texttt{GET\ /campeonatos/\{id\}} - Detalle de campeonato
+\item
+  \texttt{GET\ /estadisticas/tabla-posiciones} - Tabla de posiciones
+\item
+  \texttt{GET\ /partidos} - Lista de partidos
+\item
+  \texttt{GET\ /inscripciones/campeonato/\{id\}} - Inscripciones con GPS
+\end{itemize}
+
+\section{Tiempos de Respuesta}\label{tiempos-de-respuesta}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Endpoint & Tiempo Promedio \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GET /campeonatos & \textasciitilde150ms \\
+GET /campeonatos/\{id\} & \textasciitilde180ms \\
+GET /estadisticas/tabla-posiciones & \textasciitilde200ms \\
+GET /partidos & \textasciitilde170ms \\
+GET /inscripciones/campeonato/\{id\} & \textasciitilde250ms \\
+\end{longtable}
+
+\chapter{Autenticación}\label{autenticaciuxf3n}
+
+\chapter{Autenticación}\label{autenticaciuxf3n-1}
+
+\section{JWT Tokens}\label{jwt-tokens}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Access Token}: 15 minutos
+\item
+  \textbf{Refresh Token}: 30 días
+\item
+  Header: \texttt{Authorization:\ Bearer\ \{token\}}
+\end{itemize}
+
+\section{Flujo}\label{flujo}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Login → Obtener tokens
+\item
+  Guardar tokens
+\item
+  Usar access token en peticiones
+\item
+  Si expira → Usar refresh token
+\end{enumerate}
+
+\section{Endpoints}\label{endpoints}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{POST\ /auth/login} - Iniciar sesión
+\item
+  \texttt{POST\ /auth/refresh} - Renovar token
+\end{itemize}
+
+\chapter{Manejo de Errores}\label{manejo-de-errores-1}
+
+\chapter{Manejo de Errores}\label{manejo-de-errores-2}
+
+\section{Códigos HTTP}\label{cuxf3digos-http}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Código & Manejo \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+200 & Procesar datos \\
+400 & ``Datos inválidos'' \\
+404 & ``Recurso no encontrado'' + navegar atrás \\
+500 & ``Error del servidor'' \\
+TIMEOUT & ``Tiempo agotado'' + botón reintentar \\
+NO RESPONSE & ``Sin conexión'' + botón reintentar \\
+\end{longtable}
+
+\section{Estados Vacíos}\label{estados-vacuxedos}
+
+Mensajes informativos cuando no hay datos.
+
+\part{Despliegue}
+
+\chapter{Despliegue Backend}\label{despliegue-backend}
+
+\chapter{Despliegue Backend}\label{despliegue-backend-1}
+
+\section{Requisitos}\label{requisitos}
+
+\begin{itemize}
+\tightlist
+\item
+  Python 3.12, MySQL 8.0
+\end{itemize}
+
+\section{Instalación}\label{instalaciuxf3n}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ backend}
+\ExtensionTok{python3} \AttributeTok{{-}m}\NormalTok{ venv venv}
+\BuiltInTok{source}\NormalTok{ venv/bin/activate}
+\ExtensionTok{pip}\NormalTok{ install }\AttributeTok{{-}r}\NormalTok{ requirements.txt}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Configuración}\label{configuraciuxf3n-2}
+
+Crear \texttt{.env}:
+
+\begin{verbatim}
+DATABASE_URL=mysql+pymysql://usuario:password@localhost:3306/gestion_campeonato
+JWT_SECRET_KEY=tu-secret-key
+\end{verbatim}
+
+\section{Ejecutar}\label{ejecutar}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{python}\NormalTok{ run.py}
+\end{Highlighting}
+\end{Shaded}
+
+O con gunicorn:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{gunicorn} \AttributeTok{{-}w}\NormalTok{ 4 }\AttributeTok{{-}b}\NormalTok{ 0.0.0.0:5000 run:app}
+\end{Highlighting}
+\end{Shaded}
+
+\chapter{Despliegue Frontend Web}\label{despliegue-frontend-web}
+
+\chapter{Despliegue Frontend Web}\label{despliegue-frontend-web-1}
+
+\section{Instalación}\label{instalaciuxf3n-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ frontend}
+\ExtensionTok{npm}\NormalTok{ install}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Desarrollo}\label{desarrollo}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{ng}\NormalTok{ serve}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Producción}\label{producciuxf3n}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{ng}\NormalTok{ build }\AttributeTok{{-}{-}configuration}\NormalTok{ production}
+\end{Highlighting}
+\end{Shaded}
+
+\chapter{Despliegue Aplicación
+Móvil}\label{despliegue-aplicaciuxf3n-muxf3vil}
+
+\chapter{Despliegue Aplicación
+Móvil}\label{despliegue-aplicaciuxf3n-muxf3vil-1}
+
+\section{Instalación}\label{instalaciuxf3n-2}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ CampeonatoMovil}
+\ExtensionTok{npm}\NormalTok{ install}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Configurar Google Maps API
+Key}\label{configurar-google-maps-api-key}
+
+Editar \texttt{android/app/src/main/AndroidManifest.xml}
+
+\section{Ejecutar}\label{ejecutar-1}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{npm}\NormalTok{ run android}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Generar APK}\label{generar-apk}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{cd}\NormalTok{ android}
+\ExtensionTok{./gradlew}\NormalTok{ assembleRelease}
+\end{Highlighting}
+\end{Shaded}
+
+\part{Guías de Usuario}
+
+\chapter{Guía de Usuario - Administrador
+Web}\label{guuxeda-de-usuario---administrador-web}
+
+\chapter{Guía de Usuario - Administrador
+Web}\label{guuxeda-de-usuario---administrador-web-1}
+
+\section{Acceso}\label{acceso}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Abrir: http://localhost:4200
+\item
+  Iniciar sesión con credenciales de admin
+\end{enumerate}
+
+\section{Funcionalidades}\label{funcionalidades-1}
+
+\begin{itemize}
+\tightlist
+\item
+  Gestión de campeonatos
+\item
+  Gestión de equipos
+\item
+  Gestión de partidos
+\item
+  Visualización de estadísticas
+\end{itemize}
+
+\chapter{Guía de Usuario - Organizador
+Web}\label{guuxeda-de-usuario---organizador-web}
+
+\chapter{Guía de Usuario - Organizador
+Web}\label{guuxeda-de-usuario---organizador-web-1}
+
+\section{Funcionalidades}\label{funcionalidades-2}
+
+\begin{itemize}
+\tightlist
+\item
+  Crear campeonatos
+\item
+  Gestionar inscripciones
+\item
+  Programar partidos
+\item
+  Registrar resultados
+\end{itemize}
+
+\chapter{Guía de Usuario - App
+Móvil}\label{guuxeda-de-usuario---app-muxf3vil}
+
+\chapter{Guía de Usuario - App
+Móvil}\label{guuxeda-de-usuario---app-muxf3vil-1}
+
+\section{Funcionalidades}\label{funcionalidades-3}
+
+\begin{itemize}
+\tightlist
+\item
+  Ver campeonatos activos
+\item
+  Consultar tabla de posiciones
+\item
+  Ver calendario de partidos
+\item
+  Usar mapa de estadios
+\item
+  Búsqueda por voz
+\end{itemize}
+
+\part{Testing}
+
+\chapter{Pruebas de Integración}\label{pruebas-de-integraciuxf3n}
+
+\chapter{Pruebas de Integración}\label{pruebas-de-integraciuxf3n-1}
+
+\section{Pruebas App Móvil -
+Backend}\label{pruebas-app-muxf3vil---backend}
+
+\begin{itemize}
+\tightlist
+\item
+  Carga de campeonatos: \textless{} 200ms
+\item
+  Manejo de errores: Alertas informativas
+\item
+  Mapa de estadios: Marcadores visibles
+\item
+  Búsqueda por voz: Reconocimiento correcto
+\end{itemize}
+
+\chapter{Rendimiento}\label{rendimiento}
+
+\chapter{Rendimiento}\label{rendimiento-1}
+
+\section{Métricas}\label{muxe9tricas-1}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Endpoint & Tiempo Promedio \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+GET /campeonatos & \textasciitilde150ms \\
+GET /campeonatos/\{id\} & \textasciitilde180ms \\
+GET /estadisticas/tabla-posiciones & \textasciitilde200ms \\
+GET /partidos & \textasciitilde170ms \\
+GET /inscripciones/campeonato/\{id\} & \textasciitilde250ms \\
+\end{longtable}
+
+Todos los endpoints responden en menos de 300ms.
+
+
+\backmatter
+
+
+\end{document}

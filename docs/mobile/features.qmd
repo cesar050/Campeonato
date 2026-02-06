@@ -1,0 +1,19 @@
+---
+title: "Funcionalidades de la Aplicación Móvil"
+---
+
+# Funcionalidades de la Aplicación Móvil
+
+## Funcionalidades Principales
+
+1. **Visualización de Campeonatos**: Lista de campeonatos activos
+2. **Tabla de Posiciones**: Actualización en tiempo real
+3. **Calendario de Partidos**: Con búsqueda por voz
+4. **Mapa de Estadios**: Google Maps con marcadores
+5. **Búsqueda por Voz**: Comandos en español
+
+## Estados
+
+- **Loading**: Indicadores de carga
+- **Empty State**: Mensajes cuando no hay datos
+- **Error State**: Manejo de errores con reintento

@@ -1,0 +1,80 @@
+---
+title: "Manual de Usuario"
+---
+
+# Manual de Usuario
+
+## Manual Web para Administradores
+
+### Acceso al Sistema
+
+1. Abrir navegador en `http://localhost:4200`
+2. Hacer clic en "Iniciar Sesión"
+3. Ingresar email y contraseña de administrador
+4. Hacer clic en "Entrar"
+
+### Funcionalidades Principales
+
+- **Gestión de Campeonatos**: Crear, editar, cambiar estado, generar partidos
+- **Gestión de Equipos**: Aprobar/rechazar equipos, gestionar líderes
+- **Gestión de Partidos**: Programar partidos, registrar resultados
+- **Estadísticas**: Ver tabla de posiciones, goleadores, tarjetas
+
+## Manual Web para Organizadores
+
+### Crear Campeonato
+
+1. Ir a "Campeonatos" → "Nuevo"
+2. Completar formulario (nombre, fechas, tipo de deporte)
+3. Guardar campeonato
+
+### Gestionar Inscripciones
+
+1. Ir a "Inscripciones"
+2. Ver solicitudes pendientes
+3. Aprobar o rechazar con observaciones
+
+### Programar Partidos
+
+1. Ir a "Partidos" → "Generar"
+2. Configurar fechas y horarios
+3. Generar fixtures automáticamente
+
+### Registrar Resultados
+
+1. Ir a "Partidos" → Seleccionar partido
+2. Ingresar goles local y visitante
+3. Guardar resultado
+
+## Manual Móvil para Espectadores
+
+### Ver Campeonatos
+
+1. Abrir la aplicación
+2. Hacer clic en "Ver Campeonatos"
+3. Seleccionar un campeonato de la lista
+
+### Consultar Tabla de Posiciones
+
+1. Abrir detalle de campeonato
+2. Ir a tab "Posiciones"
+3. Ver tabla ordenada por puntos
+
+### Ver Calendario de Partidos
+
+1. En detalle de campeonato, ir a tab "Partidos"
+2. Ver lista cronológica de partidos
+3. Usar búsqueda por voz: hacer clic en micrófono y decir "Partidos de hoy"
+
+### Usar Mapa de Estadios
+
+1. En detalle de campeonato, hacer clic en "Ver Mapa de Sedes"
+2. Ver marcadores de estadios en el mapa
+3. Hacer clic en marcador para ver información
+4. Usar "Cómo llegar" para navegación
+
+### Búsqueda por Voz
+
+1. En tab "Partidos", hacer clic en icono de micrófono
+2. Decir comando (ej: "Partidos de hoy", "Partidos de Barcelona")
+3. Ver resultados filtrados

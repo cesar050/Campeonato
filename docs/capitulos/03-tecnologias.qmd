@@ -1,0 +1,35 @@
+---
+title: "Tecnologías Utilizadas"
+---
+
+# Tecnologías Utilizadas
+
+## Stack Tecnológico
+
+| Componente | Tecnología | Versión | Justificación |
+|------------|-----------|---------|---------------|
+| **Frontend Web** | Angular | 21.0.0 | Framework maduro, TypeScript, ecosistema robusto |
+| | TypeScript | 5.9.2 | Tipado estático, mejor mantenibilidad |
+| | Angular Material | 21.0.2 | Componentes UI profesionales |
+| **Frontend Móvil** | React Native | 0.83.1 | Multiplataforma, código compartido |
+| | react-native-maps | 1.26.20 | Integración Google Maps nativa |
+| | @react-native-community/voice | 1.1.9 | Reconocimiento de voz en español |
+| **Backend** | Flask | 3.0.0 | Framework ligero, Python, rápido desarrollo |
+| | Python | 3.12 | Lenguaje versátil, amplia comunidad |
+| | Flask-RESTx | 1.3.0 | Documentación Swagger automática |
+| | Flask-JWT-Extended | 4.6.0 | Autenticación JWT robusta |
+| **Base de Datos** | MySQL | 8.0 | Soporte geográfico, coordenadas GPS |
+| | SQLAlchemy | 3.1.1 | ORM potente, migraciones |
+| **Integraciones** | Google Maps API | - | Mapas interactivos, geocodificación |
+| | Google Speech API | - | Reconocimiento de voz |
+| | SMTP Gmail | - | Envío de emails transaccionales |
+
+## Justificación de Elección
+
+**Angular 21** fue seleccionado por su arquitectura modular, sistema de inyección de dependencias y soporte nativo para TypeScript, facilitando el desarrollo de aplicaciones empresariales complejas con múltiples roles.
+
+**React Native 0.83.1** permite desarrollar una sola aplicación para Android e iOS, reduciendo tiempo de desarrollo y mantenimiento, mientras mantiene rendimiento nativo para operaciones críticas como mapas y reconocimiento de voz.
+
+**Flask 3.0** ofrece flexibilidad y simplicidad para construir APIs REST rápidamente, con extensibilidad mediante extensiones como Flask-RESTx para documentación automática y Flask-JWT-Extended para autenticación segura.
+
+**MySQL 8.0** proporciona soporte nativo para coordenadas geográficas (latitud/longitud) necesario para la funcionalidad de mapas, además de ser una base de datos relacional madura y confiable.

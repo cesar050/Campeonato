@@ -1,0 +1,12 @@
+---
+title: "Guía de Usuario - Organizador Web"
+---
+
+# Guía de Usuario - Organizador Web
+
+## Funcionalidades
+
+- Crear campeonatos
+- Gestionar inscripciones
+- Programar partidos
+- Registrar resultados

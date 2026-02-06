@@ -1,0 +1,23 @@
+---
+title: "Autenticación"
+---
+
+# Autenticación
+
+## JWT Tokens
+
+- **Access Token**: 15 minutos
+- **Refresh Token**: 30 días
+- Header: `Authorization: Bearer {token}`
+
+## Flujo
+
+1. Login → Obtener tokens
+2. Guardar tokens
+3. Usar access token en peticiones
+4. Si expira → Usar refresh token
+
+## Endpoints
+
+- `POST /auth/login` - Iniciar sesión
+- `POST /auth/refresh` - Renovar token
