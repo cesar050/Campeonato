@@ -1,0 +1,78 @@
+---
+title: "Módulo Móvil (React Native)"
+---
+
+# Módulo Móvil (React Native)
+
+## Arquitectura de Componentes
+
+La aplicación móvil sigue una arquitectura basada en componentes con separación clara:
+
+```
+src/
+├── screens/          # Pantallas principales
+├── components/      # Componentes reutilizables
+├── navigation/      # Configuración de navegación
+└── utils/           # Utilidades (constants, voice processor)
+```
+
+## Pantallas Principales
+
+| Pantalla | Descripción | Funcionalidad |
+|----------|-------------|---------------|
+| **HomeScreen** | Pantalla de inicio | Logo, botón para ver campeonatos, partidos destacados |
+| **CampeonatosScreen** | Lista de campeonatos | Cards informativos, filtros, pull-to-refresh |
+| **CampeonatoDetailScreen** | Detalle con tabs | Info, Posiciones, Partidos (con búsqueda por voz) |
+| **SedesMapScreen** | Mapa interactivo | Marcadores de estadios, bottom sheet, navegación |
+
+## Integración Google Maps
+
+La app integra Google Maps mediante `react-native-maps` para mostrar estadios con coordenadas GPS obtenidas del backend:
+
+```typescript
+<MapView provider={PROVIDER_GOOGLE}>
+  {sedes.map(sede => (
+    <Marker coordinate={{latitude: sede.latitud, longitude: sede.longitud}}>
+      <CustomMarker logo={sede.logo_url} />
+    </Marker>
+  ))}
+</MapView>
+```
+
+**Características:**
+- Marcadores personalizados con logos de equipos
+- Bottom sheet con información del estadio
+- Botón "Cómo llegar" que abre Google Maps nativo
+- Zoom automático para mostrar todos los estadios
+
+## Búsqueda por Voz
+
+Implementada con `@react-native-community/voice` para reconocimiento en español:
+
+```typescript
+// Comandos soportados
+const commands = [
+  "Partidos de hoy",
+  "Partidos de mañana",
+  "Partidos de [equipo]",
+  "Mostrar todos los partidos"
+];
+```
+
+El componente `VoiceSearchButton` captura el audio, lo procesa localmente y filtra los partidos según el comando reconocido.
+
+## Manejo de Errores
+
+| Tipo de Error | Código | Manejo en App |
+|---------------|--------|---------------|
+| Sin conexión | NO RESPONSE | Alert "Sin conexión" + botón reintentar |
+| Timeout | TIMEOUT | Alert "Tiempo agotado" + botón reintentar |
+| Recurso no encontrado | 404 | Alert "No encontrado" + navegación atrás |
+| Error del servidor | 500 | Alert "Error del servidor" |
+| Datos inválidos | 400 | Alert "Datos inválidos" |
+
+## Estados de la Aplicación
+
+- **Loading**: ActivityIndicator durante peticiones
+- **Empty State**: Mensajes informativos cuando no hay datos
+- **Error State**: Alertas con opción de reintentar

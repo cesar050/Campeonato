@@ -1,0 +1,256 @@
+---
+title: "Microservicio de Alineaciones"
+---
+
+# Microservicio de Alineaciones
+
+## Introducción
+
+El microservicio de alineaciones es un servicio especializado e independiente que gestiona las alineaciones de partidos. Se comunica con el API Gateway mediante HTTP/REST a través de un **proxy** implementado en el Gateway.
+
+## Arquitectura del Proxy
+
+El API Gateway actúa como **proxy** hacia el microservicio, proporcionando:
+
+1. **Autenticación y Autorización**: Valida JWT tokens antes de enrutar
+2. **Validaciones de Negocio**: Verifica que el usuario tiene permisos
+3. **Transformación de Datos**: Adapta requests/responses si es necesario
+4. **Manejo de Errores**: Centraliza el manejo de errores
+
+## Implementación del Proxy
+
+### Archivo: `backend/app/routes/alineaciones_proxy_routes.py`
+
+El proxy está implementado como un **Flask Blueprint** que enruta las peticiones al microservicio.
+
+### Endpoints del Proxy
+
+#### 1. Definir Alineación (Líder)
+
+**Ruta**: `POST /lider/alineaciones/definir`
+
+**Flujo**:
+```
+Frontend Web → API Gateway Proxy → Validaciones → Microservicio → Respuesta
+```
+
+**Código**:
+```python
+@alineaciones_proxy_bp.route('/lider/alineaciones/definir', methods=['POST'])
+@jwt_required()
+def definir_alineacion():
+    # 1. Validar autenticación (JWT)
+    identity = get_jwt_identity()
+    usuario = Usuario.query.get(identity)
+    
+    # 2. Validar rol
+    if usuario.rol != 'lider':
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    # 3. Validar que el partido existe
+    partido = Partido.query.get(data.get('id_partido'))
+    if not partido:
+        return jsonify({'error': 'Partido no encontrado'}), 404
+    
+    # 4. Validar que el equipo participa en el partido
+    id_equipo = data.get('id_equipo')
+    if id_equipo not in [partido.id_equipo_local, partido.id_equipo_visitante]:
+        return jsonify({'error': 'El equipo no participa en este partido'}), 400
+    
+    # 5. Validar que el usuario es líder del equipo
+    equipo = Equipo.query.get(id_equipo)
+    if equipo.id_lider != usuario.id_usuario:
+        return jsonify({'error': 'No eres líder de este equipo'}), 403
+    
+    # 6. Enviar al microservicio
+    response = requests.post(
+        f"{MICROSERVICIO_URL}/alineaciones/definir-alineacion",
+        json=data,
+        headers={'Authorization': request.headers.get('Authorization')},
+        timeout=10
+    )
+    
+    return jsonify(response.json()), response.status_code
+```
+
+#### 2. Obtener Alineaciones (Líder)
+
+**Ruta**: `GET /lider/alineaciones`
+
+**Flujo**:
+```
+Frontend Web → API Gateway Proxy → Validaciones → Microservicio → Respuesta
+```
+
+**Código**:
+```python
+@alineaciones_proxy_bp.route('/lider/alineaciones', methods=['GET'])
+@jwt_required()
+def obtener_alineaciones():
+    # Validar autenticación y permisos
+    # Obtener del microservicio
+    response = requests.get(
+        f"{MICROSERVICIO_URL}/alineaciones",
+        params={'id_partido': id_partido, 'id_equipo': id_equipo},
+        timeout=5
+    )
+    return jsonify(response.json()), 200
+```
+
+#### 3. Obtener Alineaciones (Organizador)
+
+**Ruta**: `GET /organizador/partidos/<id>/alineaciones`
+
+**Flujo**:
+```
+Frontend Web → API Gateway Proxy → Microservicio (ambos equipos) → Respuesta combinada
+```
+
+**Código**:
+```python
+@alineaciones_proxy_bp.route('/organizador/partidos/<int:id_partido>/alineaciones', methods=['GET'])
+@jwt_required()
+def obtener_alineaciones_partido(id_partido):
+    # Obtener alineaciones del equipo local
+    response_local = requests.get(
+        f"{MICROSERVICIO_URL}/alineaciones",
+        params={'id_partido': id_partido, 'id_equipo': partido.id_equipo_local}
+    )
+    
+    # Obtener alineaciones del equipo visitante
+    response_visitante = requests.get(
+        f"{MICROSERVICIO_URL}/alineaciones",
+        params={'id_partido': id_partido, 'id_equipo': partido.id_equipo_visitante}
+    )
+    
+    # Combinar respuestas
+    return jsonify({
+        'alineacion_local': alineacion_local,
+        'alineacion_visitante': alineacion_visitante
+    }), 200
+```
+
+#### 4. Validar Alineaciones (Organizador)
+
+**Ruta**: `GET /organizador/partidos/<id>/validar-alineaciones`
+
+**Funcionalidad**: Valida que ambos equipos hayan subido alineación antes de iniciar el partido.
+
+## Ventajas del Proxy
+
+### 1. Seguridad Centralizada
+
+- Todas las validaciones de autenticación y autorización en un solo lugar
+- No expone el microservicio directamente a los clientes
+
+### 2. Validaciones de Negocio
+
+- Verifica que el usuario tiene permisos sobre el recurso
+- Valida que el equipo participa en el partido
+- Valida que el usuario es líder del equipo
+
+### 3. Transformación de Datos
+
+- Puede combinar respuestas de múltiples llamadas al microservicio
+- Adapta el formato de respuesta según el cliente
+
+### 4. Manejo de Errores
+
+- Manejo centralizado de errores de comunicación
+- Fallback graceful si el microservicio no está disponible
+
+## Configuración
+
+### URL del Microservicio
+
+```python
+MICROSERVICIO_URL = "http://localhost:5001"
+```
+
+### Registro del Blueprint
+
+```python
+# En app/__init__.py
+from app.routes.alineaciones_proxy_routes import alineaciones_proxy_bp
+app.register_blueprint(alineaciones_proxy_bp)
+```
+
+## Endpoints del Microservicio
+
+### POST `/alineaciones/definir-alineacion`
+
+Definir alineación completa con posiciones drag & drop.
+
+**Request**:
+```json
+{
+  "id_partido": 1,
+  "id_equipo": 1,
+  "formacion": "4-4-2",
+  "titulares": [
+    {
+      "id_jugador": 5,
+      "posicion_x": 25.0,
+      "posicion_y": 50.0
+    }
+  ],
+  "suplentes": [...]
+}
+```
+
+### GET `/alineaciones`
+
+Obtener alineaciones con datos enriquecidos.
+
+**Query Parameters**:
+- `id_partido` (opcional)
+- `id_equipo` (opcional)
+
+### POST `/alineaciones/cambio`
+
+Realizar cambio durante el partido.
+
+## Comunicación con API Gateway
+
+El microservicio se comunica con el API Gateway mediante:
+
+1. **BackendAPIClient**: Cliente HTTP para consultar datos del API Gateway
+2. **Validaciones**: Verifica existencia de partidos y equipos
+3. **Enriquecimiento**: Obtiene datos adicionales (nombres de jugadores, equipos)
+
+## Modelo de Datos
+
+### Tabla `alineaciones`
+
+```sql
+CREATE TABLE `alineaciones` (
+  `id_alineacion` int NOT NULL AUTO_INCREMENT,
+  `id_partido` int NOT NULL,
+  `id_equipo` int NOT NULL,
+  `id_jugador` int NOT NULL,
+  `titular` tinyint(1) DEFAULT '1',
+  `minuto_entrada` int DEFAULT '0',
+  `minuto_salida` int DEFAULT NULL,
+  `posicion_x` float DEFAULT NULL,
+  `posicion_y` float DEFAULT NULL,
+  `formacion` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id_alineacion`),
+  UNIQUE KEY `unique_jugador_partido` (`id_partido`,`id_jugador`)
+) ENGINE=InnoDB;
+```
+
+## Validaciones
+
+El microservicio valida:
+
+- Partido existe y está en estado válido
+- Equipo participa en el partido
+- Jugador pertenece al equipo
+- No hay duplicados en la alineación
+- Cambios solo en partidos en juego
+
+## Próximos Pasos
+
+Para más detalles sobre:
+- API Gateway: [API Gateway](api-gateway.qmd)
+- Base de Datos: [Database](database.qmd)

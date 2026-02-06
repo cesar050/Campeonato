@@ -1,0 +1,33 @@
+---
+title: "Aplicación Móvil - Visión General"
+---
+
+# Aplicación Móvil - Visión General
+
+## Tecnologías
+
+- React Native 0.83.1, TypeScript
+- react-native-maps 1.26.20
+- @react-native-community/voice 1.1.9
+- Axios 1.13.2
+
+## Características Principales
+
+1. **Visualización de Campeonatos**: Lista de campeonatos activos
+2. **Tabla de Posiciones**: Actualización en tiempo real
+3. **Calendario de Partidos**: Con búsqueda por voz
+4. **Mapa Interactivo**: Google Maps con marcadores de estadios
+5. **Búsqueda por Voz**: Comandos en español
+
+## Pantallas Principales
+
+- **HomeScreen**: Pantalla de inicio
+- **CampeonatosScreen**: Lista de campeonatos
+- **CampeonatoDetailScreen**: Detalle con tabs (Info, Posiciones, Partidos)
+- **SedesMapScreen**: Mapa de estadios
+
+## Configuración
+
+- **URL Backend**: `http://10.20.139.22:5000`
+- **Timeout**: 15 segundos
+- **Google Maps API Key**: Configurada en AndroidManifest.xml

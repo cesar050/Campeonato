@@ -1,7 +1,7 @@
 // src/theme/colors.ts
 export const colors = {
   primary: '#2E7D32',
-  accent: '#FF6F00',
+  accent: '#B8E994',
   white: '#FFFFFF',
   background: '#F5F5F5',
   textPrimary: '#212121',

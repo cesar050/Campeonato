@@ -145,7 +145,7 @@ export const CampeonatosScreen: React.FC<Props> = ({ onSelectCampeonato }) => {
   const getEstadoBadge = (estado: string) => {
     const badges: Record<string, { text: string; color: string; bg: string }> = {
       en_curso: { text: 'EN CURSO', color: colors.primary, bg: 'rgba(47, 127, 52, 0.1)' },
-      planificacion: { text: 'PRÓXIMAMENTE', color: '#FF6F00', bg: 'rgba(255, 111, 0, 0.1)' },
+      planificacion: { text: 'PRÓXIMAMENTE', color: '#B8E994', bg: 'rgba(184, 233, 148, 0.1)' },
       finalizado: { text: 'FINALIZADO', color: '#757575', bg: '#F5F5F5' },
     };
     return badges[estado] || badges.planificacion;
@@ -641,11 +641,11 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#B8E994',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 6,
-    shadowColor: '#FF6F00',
+    shadowColor: '#B8E994',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,

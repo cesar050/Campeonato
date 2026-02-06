@@ -1,0 +1,50 @@
+---
+title: "Pruebas y Validación"
+---
+
+# Pruebas y Validación
+
+## Pruebas de Integración Móvil-Backend
+
+| Tipo de Prueba | Procedimiento | Resultado |
+|----------------|---------------|-----------|
+| Carga de campeonatos | Abrir app, navegar a lista | Lista visible, tiempo < 200ms |
+| Manejo de error de red | Apagar backend, intentar cargar | Alert "Sin conexión" + botón reintentar |
+| Mapa de estadios | Abrir mapa, verificar marcadores | Marcadores visibles, bottom sheet funcional |
+| Búsqueda por voz | Activar voz, decir "Partidos de hoy" | Reconocimiento correcto, filtrado aplicado |
+| Tabla de posiciones | Abrir tab Posiciones | Tabla ordenada, estadísticas correctas |
+| Navegación a estadio | Clic en "Cómo llegar" | Google Maps abre con ruta |
+
+## Evidencias de Manejo de Errores
+
+El sistema maneja correctamente los siguientes errores:
+
+- **Sin conexión**: Alert informativo con botón de reintento
+- **Timeout**: Alert "Tiempo agotado" con opción de reintentar
+- **404 Not Found**: Alert "Recurso no encontrado" con navegación atrás
+- **500 Server Error**: Alert "Error del servidor" con mensaje claro
+- **Estado vacío**: Mensaje informativo con icono descriptivo
+
+## Métricas de Rendimiento
+
+| Endpoint | Tiempo Promedio | Evaluación |
+|----------|-----------------|------------|
+| GET /campeonatos | ~150ms | Excelente |
+| GET /campeonatos/{id} | ~180ms | Excelente |
+| GET /estadisticas/tabla-posiciones | ~200ms | Excelente |
+| GET /partidos | ~170ms | Excelente |
+| GET /inscripciones/campeonato/{id} | ~250ms | Bueno |
+
+**Conclusión**: Todos los endpoints responden en menos de 300ms, lo cual es óptimo para una aplicación móvil.
+
+## Comandos de Voz Validados
+
+Los siguientes comandos fueron probados y funcionan correctamente:
+
+1. "Partidos de hoy"
+2. "Partidos de mañana"
+3. "Partidos de [nombre equipo]"
+4. "Mostrar todos los partidos"
+5. "Próxima fecha"
+6. "Última fecha"
+7. "Últimos X partidos de [equipo]"

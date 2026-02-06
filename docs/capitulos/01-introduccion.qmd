@@ -1,0 +1,36 @@
+---
+title: "Introducción"
+---
+
+# Introducción
+
+## Descripción del Proyecto
+
+**Campeonato Libre** es un sistema multiplataforma completo diseñado para gestionar campeonatos de fútbol e indoor. El sistema permite a organizadores crear y administrar campeonatos, a líderes gestionar sus equipos y alineaciones, y a espectadores consultar información en tiempo real mediante una aplicación móvil.
+
+## Problemática
+
+El sistema resuelve las siguientes problemáticas:
+
+- **Gestión Descentralizada**: Falta de un sistema centralizado para administrar múltiples campeonatos
+- **Acceso Limitado**: Dificultad para que espectadores consulten información de campeonatos en tiempo real
+- **Procesos Manuales**: Gestión manual de inscripciones, partidos y estadísticas propensa a errores
+- **Falta de Geolocalización**: Ausencia de información sobre ubicación de estadios para espectadores
+
+## Objetivos
+
+### Objetivo General
+
+Desarrollar un sistema multiplataforma que permita la gestión integral de campeonatos deportivos con acceso web para administradores y aplicación móvil para espectadores.
+
+### Objetivos Específicos
+
+1. Implementar una aplicación web Angular para gestión administrativa con roles diferenciados
+2. Desarrollar una aplicación móvil React Native con funcionalidades avanzadas (mapas, voz)
+3. Crear un API Gateway Flask con autenticación JWT y microservicio de alineaciones
+4. Integrar Google Maps para visualización de estadios con coordenadas GPS
+5. Implementar búsqueda por voz en español para consulta de partidos
+
+## Alcance del Sistema
+
+El sistema cubre la gestión completa del ciclo de vida de un campeonato: creación, inscripción de equipos, programación de partidos, registro de resultados, cálculo de estadísticas y consulta pública. Incluye tres interfaces: web administrativa (Angular), aplicación móvil (React Native) y API REST (Flask).

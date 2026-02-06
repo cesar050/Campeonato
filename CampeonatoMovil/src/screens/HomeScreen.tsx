@@ -13,6 +13,7 @@ import {
   Animated,
   Easing,
   Alert,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
@@ -104,6 +105,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   
   const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('todos');
   const [selectedCampeonato, setSelectedCampeonato] = useState<number | null>(null);
+  const [showCampeonatoPicker, setShowCampeonatoPicker] = useState(false);
 
   // Animaciones
   const pulseAnim = useState(new Animated.Value(1))[0];
@@ -211,11 +213,37 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         console.log('Error cargando partidos:', error);
       }
 
-      // 3. Cargar tabla del primer campeonato
+      // 3. Cargar tabla del primer campeonato que tenga equipos
       if (campActivos.length > 0) {
-        const primerCamp = campActivos[0];
-        setSelectedCampeonato(primerCamp.id_campeonato);
-        await loadTabla(primerCamp.id_campeonato);
+        // Intentar encontrar un campeonato con equipos
+        let campeonatoSeleccionado = campActivos[0];
+        let encontrado = false;
+        
+        for (const camp of campActivos) {
+          try {
+            const tablaTest = await axios.get(`${API_URL}/estadisticas/tabla-posiciones`, {
+              params: { id_campeonato: camp.id_campeonato },
+              timeout: API_TIMEOUT,
+            });
+            const tablaData = tablaTest.data.tabla_posiciones || [];
+            if (tablaData.length > 0) {
+              campeonatoSeleccionado = camp;
+              encontrado = true;
+              console.log('✅ [HomeScreen] Campeonato con equipos encontrado:', camp.nombre, 'con', tablaData.length, 'equipos');
+              break;
+            }
+          } catch (error) {
+            console.log('⚠️ [HomeScreen] Error verificando campeonato', camp.nombre, ':', error);
+            // Continuar con el siguiente
+          }
+        }
+        
+        if (!encontrado) {
+          console.log('⚠️ [HomeScreen] No se encontró campeonato con equipos, usando el primero:', campeonatoSeleccionado.nombre);
+        }
+        
+        setSelectedCampeonato(campeonatoSeleccionado.id_campeonato);
+        await loadTabla(campeonatoSeleccionado.id_campeonato);
       }
 
     } catch (error) {
@@ -233,8 +261,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const loadTabla = async (idCampeonato: number) => {
     try {
+      console.log('🔍 [HomeScreen] Cargando tabla para campeonato:', idCampeonato);
       const tablaRes = await axios.get(`${API_URL}/estadisticas/tabla-posiciones`, {
-        params: { id_campeonato: idCampeonato }
+        params: { id_campeonato: idCampeonato },
+        timeout: API_TIMEOUT,
       });
       
       const tablaData = tablaRes.data.tabla_posiciones || [];
@@ -243,10 +273,64 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         equipo: item.equipo || item.nombre
       }));
       
+      console.log('✅ [HomeScreen] Tabla cargada para campeonato', idCampeonato, ':', tablaNormalizada.length, 'equipos');
+      console.log('📊 [HomeScreen] Primeros 3:', tablaNormalizada.slice(0, 3).map(t => ({
+        equipo: t.equipo,
+        puntos: t.puntos,
+        pj: t.partidos_jugados,
+      })));
+      
+      if (tablaNormalizada.length === 0) {
+        console.log('⚠️ [HomeScreen] El campeonato', idCampeonato, 'no tiene equipos registrados');
+      }
+      
+      // Actualizar la tabla directamente - confiamos en que el backend devuelve los datos correctos
       setTabla(tablaNormalizada.slice(0, 3));
     } catch (error) {
-      console.log('Error cargando tabla:', error);
+      console.log('❌ [HomeScreen] Error cargando tabla para campeonato', idCampeonato, ':', error);
       setTabla([]);
+    }
+  };
+
+  const handleCampeonatoChange = async (idCampeonato: number) => {
+    // Limpiar la tabla inmediatamente al cambiar de campeonato
+    setTabla([]);
+    setShowCampeonatoPicker(false);
+    setSelectedCampeonato(idCampeonato);
+    await loadTabla(idCampeonato);
+  };
+
+  const getSelectedCampeonatoName = () => {
+    if (!selectedCampeonato) return 'Seleccionar campeonato';
+    const camp = campeonatos.find(c => c.id_campeonato === selectedCampeonato);
+    return camp ? camp.nombre : 'Seleccionar campeonato';
+  };
+
+  const loadLogosTabla = async (equiposIds: number[]) => {
+    try {
+      const logos: EquipoLogo = {};
+      await Promise.all(
+        equiposIds.map(async (idEquipo) => {
+          try {
+            const equipoRes = await axios.get(`${API_URL}/equipos/${idEquipo}`);
+            const equipo = equipoRes.data.equipo || equipoRes.data;
+            let logoUrl = equipo.logo_url;
+            
+            if (logoUrl && logoUrl.includes('localhost')) {
+              logoUrl = logoUrl.replace('http://localhost:5000', API_URL);
+            }
+            
+            logos[idEquipo] = logoUrl || null;
+          } catch (error) {
+            console.log(`Error cargando logo del equipo ${idEquipo}:`, error);
+            logos[idEquipo] = null;
+          }
+        })
+      );
+      
+      setEquiposLogos(prev => ({ ...prev, ...logos }));
+    } catch (error) {
+      console.error('Error cargando logos de tabla:', error);
     }
   };
 
@@ -735,17 +819,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Tabla de Posiciones</Text>
-            {tabla.length > 0 && (
-              <TouchableOpacity activeOpacity={0.7}>
-                <Text style={styles.seeAll}>Ver completa</Text>
+            {campeonatos.length > 1 && (
+              <TouchableOpacity 
+                style={styles.campeonatoSelector}
+                onPress={() => setShowCampeonatoPicker(true)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.campeonatoSelectorText} numberOfLines={1}>
+                  {getSelectedCampeonatoName()}
+                </Text>
+                <Text style={styles.campeonatoSelectorIcon}>▼</Text>
               </TouchableOpacity>
             )}
           </View>
 
           {tabla.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyIcon}>📊</Text>
-              <Text style={styles.emptyText}>No hay tabla disponible</Text>
+              <Text style={styles.emptyIcon}>⚽</Text>
+              <Text style={styles.emptyText}>
+                {selectedCampeonato 
+                  ? 'No hay equipos registrados en este campeonato'
+                  : 'No hay tabla disponible'
+                }
+              </Text>
             </View>
           ) : (
             <View style={styles.tablaCard}>
@@ -758,9 +854,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </View>
 
               {/* Rows */}
-              {tabla.map((item, index) => (
+              {tabla.map((item, index) => {
+                console.log(`🎯 [HomeScreen] Renderizando fila ${index + 1}:`, {
+                  equipo: item.equipo,
+                  puntos: item.puntos,
+                  partidos_jugados: item.partidos_jugados,
+                  tipo_puntos: typeof item.puntos,
+                  tipo_pj: typeof item.partidos_jugados,
+                });
+                return (
                 <TouchableOpacity 
-                  key={index} 
+                  key={`${item.id_equipo}-${index}`} 
                   style={styles.tablaRow}
                   activeOpacity={0.7}
                 >
@@ -780,10 +884,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
                   <View style={[styles.equipoContainer, { flex: 1 }]}>
                     <View style={styles.escudoMini}>
-                      {item.logo_url ? (
+                      {(item.logo_url || getLogoEquipo(item.id_equipo)) ? (
                         <Image 
-                          source={{ uri: item.logo_url }} 
+                          source={{ uri: item.logo_url || getLogoEquipo(item.id_equipo) || '' }} 
                           style={styles.escudoMiniImage}
+                          onError={(error) => {
+                            console.warn('Error cargando logo en tabla:', item.logo_url || getLogoEquipo(item.id_equipo));
+                          }}
                         />
                       ) : (
                         <Text style={styles.escudoMiniText}>
@@ -792,7 +899,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       )}
                     </View>
                     <Text style={styles.equipoNombre} numberOfLines={1}>
-                      {item.equipo}
+                      {item.equipo || item.nombre || 'Equipo'}
                     </Text>
                     {item.posicion <= 3 && (
                       <Text style={[
@@ -804,14 +911,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     )}
                   </View>
 
-                  <Text style={[styles.tablaValue, { width: 50 }]}>
-                    {item.partidos_jugados}
+                  <Text style={[styles.tablaValue, { width: 50, textAlign: 'center' }]}>
+                    {item.partidos_jugados ?? 0}
                   </Text>
-                  <Text style={[styles.tablaValueDestacado, { width: 50 }]}>
-                    {item.puntos}
+                  <Text style={[styles.tablaValueDestacado, { width: 50, textAlign: 'center' }]}>
+                    {item.puntos ?? 0}
                   </Text>
                 </TouchableOpacity>
-              ))}
+                );
+              })}
             </View>
           )}
         </View>
@@ -924,6 +1032,55 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       >
         <Text style={styles.fabIcon}>🎤</Text>
       </TouchableOpacity>
+
+      {/* ===== MODAL SELECTOR CAMPEONATO ===== */}
+      <Modal
+        visible={showCampeonatoPicker}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowCampeonatoPicker(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowCampeonatoPicker(false)}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Seleccionar Campeonato</Text>
+              <TouchableOpacity 
+                onPress={() => setShowCampeonatoPicker(false)}
+                style={styles.modalCloseButton}
+              >
+                <Text style={styles.modalCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.modalList}>
+              {campeonatos.map((camp) => (
+                <TouchableOpacity
+                  key={camp.id_campeonato}
+                  style={[
+                    styles.modalItem,
+                    selectedCampeonato === camp.id_campeonato && styles.modalItemSelected
+                  ]}
+                  onPress={() => handleCampeonatoChange(camp.id_campeonato)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[
+                    styles.modalItemText,
+                    selectedCampeonato === camp.id_campeonato && styles.modalItemTextSelected
+                  ]}>
+                    {camp.nombre}
+                  </Text>
+                  {selectedCampeonato === camp.id_campeonato && (
+                    <Text style={styles.modalItemCheck}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -1278,14 +1435,14 @@ const styles = StyleSheet.create({
   campeonatoEstado: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#FF6F00',
+    color: '#B8E994',
     textTransform: 'uppercase',
   },
   campeonatoEstadoActivo: {
     color: colors.primary,
   },
   campeonatoEstadoPlanificacion: {
-    color: '#FF6F00',
+    color: '#B8E994',
   },
   campeonatoEstadoFinalizado: {
     color: '#757575',
@@ -1318,10 +1475,11 @@ const styles = StyleSheet.create({
   tablaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#F5F5F5',
+    minHeight: 60,
   },
   posicionContainer: {
     alignItems: 'center',
@@ -1386,13 +1544,13 @@ const styles = StyleSheet.create({
   tablaValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#616161',
+    color: '#212121',
     textAlign: 'center',
   },
   tablaValueDestacado: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#212121',
+    color: colors.primary,
     textAlign: 'center',
   },
 
@@ -1505,17 +1663,105 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#B8E994',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
-    shadowColor: '#FF6F00',
+    shadowColor: '#B8E994',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
   },
   fabIcon: {
     fontSize: 32,
+  },
+
+  // ===== CAMPEONATO SELECTOR =====
+  campeonatoSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    maxWidth: 180,
+  },
+  campeonatoSelectorText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginRight: 4,
+    flex: 1,
+  },
+  campeonatoSelectorIcon: {
+    fontSize: 10,
+    color: '#FFFFFF',
+  },
+
+  // ===== MODAL =====
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#212121',
+  },
+  modalCloseButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCloseText: {
+    fontSize: 24,
+    color: '#757575',
+  },
+  modalList: {
+    paddingHorizontal: 20,
+  },
+  modalItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
+  },
+  modalItemSelected: {
+    backgroundColor: 'rgba(184, 233, 148, 0.1)',
+  },
+  modalItemText: {
+    fontSize: 16,
+    color: '#212121',
+    flex: 1,
+  },
+  modalItemTextSelected: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  modalItemCheck: {
+    fontSize: 18,
+    color: colors.primary,
+    fontWeight: 'bold',
   },
 });
 

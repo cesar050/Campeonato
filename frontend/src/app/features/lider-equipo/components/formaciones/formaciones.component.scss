@@ -907,11 +907,11 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #0891b2, #0e7490);
+  background: linear-gradient(135deg, #B8E994, #95C97A);
   color: white;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0e7490, #155e75);
+    background: linear-gradient(135deg, #95C97A, #81C784);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3);
   }

@@ -1,0 +1,22 @@
+---
+title: "Funcionalidades Frontend Web"
+---
+
+# Funcionalidades Frontend Web
+
+## Por Rol
+
+### Superadministrador
+- Gestión completa de usuarios
+- Configuración global
+
+### Organizador
+- Crear y gestionar campeonatos
+- Aprobar/rechazar inscripciones
+- Programar partidos
+- Registrar resultados
+
+### Líder
+- Gestionar equipo y jugadores
+- Definir alineaciones
+- Ver estadísticas

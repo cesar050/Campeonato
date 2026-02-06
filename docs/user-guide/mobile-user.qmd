@@ -1,0 +1,13 @@
+---
+title: "Guía de Usuario - App Móvil"
+---
+
+# Guía de Usuario - App Móvil
+
+## Funcionalidades
+
+- Ver campeonatos activos
+- Consultar tabla de posiciones
+- Ver calendario de partidos
+- Usar mapa de estadios
+- Búsqueda por voz

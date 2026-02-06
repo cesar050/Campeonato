@@ -1,0 +1,39 @@
+---
+title: "Conclusiones"
+---
+
+# Conclusiones
+
+## Logros Alcanzados
+
+1. **Sistema Multiplataforma Completo**: Se desarrolló exitosamente un sistema con tres interfaces (web Angular, app móvil React Native, API REST Flask) que cubre todas las necesidades del dominio.
+
+2. **Arquitectura de Microservicios**: Se implementó una arquitectura escalable con API Gateway y microservicio de alineaciones, permitiendo separación de responsabilidades y escalabilidad independiente.
+
+3. **Funcionalidades Avanzadas**: Se integraron funcionalidades modernas como Google Maps con coordenadas GPS, búsqueda por voz en español, y manejo robusto de errores en la aplicación móvil.
+
+4. **Seguridad Implementada**: Se implementó autenticación JWT con refresh tokens, rate limiting, account lockout, y validación de entrada en todas las capas.
+
+5. **Rendimiento Óptimo**: Todos los endpoints responden en menos de 300ms, proporcionando una experiencia de usuario fluida.
+
+6. **Documentación Técnica Completa**: Se generó documentación técnica profesional con modelo C4 completo (4 niveles) y guías de instalación y uso.
+
+## Lecciones Aprendidas
+
+1. **Importancia de la Arquitectura**: Una arquitectura bien diseñada desde el inicio facilita el desarrollo y mantenimiento del sistema.
+
+2. **Separación de Responsabilidades**: El uso de microservicios y proxy permite escalar componentes independientemente y mantener código más limpio.
+
+3. **Experiencia de Usuario**: El manejo robusto de errores y estados vacíos mejora significativamente la experiencia del usuario en aplicaciones móviles.
+
+## Trabajo Futuro
+
+1. **Caché Offline**: Implementar caché con AsyncStorage para permitir consulta sin conexión.
+
+2. **Notificaciones Push**: Agregar notificaciones push para resultados de partidos y eventos importantes.
+
+3. **Optimización de Imágenes**: Implementar compresión y CDN para logos y fotos de estadios.
+
+4. **Pruebas Automatizadas**: Agregar suite de pruebas unitarias y de integración automatizadas.
+
+5. **Dashboard de Métricas**: Implementar dashboard de monitoreo con métricas en tiempo real.

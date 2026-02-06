@@ -742,6 +742,34 @@ export const PartidoDetailScreen: React.FC<Props> = ({ partidoId, onBack }) => {
               {jugadoresConPosicion.length > 0 && (
                 <View style={styles.canchaContainer}>
                   <View style={styles.cancha}>
+                    {/* Línea central horizontal */}
+                    <View style={styles.lineaCentral} />
+                    
+                    {/* Círculo central */}
+                    <View style={styles.circuloCentral} />
+                    <View style={styles.puntoCentral} />
+                    
+                    {/* Área grande superior */}
+                    <View style={styles.areaGrandeSuperior} />
+                    <View style={styles.areaGrandeSuperiorLinea} />
+                    <View style={styles.areaPequenaSuperior} />
+                    <View style={styles.puntoPenalSuperior} />
+                    
+                    {/* Área grande inferior */}
+                    <View style={styles.areaGrandeInferior} />
+                    <View style={styles.areaGrandeInferiorLinea} />
+                    <View style={styles.areaPequenaInferior} />
+                    <View style={styles.puntoPenalInferior} />
+                    
+                    {/* Portería superior */}
+                    <View style={styles.porteriaSuperior} />
+                    <View style={styles.porteriaSuperiorPoste} />
+                    
+                    {/* Portería inferior */}
+                    <View style={styles.porteriaInferior} />
+                    <View style={styles.porteriaInferiorPoste} />
+                    
+                    {/* Jugadores */}
                     {jugadoresConPosicion.map((jugador, jIndex) => {
                       // Convertir posiciones de 0-100 a porcentajes
                       const left = `${jugador.posicion_x || 50}%`;
@@ -758,6 +786,7 @@ export const PartidoDetailScreen: React.FC<Props> = ({ partidoId, onBack }) => {
                               top: top,
                               marginLeft: -25,
                               marginTop: -25,
+                              zIndex: 10,
                             },
                           ]}
                         >
@@ -1228,7 +1257,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderRadius: 12,
     position: 'relative',
-    borderWidth: 3,
+    borderWidth: 4,
     borderColor: '#FFFFFF',
     overflow: 'hidden',
   },
@@ -1263,6 +1292,180 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     maxWidth: 60,
     minWidth: 40,
+  },
+  // Líneas de la cancha
+  lineaCentral: {
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    zIndex: 1,
+  },
+  circuloCentral: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    marginLeft: -40,
+    marginTop: -40,
+    zIndex: 1,
+  },
+  puntoCentral: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    marginLeft: -4,
+    marginTop: -4,
+    zIndex: 2,
+  },
+  // Áreas superiores (portería arriba)
+  areaGrandeSuperior: {
+    position: 'absolute',
+    top: 0,
+    left: '20%',
+    right: '20%',
+    height: '25%',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    zIndex: 1,
+  },
+  areaGrandeSuperiorLinea: {
+    position: 'absolute',
+    top: '25%',
+    left: '20%',
+    right: '20%',
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    zIndex: 1,
+  },
+  areaPequenaSuperior: {
+    position: 'absolute',
+    top: 0,
+    left: '35%',
+    right: '35%',
+    height: '12%',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    zIndex: 1,
+  },
+  puntoPenalSuperior: {
+    position: 'absolute',
+    top: '20%',
+    left: '50%',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FFFFFF',
+    marginLeft: -3,
+    zIndex: 2,
+  },
+  // Áreas inferiores (portería abajo)
+  areaGrandeInferior: {
+    position: 'absolute',
+    bottom: 0,
+    left: '20%',
+    right: '20%',
+    height: '25%',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+    zIndex: 1,
+  },
+  areaGrandeInferiorLinea: {
+    position: 'absolute',
+    bottom: '25%',
+    left: '20%',
+    right: '20%',
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    zIndex: 1,
+  },
+  areaPequenaInferior: {
+    position: 'absolute',
+    bottom: 0,
+    left: '35%',
+    right: '35%',
+    height: '12%',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    zIndex: 1,
+  },
+  puntoPenalInferior: {
+    position: 'absolute',
+    bottom: '20%',
+    left: '50%',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FFFFFF',
+    marginLeft: -3,
+    zIndex: 2,
+  },
+  // Porterías
+  porteriaSuperior: {
+    position: 'absolute',
+    top: 0,
+    left: '42%',
+    right: '42%',
+    height: '8%',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    zIndex: 1,
+  },
+  porteriaSuperiorPoste: {
+    position: 'absolute',
+    top: 0,
+    left: '42%',
+    right: '42%',
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    zIndex: 2,
+  },
+  porteriaInferior: {
+    position: 'absolute',
+    bottom: 0,
+    left: '42%',
+    right: '42%',
+    height: '8%',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    zIndex: 1,
+  },
+  porteriaInferiorPoste: {
+    position: 'absolute',
+    bottom: 0,
+    left: '42%',
+    right: '42%',
+    height: 2,
+    backgroundColor: '#FFFFFF',
+    zIndex: 2,
   },
   infoText: {
     fontSize: 12,

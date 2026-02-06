@@ -13,7 +13,7 @@ import {
   Dimensions,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+// Iconos reemplazados por emojis
 import axios from 'axios';
 import { colors } from '../theme/colors';
 import { API_BASE_URL, API_TIMEOUT } from '../utils/constants';
@@ -468,7 +468,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
             <View style={styles.sheetHeaderLeft}>
               <Text style={styles.sheetTitle}>{selectedSede.estadio}</Text>
               <View style={styles.sheetSubtitle}>
-                <Icon name="sports-soccer" size={16} color={colors.primary} />
+                <Text style={styles.emojiIcon}>⚽</Text>
                 <Text style={styles.sheetTeam}>Local: {selectedSede.nombre_equipo}</Text>
               </View>
             </View>
@@ -521,7 +521,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
               />
             ) : (
               <View style={styles.sheetImagePlaceholder}>
-                <Icon name="stadium" size={64} color="#9E9E9E" />
+                <Text style={styles.emojiLarge}>🏟️</Text>
                 <Text style={styles.sheetImagePlaceholderText}>
                   No hay imagen disponible
                 </Text>
@@ -537,7 +537,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
             <View style={styles.detailRow}>
               <View style={styles.detailItem}>
                 <View style={styles.detailIcon}>
-                  <Icon name="people" size={20} color={colors.primary} />
+                  <Text style={styles.emojiIcon}>👥</Text>
                 </View>
                 <View style={styles.detailInfo}>
                   <Text style={styles.detailLabel}>CAPACIDAD</Text>
@@ -547,7 +547,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
 
               <View style={styles.detailItem}>
                 <View style={styles.detailIcon}>
-                  <Icon name="grass" size={20} color={colors.primary} />
+                  <Text style={styles.emojiIcon}>🌱</Text>
                 </View>
                 <View style={styles.detailInfo}>
                   <Text style={styles.detailLabel}>SUPERFICIE</Text>
@@ -558,7 +558,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
 
             <View style={styles.detailItemFull}>
               <View style={styles.detailIcon}>
-                <Icon name="location-on" size={20} color={colors.primary} />
+                <Text style={styles.emojiIcon}>📍</Text>
               </View>
               <View style={styles.detailInfo}>
                 <Text style={styles.detailLabel}>ESTADIO</Text>
@@ -568,7 +568,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
             
             <View style={styles.detailItemFull}>
               <View style={styles.detailIcon}>
-                <Icon name="info" size={20} color={colors.primary} />
+                <Text style={styles.emojiIcon}>ℹ️</Text>
               </View>
               <View style={styles.detailInfo}>
                 <Text style={styles.detailLabel}>EQUIPO</Text>
@@ -578,7 +578,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
 
             <View style={styles.detailItemFull}>
               <View style={styles.detailIcon}>
-                <Icon name="my-location" size={20} color={colors.primary} />
+                <Text style={styles.emojiIcon}>🗺️</Text>
               </View>
               <View style={styles.detailInfo}>
                 <Text style={styles.detailLabel}>COORDENADAS</Text>
@@ -595,7 +595,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
             onPress={() => openDirections(selectedSede)}
             activeOpacity={0.8}
           >
-            <Icon name="explore" size={20} color="#FFFFFF" />
+            <Text style={styles.emojiButton}>🧭</Text>
             <Text style={styles.directionsText}>Cómo llegar</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -651,7 +651,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
             }}
             activeOpacity={0.7}
           >
-            <Icon name="location-on" size={20} color="#FFFFFF" />
+            <Text style={styles.emojiButtonSmall}>🧭</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       ))}
@@ -705,7 +705,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
           <View style={styles.mapContainer}>
           {sedes.length > 0 && !loading && (
             <View style={styles.mapInfoBadge}>
-              <Icon name="location-on" size={12} color={colors.primary} style={styles.mapInfoIcon} />
+              <Text style={styles.emojiSmall}>📍</Text>
               <Text style={styles.mapInfoText}>
                 {sedes.length} {sedes.length === 1 ? 'sede' : 'sedes'} en el mapa
               </Text>
@@ -722,21 +722,21 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
             showsUserLocation={false}
             showsMyLocationButton={false}
             loadingEnabled={true}
-            mapType="satellite"
+            mapType="standard"
             zoomEnabled={true}
             scrollEnabled={true}
             pitchEnabled={true}
             rotateEnabled={true}
             toolbarEnabled={false}
             liteMode={false}
-            showsPointsOfInterest={showPlaces}
-            showsBuildings={showPlaces}
+            showsPointsOfInterest={true}
+            showsBuildings={true}
             showsTraffic={false}
             showsIndoors={false}
             showsCompass={true}
             showsScale={true}
             onMapReady={() => {
-              console.log('🗺️ [SedesMapScreen] ✅ Mapa SATELITAL listo!');
+              console.log('🗺️ [SedesMapScreen] ✅ Mapa estándar listo!');
               console.log('🗺️ [SedesMapScreen] Total de sedes:', sedes.length);
               if (sedes.length > 0) {
                 console.log('🗺️ [SedesMapScreen] Coordenadas de sedes:', sedes.map(s => ({
@@ -788,10 +788,10 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
                     latitude: sede.latitud,
                     longitude: sede.longitud,
                   }}
-                      title={sede.nombre_equipo}
-                      description={sede.estadio}
+                      title={`${sede.nombre_equipo}`}
+                      description={`🏟️ ${sede.estadio}`}
                       anchor={{ x: 0.5, y: 1 }}
-                      tracksViewChanges={true}
+                      tracksViewChanges={false}
                       onPress={() => {
                         console.log('📍 [SedesMapScreen] Marcador presionado:', sede.estadio);
                         setSelectedSede(sede);
@@ -808,37 +808,39 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
                     styles.markerContainer,
                     selectedSede?.id_equipo === sede.id_equipo && styles.markerSelected
                   ]}>
-                    {sede.logo_url ? (
-                          <Image 
-                            source={{ 
-                              uri: sede.logo_url,
-                              cache: 'force-cache'
-                            }} 
-                            style={styles.markerLogo}
-                            resizeMode="cover"
-                            onLoadStart={() => {
-                              console.log('⏳ [SedesMapScreen] Iniciando carga de logo:', sede.logo_url);
-                            }}
-                            onError={(error) => {
-                              console.error('❌ [SedesMapScreen] Error cargando logo en marcador');
-                              console.error('❌ [SedesMapScreen] URL intentada:', sede.logo_url);
-                              console.error('❌ [SedesMapScreen] API_BASE_URL:', API_URL);
-                              console.error('❌ [SedesMapScreen] Error details:', JSON.stringify(error.nativeEvent, null, 2));
-                              // Si falla la carga, marcar como cargado para evitar loops
-                              setLogosLoaded(prev => new Set(prev).add(sede.id_equipo));
-                            }}
-                            onLoad={() => {
-                              console.log('✅ [SedesMapScreen] Logo cargado correctamente en marcador');
-                              console.log('✅ [SedesMapScreen] URL final:', sede.logo_url);
-                              // Marcar el logo como cargado
-                              setLogosLoaded(prev => new Set(prev).add(sede.id_equipo));
-                            }}
-                          />
-                    ) : (
-                      <View style={styles.markerLogoPlaceholder}>
-                            <Text style={styles.markerLogoText}>{sede.nombre_equipo.charAt(0).toUpperCase()}</Text>
-                      </View>
-                    )}
+                    <View style={styles.markerLogoWrapper}>
+                      {sede.logo_url ? (
+                            <Image 
+                              source={{ 
+                                uri: sede.logo_url,
+                                cache: 'force-cache'
+                              }} 
+                              style={styles.markerLogo}
+                              resizeMode="cover"
+                              onLoadStart={() => {
+                                console.log('⏳ [SedesMapScreen] Iniciando carga de logo:', sede.logo_url);
+                              }}
+                              onError={(error) => {
+                                console.error('❌ [SedesMapScreen] Error cargando logo en marcador');
+                                console.error('❌ [SedesMapScreen] URL intentada:', sede.logo_url);
+                                console.error('❌ [SedesMapScreen] API_BASE_URL:', API_URL);
+                                console.error('❌ [SedesMapScreen] Error details:', JSON.stringify(error.nativeEvent, null, 2));
+                                // Si falla la carga, marcar como cargado para evitar loops
+                                setLogosLoaded(prev => new Set(prev).add(sede.id_equipo));
+                              }}
+                              onLoad={() => {
+                                console.log('✅ [SedesMapScreen] Logo cargado correctamente en marcador');
+                                console.log('✅ [SedesMapScreen] URL final:', sede.logo_url);
+                                // Marcar el logo como cargado
+                                setLogosLoaded(prev => new Set(prev).add(sede.id_equipo));
+                              }}
+                            />
+                      ) : (
+                        <View style={styles.markerLogoPlaceholder}>
+                              <Text style={styles.markerLogoText}>{sede.nombre_equipo.charAt(0).toUpperCase()}</Text>
+                        </View>
+                      )}
+                    </View>
                         {/* Indicador de pin */}
                         <View style={styles.markerPin} />
                   </View>
@@ -855,7 +857,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
                   onPress={fitToMarkers}
                   activeOpacity={0.7}
                 >
-                  <Icon name="my-location" size={24} color={colors.primary} />
+                  <Text style={styles.emojiControl}>🎯</Text>
                 </TouchableOpacity>
               )}
               {selectedSede && (
@@ -864,7 +866,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
                 onPress={centerOnLocation}
                 activeOpacity={0.7}
               >
-                <Icon name="location-on" size={24} color={colors.primary} />
+                <Text style={styles.emojiControl}>📍</Text>
               </TouchableOpacity>
             )}
               <TouchableOpacity 
@@ -872,13 +874,13 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
                 onPress={() => setShowPlaces(!showPlaces)}
                 activeOpacity={0.7}
               >
-                <Icon name={showPlaces ? "place" : "place-outline"} size={24} color={showPlaces ? colors.primary : '#757575'} />
+                <Text style={styles.emojiControl}>{showPlaces ? "🗺️" : "🗺️"}</Text>
               </TouchableOpacity>
             </View>
 
           {sedes.length === 0 && !loading && (
             <View style={styles.emptyStateOverlay}>
-              <Icon name="stadium" size={64} color="#9E9E9E" />
+              <Text style={styles.emojiLarge}>🏟️</Text>
               <Text style={styles.emptyText}>No hay sedes con ubicación registrada</Text>
               <Text style={styles.emptySubtext}>Las sedes aparecerán aquí cuando tengan coordenadas válidas</Text>
             </View>
@@ -898,7 +900,7 @@ export const SedesMapScreen: React.FC<Props> = ({ campeonatoId, onBack }) => {
 
       {sedes.length === 0 && !loading && viewMode === 'lista' && (
         <View style={styles.emptyState}>
-          <Icon name="stadium" size={64} color="#9E9E9E" />
+          <Text style={styles.emojiLarge}>🏟️</Text>
           <Text style={styles.emptyText}>No hay sedes registradas</Text>
         </View>
       )}
@@ -1045,7 +1047,7 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     borderWidth: 4,
-    borderColor: '#FF6F00',
+    borderColor: '#B8E994',
     transform: [{ scale: 1.15 }],
     elevation: 12,
     shadowOpacity: 0.6,
@@ -1061,6 +1063,15 @@ const styles = StyleSheet.create({
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
     borderTopColor: colors.primary,
+  },
+  markerLogoWrapper: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   markerLogo: {
     width: 50,
@@ -1238,14 +1249,14 @@ const styles = StyleSheet.create({
   },
   directionsButton: {
     flexDirection: 'row',
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#B8E994',
     paddingVertical: 16,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
     elevation: 4,
-    shadowColor: '#FF6F00',
+    shadowColor: '#B8E994',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -1389,5 +1400,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: colors.primary,
+  },
+  // Emoji styles
+  emojiIcon: {
+    fontSize: 20,
+  },
+  emojiSmall: {
+    fontSize: 14,
+  },
+  emojiLarge: {
+    fontSize: 64,
+    textAlign: 'center',
+  },
+  emojiControl: {
+    fontSize: 24,
+  },
+  emojiButton: {
+    fontSize: 20,
+    marginRight: 4,
+  },
+  emojiButtonSmall: {
+    fontSize: 18,
   },
 });
